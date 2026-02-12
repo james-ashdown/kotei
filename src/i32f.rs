@@ -1,5 +1,6 @@
 use ::core::fmt;
 
+#[derive(Clone, Copy, Hash)]
 pub struct I32F<const E: i32>(pub(crate) i32);
 
 impl<const E: i32> I32F<E> {
