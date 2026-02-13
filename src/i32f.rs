@@ -20,6 +20,63 @@ impl<const E: i32> I32F<E> {
         Self(significand)
     }
 
+    /// Raw transutation from [`u32`].
+    #[must_use]
+    pub const fn from_bits(bits: u32) -> Self {
+        Self(bits.cast_signed())
+    }
+
+    /// Creates a native endian fixed-point number from its memory representation as a byte array in native endian byte order.
+    ///
+    /// As the target platform's native endianness is used, portable code likely wants to use [`from_be_bytes`](Self::from_be_bytes) or [`from_le_bytes`](Self::from_le_bytes), as appropriate, instead.
+    #[inline(always)]
+    #[must_use]
+    pub const fn from_ne_bytes(bytes: [u8; 4]) -> Self {
+        Self(i32::from_ne_bytes(bytes))
+    }
+
+    /// Creates a fixed-point number from its memory representation as a byte array in big endian byte order.
+    #[inline(always)]
+    #[must_use]
+    pub const fn from_be_bytes(bytes: [u8; 4]) -> Self {
+        Self(i32::from_be_bytes(bytes))
+    }
+
+    /// Creates a fixed-point number from its memory representation as a byte array in little endian byte order.
+    #[inline(always)]
+    #[must_use]
+    pub const fn from_le_bytes(bytes: [u8; 4]) -> Self {
+        Self(i32::from_le_bytes(bytes))
+    }
+
+    /// Raw transmutation to [`u32`].
+    #[inline(always)]
+    #[must_use]
+    pub const fn to_bits(self) -> u32 {
+        self.0.cast_unsigned()
+    }
+
+    /// Returns the memory representation of this fixed-point number as a byte array in native byte order.
+    #[inline(always)]
+    #[must_use]
+    pub const fn to_ne_bytes(self) -> [u8; 4] {
+        self.0.to_ne_bytes()
+    }
+
+    /// Returns the memory representation of this fixed-point number as a byte array in big-endian (network) byte order.
+    #[inline(always)]
+    #[must_use]
+    pub const fn to_be_bytes(self) -> [u8; 4] {
+        self.0.to_be_bytes()
+    }
+
+    /// Returns the memory representation of this fixed-point number as a byte array in little-endian byte order.
+    #[inline(always)]
+    #[must_use]
+    pub const fn to_le_bytes(self) -> [u8; 4] {
+        self.0.to_le_bytes()
+    }
+
     /// Returns the fixed-point significand, equal to `self` ⋅ 2<sup>-E</sup>.
     #[must_use]
     pub const fn significand(self) -> i32 {
