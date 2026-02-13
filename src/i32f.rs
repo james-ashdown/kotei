@@ -91,6 +91,12 @@ impl<const E: i32> I32F<E> {
     }
 }
 
+impl From<i32> for I32F<0> {
+    fn from(value: i32) -> Self {
+        Self(value)
+    }
+}
+
 impl<const E: i32> fmt::Debug for I32F<E> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "I32F<{E}")?;
