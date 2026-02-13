@@ -91,6 +91,12 @@ impl<const E: i32> I32F<E> {
     }
 }
 
+impl From<I32F<0>> for i32 {
+    fn from(value: I32F<0>) -> Self {
+        value.0
+    }
+}
+
 impl From<i32> for I32F<0> {
     fn from(value: i32) -> Self {
         Self(value)
