@@ -1,4 +1,5 @@
 use ::core::fmt;
+use ::core::ops;
 
 /// The 32-bit signed fixed-point type.
 #[derive(Clone, Copy, Hash)]
@@ -122,5 +123,21 @@ impl<const E: i32> fmt::UpperHex for I32F<E> {
     #[inline(always)]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         fmt::UpperHex::fmt(&self.to_bits(), f)
+    }
+}
+
+impl<const E: i32> ops::Add for I32F<E> {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Self(self.0 + rhs.0)
+    }
+}
+
+impl<const E: i32> ops::Sub for I32F<E> {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self(self.0 - rhs.0)
     }
 }
