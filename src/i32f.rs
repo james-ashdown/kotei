@@ -109,6 +109,16 @@ impl<const E: i32> I32F<E> {
     pub const fn sub(self, rhs: Self) -> Self {
         Self(self.0 - rhs.0)
     }
+
+    /// Computes `self - rhs`, panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will always panic on overflow, regardless of whether overflow checks are enabled.
+    #[must_use]
+    pub const fn strict_sub(self, rhs: Self) -> Self {
+        Self(self.0.strict_sub(rhs.0))
+    }
 }
 
 impl From<I32F<0>> for i32 {
