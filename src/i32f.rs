@@ -15,16 +15,19 @@ impl<const E: i32> I32F<E> {
     pub const BITS: u32 = i32::BITS;
 
     /// Creates a new fixed-point number from an integer significand, equal to `significand` ⋅ 2<sup>E</sup>.
+    #[must_use]
     pub const fn new(significand: i32) -> Self {
         Self(significand)
     }
 
     /// Returns the fixed-point significand, equal to `self` ⋅ 2<sup>-E</sup>.
+    #[must_use]
     pub const fn significand(self) -> i32 {
         self.0
     }
 
     /// Returns the fixed-point exponent.
+    #[must_use]
     pub const fn exponent(self) -> i32 {
         E
     }
