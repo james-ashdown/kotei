@@ -111,6 +111,14 @@ impl<const E: i32> I32F<E> {
         Self(self.0.wrapping_add(rhs.0))
     }
 
+    /// Computes `self + rhs`, returning a tuple of the result along with a boolean indicating whether an arithmetic overflow would occur. If an overflow would have occurred then the wrapped value is returned.
+    #[must_use]
+    pub const fn overflowing_add(self, rhs: Self) -> (Self, bool) {
+        let (x, overflowed) = self.0.overflowing_add(rhs.0);
+
+        (Self(x), overflowed)
+    }
+
     #[doc(hidden)]
     pub const fn sub(self, rhs: Self) -> Self {
         Self(self.0 - rhs.0)
@@ -130,6 +138,14 @@ impl<const E: i32> I32F<E> {
     #[must_use]
     pub const fn wrapping_sub(self, rhs: Self) -> Self {
         Self(self.0.wrapping_sub(rhs.0))
+    }
+
+    /// Computes `self - rhs`, returning a tuple of the result along with a boolean indicating whether an arithmetic overflow would occur. If an overflow would have occurred then the wrapped value is returned.
+    #[must_use]
+    pub const fn overflowing_sub(self, rhs: Self) -> (Self, bool) {
+        let (x, overflowed) = self.0.overflowing_sub(rhs.0);
+
+        (Self(x), overflowed)
     }
 }
 
