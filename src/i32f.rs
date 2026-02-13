@@ -95,6 +95,16 @@ impl<const E: i32> I32F<E> {
         Self(self.0 + rhs.0)
     }
 
+    /// Computes `self + rhs`, panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will always panic on overflow, regardless of whether overflow checks are enabled.
+    #[must_use]
+    pub const fn strict_add(self, rhs: Self) -> Self {
+        Self(self.0.strict_add(rhs.0))
+    }
+
     #[doc(hidden)]
     pub const fn sub(self, rhs: Self) -> Self {
         Self(self.0 - rhs.0)
