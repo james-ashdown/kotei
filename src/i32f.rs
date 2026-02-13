@@ -99,7 +99,7 @@ impl<const E: i32> I32F<E> {
     ///
     /// # Panics
     ///
-    /// This function will always panic on overflow, regardless of whether overflow checks are enabled.
+    /// This function will always panic on overflow, even if overflow checks are disabled.
     #[must_use]
     pub const fn strict_add(self, rhs: Self) -> Self {
         Self(self.0.strict_add(rhs.0))
@@ -114,7 +114,7 @@ impl<const E: i32> I32F<E> {
     ///
     /// # Panics
     ///
-    /// This function will always panic on overflow, regardless of whether overflow checks are enabled.
+    /// This function will always panic on overflow, even if overflow checks are disabled.
     #[must_use]
     pub const fn strict_sub(self, rhs: Self) -> Self {
         Self(self.0.strict_sub(rhs.0))
