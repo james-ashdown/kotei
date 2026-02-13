@@ -96,3 +96,31 @@ impl<const E: i32> fmt::Debug for I32F<E> {
         f.debug_tuple(">").field(&self.0).finish()
     }
 }
+
+impl<const E: i32> fmt::Binary for I32F<E> {
+    #[inline(always)]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Binary::fmt(&self.to_bits(), f)
+    }
+}
+
+impl<const E: i32> fmt::LowerHex for I32F<E> {
+    #[inline(always)]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::LowerHex::fmt(&self.to_bits(), f)
+    }
+}
+
+impl<const E: i32> fmt::Octal for I32F<E> {
+    #[inline(always)]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Octal::fmt(&self.to_bits(), f)
+    }
+}
+
+impl<const E: i32> fmt::UpperHex for I32F<E> {
+    #[inline(always)]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::UpperHex::fmt(&self.to_bits(), f)
+    }
+}
