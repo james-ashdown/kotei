@@ -105,6 +105,12 @@ impl<const E: i32> I32F<E> {
         Self(self.0.strict_add(rhs.0))
     }
 
+    /// Computes `self + rhs`, wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn wrapping_add(self, rhs: Self) -> Self {
+        Self(self.0.wrapping_add(rhs.0))
+    }
+
     #[doc(hidden)]
     pub const fn sub(self, rhs: Self) -> Self {
         Self(self.0 - rhs.0)
@@ -118,6 +124,12 @@ impl<const E: i32> I32F<E> {
     #[must_use]
     pub const fn strict_sub(self, rhs: Self) -> Self {
         Self(self.0.strict_sub(rhs.0))
+    }
+
+    /// Computes `self - rhs`, wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn wrapping_sub(self, rhs: Self) -> Self {
+        Self(self.0.wrapping_sub(rhs.0))
     }
 }
 
