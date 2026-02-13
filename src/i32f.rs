@@ -119,6 +119,12 @@ impl<const E: i32> I32F<E> {
         (Self(x), overflowed)
     }
 
+    /// Computes `self + rhs`, saturating at the numeric bounds of the type instead of overflowing.
+    #[must_use]
+    pub const fn saturating_add(self, rhs: Self) -> Self {
+        Self(self.0.saturating_add(rhs.0))
+    }
+
     #[doc(hidden)]
     pub const fn sub(self, rhs: Self) -> Self {
         Self(self.0 - rhs.0)
@@ -146,6 +152,12 @@ impl<const E: i32> I32F<E> {
         let (x, overflowed) = self.0.overflowing_sub(rhs.0);
 
         (Self(x), overflowed)
+    }
+
+    /// Computes `self - rhs`, saturating at the numeric bounds of the type instead of overflowing.
+    #[must_use]
+    pub const fn saturating_sub(self, rhs: Self) -> Self {
+        Self(self.0.saturating_sub(rhs.0))
     }
 }
 
