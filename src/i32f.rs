@@ -89,6 +89,16 @@ impl<const E: i32> I32F<E> {
     pub const fn exponent(self) -> i32 {
         E
     }
+
+    #[doc(hidden)]
+    pub const fn add(self, rhs: Self) -> Self {
+        Self(self.0 + rhs.0)
+    }
+
+    #[doc(hidden)]
+    pub const fn sub(self, rhs: Self) -> Self {
+        Self(self.0 - rhs.0)
+    }
 }
 
 impl From<I32F<0>> for i32 {
