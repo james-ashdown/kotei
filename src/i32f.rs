@@ -125,6 +125,16 @@ impl<const E: i32> I32F<E> {
         Self(self.0.saturating_add(rhs.0))
     }
 
+    /// Computes `self + rhs`, returning `None` if overflow occurred.
+    #[must_use]
+    pub const fn checked_add(self, rhs: Self) -> Option<Self> {
+        let Some(x) = self.0.checked_add(rhs.0) else {
+            return None;
+        };
+
+        Some(Self(x))
+    }
+
     #[doc(hidden)]
     pub const fn sub(self, rhs: Self) -> Self {
         Self(self.0 - rhs.0)
@@ -158,6 +168,16 @@ impl<const E: i32> I32F<E> {
     #[must_use]
     pub const fn saturating_sub(self, rhs: Self) -> Self {
         Self(self.0.saturating_sub(rhs.0))
+    }
+
+    /// Computes `self - rhs`, returning `None` if overflow occurred.
+    #[must_use]
+    pub const fn checked_sub(self, rhs: Self) -> Option<Self> {
+        let Some(x) = self.0.checked_sub(rhs.0) else {
+            return None;
+        };
+
+        Some(Self(x))
     }
 }
 
