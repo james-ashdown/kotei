@@ -3,5 +3,7 @@
 #![warn(missing_docs)]
 #![no_std]
 
+mod panic;
+
 mod i32f;
 pub use i32f::*;

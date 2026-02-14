@@ -90,6 +90,35 @@ impl<const E: i32> I32F<E> {
         E
     }
 
+    /// Computes the base 2 logarithm of `self`, rounded down.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if `self` is zero or negative, or if overflow occurred.
+    #[must_use]
+    #[track_caller]
+    pub const fn ilog2(self) -> i32 {
+        let x = self.0.ilog2();
+        let Some(x) = E.checked_add_unsigned(x) else {
+            crate::panic::ilog2();
+        };
+
+        x
+    }
+
+    /// Computes the base 2 logarithm of `self`, rounded down. Returns `None` if `self` is zero or negative, or if overflow occurred.
+    #[must_use]
+    pub const fn checked_ilog2(self) -> Option<i32> {
+        let Some(x) = self.0.checked_ilog2() else {
+            return None;
+        };
+        let Some(x) = E.checked_add_unsigned(x) else {
+            return None;
+        };
+
+        Some(x)
+    }
+
     #[doc(hidden)]
     pub const fn add(self, rhs: Self) -> Self {
         Self(self.0 + rhs.0)
