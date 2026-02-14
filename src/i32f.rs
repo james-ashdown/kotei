@@ -121,6 +121,7 @@ impl<const E: i32> I32F<E> {
 
     #[doc(hidden)]
     #[must_use]
+    #[track_caller]
     pub const fn add(self, rhs: Self) -> Self {
         Self(self.0 + rhs.0)
     }
@@ -131,6 +132,7 @@ impl<const E: i32> I32F<E> {
     ///
     /// This function will always panic on overflow, even if overflow checks are disabled.
     #[must_use]
+    #[track_caller]
     pub const fn strict_add(self, rhs: Self) -> Self {
         Self(self.0.strict_add(rhs.0))
     }
@@ -167,6 +169,7 @@ impl<const E: i32> I32F<E> {
 
     #[doc(hidden)]
     #[must_use]
+    #[track_caller]
     pub const fn sub(self, rhs: Self) -> Self {
         Self(self.0 - rhs.0)
     }
@@ -177,6 +180,7 @@ impl<const E: i32> I32F<E> {
     ///
     /// This function will always panic on overflow, even if overflow checks are disabled.
     #[must_use]
+    #[track_caller]
     pub const fn strict_sub(self, rhs: Self) -> Self {
         Self(self.0.strict_sub(rhs.0))
     }
@@ -262,6 +266,7 @@ impl<const E: i32> fmt::UpperHex for I32F<E> {
 impl<const E: i32> ops::Add for I32F<E> {
     type Output = Self;
 
+    #[track_caller]
     fn add(self, rhs: Self) -> Self::Output {
         Self(self.0 + rhs.0)
     }
@@ -270,6 +275,7 @@ impl<const E: i32> ops::Add for I32F<E> {
 impl<const E: i32> ops::Sub for I32F<E> {
     type Output = Self;
 
+    #[track_caller]
     fn sub(self, rhs: Self) -> Self::Output {
         Self(self.0 - rhs.0)
     }
