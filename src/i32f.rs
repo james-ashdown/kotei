@@ -120,6 +120,7 @@ impl<const E: i32> I32F<E> {
     }
 
     #[doc(hidden)]
+    #[must_use]
     pub const fn add(self, rhs: Self) -> Self {
         Self(self.0 + rhs.0)
     }
@@ -165,6 +166,7 @@ impl<const E: i32> I32F<E> {
     }
 
     #[doc(hidden)]
+    #[must_use]
     pub const fn sub(self, rhs: Self) -> Self {
         Self(self.0 - rhs.0)
     }
