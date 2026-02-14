@@ -122,6 +122,54 @@ impl<const E: i32> I32F<E> {
     #[doc(hidden)]
     #[must_use]
     #[track_caller]
+    pub const fn neg(self) -> Self {
+        Self(-self.0)
+    }
+
+    /// Computes `-self`, panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will always panic on overflow, even if overflow checks are disabled.
+    #[must_use]
+    #[track_caller]
+    pub const fn strict_neg(self) -> Self {
+        Self(self.0.strict_neg())
+    }
+
+    /// Computes `-self`, wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn wrapping_neg(self) -> Self {
+        Self(self.0.wrapping_neg())
+    }
+
+    /// Computes `-self`, saturating at the numeric bounds of the type instead of overflowing.
+    #[must_use]
+    pub const fn saturating_neg(self) -> Self {
+        Self(self.0.saturating_neg())
+    }
+
+    /// Computes `-self`. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
+    #[must_use]
+    pub const fn overflowing_neg(self) -> (Self, bool) {
+        let (x, overflow) = self.0.overflowing_neg();
+
+        (Self(x), overflow)
+    }
+
+    /// Computes `-self`, returning `None` if overflow occurred.
+    #[must_use]
+    pub const fn checked_neg(self) -> Option<Self> {
+        let Some(x) = self.0.checked_neg() else {
+            return None;
+        };
+
+        Some(Self(x))
+    }
+
+    #[doc(hidden)]
+    #[must_use]
+    #[track_caller]
     pub const fn add(self, rhs: Self) -> Self {
         Self(self.0 + rhs.0)
     }
@@ -260,6 +308,15 @@ impl<const E: i32> fmt::UpperHex for I32F<E> {
     #[inline(always)]
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         fmt::UpperHex::fmt(&self.to_bits(), f)
+    }
+}
+
+impl<const E: i32> ops::Neg for I32F<E> {
+    type Output = Self;
+
+    #[track_caller]
+    fn neg(self) -> Self::Output {
+        Self(-self.0)
     }
 }
 
