@@ -50,6 +50,74 @@ impl<const E: i32> I32F<E> {
         Self(i32::from_le_bytes(bytes))
     }
 
+    /// Returns the nearest [`f32`] to `self`, rounded to the number with even least significant digits if `self` is halfway between two representable [`f32`] numbers, saturating at [`f32::INFINITY`] or [`f32::NEG_INFINITY`] if `self` rounds to a value greater than [`f32::MAX`] or less than [`f32::MIN`], respectively.
+    pub const fn to_f32(self) -> f32 {
+        if self.0 == 0 {
+            return 0.0;
+        }
+
+        if E >= -149 {
+            let scaling_factor = const {
+                let mut e = E.saturating_add(127);
+
+                if e >= 0xFF {
+                    e = 0xFF;
+                }
+
+                let bits = if e > 0 {
+                    e.cast_unsigned() << 23
+                } else {
+                    0x400000u32.unbounded_shr(e.unsigned_abs())
+                };
+
+                f32::from_bits(bits)
+            };
+
+            return self.0 as f32 * scaling_factor;
+        }
+
+        let mut bits = 0;
+        let mut significand = self.0.cast_unsigned();
+
+        if self.0 < 0 {
+            bits |= 0x80000000;
+            significand = significand.wrapping_neg();
+        }
+
+        let leading_zeros = significand.leading_zeros();
+        let mut exponent = const { 127 + 31 } - leading_zeros;
+        let mut shift = 8u32.saturating_sub(leading_zeros);
+
+        if shift < const { (-149i32).wrapping_sub(E).cast_unsigned() } {
+            shift = const { (-149i32).wrapping_sub(E).cast_unsigned() };
+        }
+
+        if shift >= u32::BITS {
+            significand = 0;
+        } else if shift > 0 {
+            let mut round = !(!0 << (shift - 1));
+            round += significand >> shift & 1;
+            significand += round;
+            significand >>= shift;
+
+            if significand.leading_zeros() < 8 {
+                exponent += 1;
+                significand >>= 1;
+            }
+        }
+
+        exponent = exponent.saturating_add_signed(E);
+
+        if exponent > 0 {
+            significand &= 0x7FFFFF;
+        }
+
+        bits |= exponent << 23;
+        bits |= significand;
+
+        f32::from_bits(bits)
+    }
+
     /// Raw transmutation to [`u32`].
     #[inline(always)]
     #[must_use]
@@ -335,5 +403,35 @@ impl<const E: i32> ops::Sub for I32F<E> {
     #[track_caller]
     fn sub(self, rhs: Self) -> Self::Output {
         Self(self.0 - rhs.0)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn to_f32() {
+        assert_eq!(I32F::<{ i32::MIN }>::new(0).to_f32(), 0.0);
+        assert_eq!(I32F::<0>::new(0).to_f32(), 0.0);
+        assert_eq!(I32F::<{ i32::MAX }>::new(0).to_f32(), 0.0);
+
+        assert_eq!(I32F::<{ i32::MIN }>::MIN.to_f32(), -0.0);
+        assert_eq!(I32F::<{ i32::MIN }>::new(-1).to_f32(), -0.0);
+        assert_eq!(
+            I32F::<{ f32::MIN_EXP - 1 - 23 }>::new(-1).to_f32(),
+            (-0.0f32).next_down()
+        );
+        assert_eq!(
+            I32F::<{ f32::MIN_EXP - 1 }>::new(-1).to_f32(),
+            -f32::MIN_POSITIVE
+        );
+        assert_eq!(I32F::<0>::new(i32::MIN).to_f32(), i32::MIN as f32);
+        assert_eq!(I32F::<0>::new(-1).to_f32(), -1 as f32);
+        assert_eq!(I32F::<0>::new(1).to_f32(), 1 as f32);
+
+        // for i in 0..i32::MAX {
+        //     assert_eq!(I32F::<0>::new(i).to_f32(), i as f32);
+        // }
     }
 }
