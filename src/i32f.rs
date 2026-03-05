@@ -53,70 +53,64 @@ impl<const E: i32> I32F<E> {
     /// Returns the nearest [`f32`] to `self`, rounded to the number with even least significant digits if `self` is halfway between two representable [`f32`] numbers, saturating at [`f32::INFINITY`] or [`f32::NEG_INFINITY`] if `self` rounds to a value greater than [`f32::MAX`] or less than [`f32::MIN`], respectively.
     #[must_use]
     pub const fn to_f32(self) -> f32 {
-        if self.0 == 0 {
-            return 0.0;
-        }
-
-        if E >= -149 {
+        if E >= -126 {
             let scaling_factor = const {
-                let mut e = E.saturating_add(127);
+                let mut exponent = 127u32.saturating_add_signed(E);
 
-                if e >= 0xFF {
-                    e = 0xFF;
+                if exponent > 0xFF {
+                    exponent = 0xFF;
                 }
 
-                let bits = if e > 0 {
-                    e.cast_unsigned() << 23
-                } else {
-                    0x400000u32.unbounded_shr(e.unsigned_abs())
-                };
+                let bits = exponent << 23;
 
                 f32::from_bits(bits)
             };
 
-            return self.0 as f32 * scaling_factor;
-        }
-
-        let mut bits = 0;
-        let mut significand = self.0.cast_unsigned();
-
-        if self.0 < 0 {
-            bits |= 0x80000000;
-            significand = significand.wrapping_neg();
-        }
-
-        let leading_zeros = significand.leading_zeros();
-        let mut exponent = const { 127 + 31 } - leading_zeros;
-        let mut shift = 8u32.saturating_sub(leading_zeros);
-
-        if shift < const { (-149i32).wrapping_sub(E).cast_unsigned() } {
-            shift = const { (-149i32).wrapping_sub(E).cast_unsigned() };
-        }
-
-        if shift >= u32::BITS {
-            significand = 0;
-        } else if shift > 0 {
-            let mut round = !(!0 << (shift - 1));
-            round += significand >> shift & 1;
-            significand += round;
-            significand >>= shift;
-
-            if significand.leading_zeros() < 8 {
-                exponent += 1;
-                significand >>= 1;
+            if scaling_factor == f32::INFINITY && self.0 == 0 {
+                0.0
+            } else {
+                self.0 as f32 * scaling_factor
             }
+        } else {
+            let mut bits = 0;
+            let mut significand = self.0.cast_unsigned();
+
+            if self.0 < 0 {
+                bits |= 0x80000000;
+                significand = significand.wrapping_neg();
+            }
+
+            let leading_zeros = significand.leading_zeros();
+            let mut exponent = const { 127 + 31 } - leading_zeros;
+            let align =
+                8 + leading_zeros.saturating_sub_signed(const { E.saturating_add(126 + 31) });
+
+            if leading_zeros >= align {
+                let shift = leading_zeros - align;
+                significand <<= shift;
+            } else {
+                let shift = align - leading_zeros;
+
+                if shift >= u32::BITS {
+                    significand = 0;
+                } else {
+                    significand += significand >> shift & 1;
+                    significand += !(!0 << shift - 1);
+                    significand >>= shift;
+
+                    if significand.leading_zeros() < 8 {
+                        significand >>= 1;
+                        exponent += 1;
+                    }
+                }
+            }
+
+            exponent = exponent.saturating_add_signed(E);
+            bits |= exponent << 23;
+            bits |= significand & 0x007FFFFF;
+
+            f32::from_bits(bits)
         }
-
-        exponent = exponent.saturating_add_signed(E);
-
-        if exponent > 0 {
-            significand &= 0x7FFFFF;
-        }
-
-        bits |= exponent << 23;
-        bits |= significand;
-
-        f32::from_bits(bits)
     }
 
     /// Raw transmutation to [`u32`].
