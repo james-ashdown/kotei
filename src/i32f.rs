@@ -402,27 +402,78 @@ mod tests {
     use super::*;
 
     #[test]
-    fn to_f32() {
-        assert_eq!(I32F::<{ i32::MIN }>::new(0).to_f32(), 0.0);
-        assert_eq!(I32F::<0>::new(0).to_f32(), 0.0);
-        assert_eq!(I32F::<{ i32::MAX }>::new(0).to_f32(), 0.0);
+    fn to_f32_half() {
+        assert_eq!(I32F::<-1>::new(1).to_f32(), 0.5);
+    }
 
-        assert_eq!(I32F::<{ i32::MIN }>::MIN.to_f32(), -0.0);
-        assert_eq!(I32F::<{ i32::MIN }>::new(-1).to_f32(), -0.0);
+    #[test]
+    fn to_f32_max() {
+        assert!(I32F::<{ f32::MAX_EXP }>::new(1).to_f32() > f32::MAX);
         assert_eq!(
-            I32F::<{ f32::MIN_EXP - 1 - 23 }>::new(-1).to_f32(),
-            (-0.0f32).next_down()
+            I32F::<{ f32::MAX_EXP - 24 }>::new(0x00FFFFFF).to_f32(),
+            f32::MAX
         );
+    }
+
+    #[test]
+    fn to_f32_max_negative() {
         assert_eq!(
             I32F::<{ f32::MIN_EXP - 1 }>::new(-1).to_f32(),
             -f32::MIN_POSITIVE
         );
-        assert_eq!(I32F::<0>::new(i32::MIN).to_f32(), i32::MIN as f32);
-        assert_eq!(I32F::<0>::new(-1).to_f32(), -1 as f32);
-        assert_eq!(I32F::<0>::new(1).to_f32(), 1 as f32);
+    }
 
-        // for i in 0..i32::MAX {
-        //     assert_eq!(I32F::<0>::new(i).to_f32(), i as f32);
-        // }
+    #[test]
+    fn to_f32_max_negative_subnormal() {
+        assert_eq!(I32F::<-149>::new(-1).to_f32(), (-0.0f32).next_down());
+    }
+
+    #[test]
+    fn to_f32_min() {
+        assert!(I32F::<{ f32::MAX_EXP }>::new(-1).to_f32() < f32::MIN);
+        assert_eq!(
+            I32F::<{ f32::MAX_EXP - 24 }>::new(-0x00FFFFFF).to_f32(),
+            f32::MIN
+        );
+    }
+
+    #[test]
+    fn to_f32_min_positive() {
+        assert_eq!(
+            I32F::<{ f32::MIN_EXP - 1 }>::new(1).to_f32(),
+            f32::MIN_POSITIVE
+        );
+    }
+
+    #[test]
+    fn to_f32_min_positive_subnormal() {
+        assert_eq!(I32F::<-149>::new(1).to_f32(), 0.0f32.next_up());
+    }
+
+    #[test]
+    fn to_f32_one() {
+        assert_eq!(I32F::<0>::new(1).to_f32(), 1.0);
+    }
+
+    #[test]
+    fn to_f32_round_once() {
+        let x = 0x01000005i32;
+        assert_eq!(I32F::<-152>::new(x).to_f32().to_bits(), 0x00200001);
+        assert_eq!(
+            (x as f32 * 2.0f32.powi(-76) * 2.0f32.powi(-76)).to_bits(),
+            0x00200000
+        );
+    }
+
+    #[test]
+    fn to_f32_two() {
+        assert_eq!(I32F::<1>::new(1).to_f32(), 2.0);
+    }
+
+    #[test]
+    fn to_f32_zero() {
+        assert_eq!(I32F::<{ i32::MIN }>::new(0).to_f32(), 0.0);
+        assert_eq!(I32F::<0>::new(0).to_f32(), 0.0);
+        assert_eq!(I32F::<{ i32::MAX }>::new(0).to_f32(), 0.0);
     }
 }
