@@ -30,21 +30,18 @@ impl<const E: i32> I32F<E> {
     /// Creates a native endian fixed-point number from its memory representation as a byte array in native endian byte order.
     ///
     /// As the target platform's native endianness is used, portable code likely wants to use [`from_be_bytes`](Self::from_be_bytes) or [`from_le_bytes`](Self::from_le_bytes), as appropriate, instead.
-
     #[must_use]
     pub const fn from_ne_bytes(bytes: [u8; 4]) -> Self {
         Self(i32::from_ne_bytes(bytes))
     }
 
     /// Creates a fixed-point number from its memory representation as a byte array in big endian byte order.
-
     #[must_use]
     pub const fn from_be_bytes(bytes: [u8; 4]) -> Self {
         Self(i32::from_be_bytes(bytes))
     }
 
     /// Creates a fixed-point number from its memory representation as a byte array in little endian byte order.
-
     #[must_use]
     pub const fn from_le_bytes(bytes: [u8; 4]) -> Self {
         Self(i32::from_le_bytes(bytes))
@@ -95,7 +92,7 @@ impl<const E: i32> I32F<E> {
                     significand = 0;
                 } else {
                     significand += significand >> shift & 1;
-                    significand += !(!0 << shift - 1);
+                    significand += !(!0 << (shift - 1));
                     significand >>= shift;
 
                     if significand.leading_zeros() < 8 {
@@ -114,28 +111,24 @@ impl<const E: i32> I32F<E> {
     }
 
     /// Raw transmutation to [`u32`].
-
     #[must_use]
     pub const fn to_bits(self) -> u32 {
         self.0.cast_unsigned()
     }
 
     /// Returns the memory representation of this fixed-point number as a byte array in native byte order.
-
     #[must_use]
     pub const fn to_ne_bytes(self) -> [u8; 4] {
         self.0.to_ne_bytes()
     }
 
     /// Returns the memory representation of this fixed-point number as a byte array in big-endian (network) byte order.
-
     #[must_use]
     pub const fn to_be_bytes(self) -> [u8; 4] {
         self.0.to_be_bytes()
     }
 
     /// Returns the memory representation of this fixed-point number as a byte array in little-endian byte order.
-
     #[must_use]
     pub const fn to_le_bytes(self) -> [u8; 4] {
         self.0.to_le_bytes()
