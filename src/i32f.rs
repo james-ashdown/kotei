@@ -54,8 +54,8 @@ impl<const E: i32> I32F<E> {
             let scaling_factor = const {
                 let mut exponent = 127u32.saturating_add_signed(E);
 
-                if exponent > 0xFF {
-                    exponent = 0xFF;
+                if exponent > 0x000000FF {
+                    exponent = 0x000000FF;
                 }
 
                 let bits = exponent << 23;
@@ -91,7 +91,7 @@ impl<const E: i32> I32F<E> {
                 if shift >= u32::BITS {
                     significand = 0;
                 } else {
-                    significand += significand >> shift & 1;
+                    significand += significand >> shift & 0x00000001;
                     significand += !(!0 << (shift - 1));
                     significand >>= shift;
 
