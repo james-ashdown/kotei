@@ -403,7 +403,7 @@ mod tests {
     fn to_f32_max() {
         assert!(I32F::<{ f32::MAX_EXP }>::new(1).to_f32() > f32::MAX);
         assert_eq!(
-            I32F::<{ f32::MAX_EXP - 24 }>::new(0x00FFFFFF).to_f32(),
+            I32F::<{ f32::MAX_EXP - 24 }>::from_bits(0x00FFFFFF).to_f32(),
             f32::MAX
         );
     }
@@ -425,7 +425,7 @@ mod tests {
     fn to_f32_min() {
         assert!(I32F::<{ f32::MAX_EXP }>::new(-1).to_f32() < f32::MIN);
         assert_eq!(
-            I32F::<{ f32::MAX_EXP - 24 }>::new(-0x00FFFFFF).to_f32(),
+            I32F::<{ f32::MAX_EXP - 24 }>::from_bits(0xFF000001).to_f32(),
             f32::MIN
         );
     }
@@ -450,8 +450,8 @@ mod tests {
 
     #[test]
     fn to_f32_round_once() {
-        let x = 0x01000005i32;
-        assert_eq!(I32F::<-152>::new(x).to_f32().to_bits(), 0x00200001);
+        let x = 0x01000005;
+        assert_eq!(I32F::<-152>::from_bits(x).to_f32().to_bits(), 0x00200001);
         assert_eq!(
             (x as f32 * 2.0f32.powi(-76) * 2.0f32.powi(-76)).to_bits(),
             0x00200000
