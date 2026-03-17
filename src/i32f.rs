@@ -1,8 +1,9 @@
+use ::core::cmp;
 use ::core::fmt;
 use ::core::ops;
 
 /// The 32-bit signed fixed-point type.
-#[derive(Clone, Copy, Hash)]
+#[derive(Clone, Copy, Eq, Hash, Ord)]
 pub struct I32F<const E: i32>(pub(crate) i32);
 
 impl<const E: i32> I32F<E> {
@@ -332,6 +333,64 @@ impl From<i32> for I32F<0> {
     }
 }
 
+impl<const E1: i32, const E2: i32> PartialEq<I32F<E2>> for I32F<E1> {
+    fn eq(&self, other: &I32F<E2>) -> bool {
+        let mut lhs = self.0;
+        let mut rhs = other.0;
+
+        if const { E1 > E2 } && lhs != 0 {
+            if const { E1.abs_diff(E2) } >= lhs.leading_zeros() | lhs.leading_ones() {
+                return false;
+            }
+
+            lhs <<= const { E1.abs_diff(E2) };
+        }
+
+        if const { E2 > E1 } && rhs != 0 {
+            if const { E2.abs_diff(E1) } >= rhs.leading_zeros() | rhs.leading_ones() {
+                return false;
+            }
+
+            rhs <<= const { E2.abs_diff(E1) };
+        }
+
+        lhs == rhs
+    }
+}
+
+impl<const E1: i32, const E2: i32> PartialOrd<I32F<E2>> for I32F<E1> {
+    fn partial_cmp(&self, other: &I32F<E2>) -> Option<cmp::Ordering> {
+        let mut lhs = self.0;
+        let mut rhs = other.0;
+
+        if const { E1 > E2 } && lhs != 0 {
+            if const { E1.abs_diff(E2) } >= lhs.leading_zeros() | lhs.leading_ones() {
+                if lhs > 0 {
+                    return Some(cmp::Ordering::Greater);
+                } else {
+                    return Some(cmp::Ordering::Less);
+                }
+            }
+
+            lhs <<= const { E1.abs_diff(E2) };
+        }
+
+        if const { E2 > E1 } && rhs != 0 {
+            if const { E2.abs_diff(E1) } >= rhs.leading_zeros() | rhs.leading_ones() {
+                if rhs > 0 {
+                    return Some(cmp::Ordering::Less);
+                } else {
+                    return Some(cmp::Ordering::Greater);
+                }
+            }
+
+            rhs <<= const { E2.abs_diff(E1) };
+        }
+
+        PartialOrd::partial_cmp(&lhs, &rhs)
+    }
+}
+
 impl<const E: i32> fmt::Debug for I32F<E> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "I32F<{E}")?;
@@ -393,6 +452,26 @@ impl<const E: i32> ops::Sub for I32F<E> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn cmp_greater_than_max() {
+        assert!(I32F::<0>::new(1) > I32F::<-31>::MAX);
+        assert!(I32F::<-31>::MAX < I32F::<0>::new(1));
+    }
+
+    #[test]
+    fn eq_one() {
+        assert_eq!(I32F::<0>::new(1), I32F::<0>::new(1));
+        assert_eq!(I32F::<0>::new(1), I32F::<-1>::new(2));
+        assert_eq!(I32F::<-1>::new(2), I32F::<0>::new(1));
+    }
+
+    #[test]
+    fn eq_zero() {
+        assert_eq!(I32F::<0>::new(0), I32F::<0>::new(0));
+        assert_eq!(I32F::<0>::new(0), I32F::<1>::new(0));
+        assert_eq!(I32F::<1>::new(0), I32F::<0>::new(0));
+    }
 
     #[test]
     fn to_f32_half() {
