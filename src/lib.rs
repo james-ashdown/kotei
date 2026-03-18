@@ -3,6 +3,7 @@
 #![warn(missing_docs)]
 #![no_std]
 
+pub mod error;
 mod panic;
 
 mod i32f;

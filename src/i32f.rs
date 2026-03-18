@@ -2,6 +2,8 @@ use ::core::cmp;
 use ::core::fmt;
 use ::core::ops;
 
+use crate::error::TryFromFloatError;
+
 /// The 32-bit signed fixed-point type.
 #[derive(Clone, Copy, Eq, Hash, Ord)]
 pub struct I32F<const E: i32>(pub(crate) i32);
@@ -20,6 +22,68 @@ impl<const E: i32> I32F<E> {
     #[must_use]
     pub const fn new(significand: i32) -> Self {
         Self(significand)
+    }
+
+    /// Tries to create a new fixed-point number from [`f32`]. Returns the nearest multiple of 2<sup>E</sup> to `value`, rounded to the number with even least significant digits if `value` is halfway between two multiples of 2<sup>E</sup>. Returns an error if `value` is not a number, less than [`Self::MIN`], or greater than [`Self::MAX`].
+    #[must_use]
+    pub const fn try_new_from_f32(value: f32) -> Result<Self, TryFromFloatError> {
+        let bits = value.to_bits();
+
+        if bits & 0x7FFFFFFF == 0 {
+            return Ok(Self(0));
+        }
+
+        let mut significand = bits & 0x7FFFFF;
+        let mut exponent = bits >> 23 & 0xFF;
+        let negative = bits >> 31 != 0;
+
+        if exponent == 0xFF {
+            if significand != 0 {
+                return Err(TryFromFloatError::Nan);
+            } else if negative {
+                return Err(TryFromFloatError::Underflow);
+            } else {
+                return Err(TryFromFloatError::Overflow);
+            }
+        } else if exponent > 0 {
+            significand |= 0x800000;
+        } else {
+            exponent = 1;
+        }
+
+        let mut significand = significand.cast_signed();
+
+        if negative {
+            significand = significand.wrapping_neg();
+        }
+
+        let exponent = exponent.cast_signed() - const { 127 + 23 };
+
+        if exponent >= E {
+            let shift = exponent.wrapping_sub(E).cast_unsigned();
+
+            if shift >= significand.leading_zeros() | significand.leading_ones() {
+                if negative {
+                    return Err(TryFromFloatError::Underflow);
+                } else {
+                    return Err(TryFromFloatError::Overflow);
+                }
+            } else {
+                significand <<= shift;
+            }
+        } else {
+            let shift = E.wrapping_sub(exponent).cast_unsigned();
+
+            if shift >= i32::BITS {
+                significand = 0;
+            } else {
+                significand += significand >> shift & 0x00000001;
+                significand += !(!0 << (shift - 1));
+                significand >>= shift;
+            }
+        }
+
+        Ok(Self(significand))
     }
 
     /// Raw transutation from [`u32`].
@@ -547,5 +611,28 @@ mod tests {
         assert_eq!(I32F::<{ i32::MIN }>::new(0).to_f32(), 0.0);
         assert_eq!(I32F::<0>::new(0).to_f32(), 0.0);
         assert_eq!(I32F::<{ i32::MAX }>::new(0).to_f32(), 0.0);
+    }
+
+    #[test]
+    fn try_new_from_f32_negative_one() {
+        assert_eq!(I32F::<0>::try_new_from_f32(-1.0), Ok(I32F::new(-1)));
+    }
+
+    #[test]
+    fn try_new_from_f32_one() {
+        assert_eq!(I32F::<0>::try_new_from_f32(1.0), Ok(I32F::new(1)));
+    }
+
+    #[test]
+    fn try_new_from_f32_zero() {
+        assert_eq!(
+            I32F::<{ i32::MIN }>::try_new_from_f32(0.0),
+            Ok(I32F::new(0))
+        );
+        assert_eq!(I32F::<0>::try_new_from_f32(0.0), Ok(I32F::new(0)));
+        assert_eq!(
+            I32F::<{ i32::MAX }>::try_new_from_f32(0.0),
+            Ok(I32F::new(0))
+        );
     }
 }
