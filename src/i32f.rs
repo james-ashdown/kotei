@@ -115,7 +115,7 @@ impl<const E: i32> I32F<E> {
     /// Returns the nearest [`f32`] to `self`, rounded to the number with even least significant digits if `self` is halfway between two representable [`f32`] numbers, saturating at [`f32::INFINITY`] or [`f32::NEG_INFINITY`] if `self` rounds to a value greater than [`f32::MAX`] or less than [`f32::MIN`], respectively.
     #[must_use]
     pub const fn to_f32(self) -> f32 {
-        if E >= -126 {
+        if const { E >= -126 } {
             let scaling_factor = const {
                 let mut exponent = 127u32.saturating_add_signed(E);
 
