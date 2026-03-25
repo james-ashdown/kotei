@@ -25,7 +25,6 @@ impl<const E: i32> I32F<E> {
     }
 
     /// Tries to create a new fixed-point number from [`f32`]. Returns the nearest multiple of 2<sup>E</sup> to `value`, rounded to the number with even least significant digits if `value` is halfway between two multiples of 2<sup>E</sup>. Returns an error if `value` is not a number, less than [`Self::MIN`], or greater than [`Self::MAX`].
-    #[must_use]
     pub const fn try_new_from_f32(value: f32) -> Result<Self, TryFromFloatError> {
         let bits = value.to_bits();
 
