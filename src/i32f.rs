@@ -382,6 +382,214 @@ impl<const E: i32> I32F<E> {
 
         Some(Self(x))
     }
+
+    #[doc(hidden)]
+    #[must_use]
+    #[track_caller]
+    pub const fn mul<const RHS: i32>(self, rhs: I32F<RHS>) -> Self {
+        let mut x = self.0 as i64 * rhs.0 as i64;
+
+        if const { RHS > 0 } {
+            if cfg!(debug_assertions)
+                && x != 0
+                && x.leading_zeros() | x.leading_ones() <= const { RHS.unsigned_abs() }
+            {
+                crate::panic::mul();
+            }
+
+            if const { RHS.unsigned_abs() >= i64::BITS } {
+                x = 0;
+            } else {
+                x <<= const { RHS.unsigned_abs() };
+            }
+        } else if const { RHS < 0 } {
+            if const { RHS.unsigned_abs() >= i64::BITS } {
+                x = 0;
+            } else {
+                x += x >> const { RHS.unsigned_abs() } & 0x0000000000000001;
+                x += const { !((!0i64).unbounded_shl(RHS.unsigned_abs().saturating_sub(1))) };
+                x >>= const { RHS.unsigned_abs() };
+            }
+        }
+
+        if cfg!(debug_assertions) && x < i32::MIN as i64 || x > i32::MAX as i64 {
+            crate::panic::mul();
+        }
+
+        let x = x as i32;
+
+        Self(x)
+    }
+
+    /// Computes `self * rhs`, panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will always panic on overflow, even if overflow checks are disabled.
+    #[must_use]
+    #[track_caller]
+    pub const fn strict_mul<const RHS: i32>(self, rhs: I32F<RHS>) -> Self {
+        let mut x = self.0 as i64 * rhs.0 as i64;
+
+        if const { RHS > 0 } {
+            if x != 0 && x.leading_zeros() | x.leading_ones() <= const { RHS.unsigned_abs() } {
+                crate::panic::mul();
+            }
+
+            if const { RHS.unsigned_abs() >= i64::BITS } {
+                x = 0;
+            } else {
+                x <<= const { RHS.unsigned_abs() };
+            }
+        } else if const { RHS < 0 } {
+            if const { RHS.unsigned_abs() >= i64::BITS } {
+                x = 0;
+            } else {
+                x += x >> const { RHS.unsigned_abs() } & 0x0000000000000001;
+                x += const { !((!0i64).unbounded_shl(RHS.unsigned_abs().saturating_sub(1))) };
+                x >>= const { RHS.unsigned_abs() };
+            }
+        }
+
+        if x < i32::MIN as i64 || x > i32::MAX as i64 {
+            crate::panic::mul();
+        }
+
+        let x = x as i32;
+
+        Self(x)
+    }
+
+    /// Computes `self * rhs`, wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn wrapping_mul<const RHS: i32>(self, rhs: I32F<RHS>) -> Self {
+        let mut x = self.0 as i64 * rhs.0 as i64;
+
+        if const { RHS > 0 } {
+            if const { RHS.unsigned_abs() >= i64::BITS } {
+                x = 0;
+            } else {
+                x <<= RHS;
+            }
+        } else if const { RHS < 0 } {
+            if const { RHS.unsigned_abs() >= i64::BITS } {
+                x = 0;
+            } else {
+                x += x >> const { RHS.unsigned_abs() } & 0x0000000000000001;
+                x += const { !((!0i64).unbounded_shl(RHS.unsigned_abs().saturating_sub(1))) };
+                x >>= const { RHS.unsigned_abs() };
+            }
+        }
+
+        let x = x as i32;
+
+        Self(x)
+    }
+
+    /// Computes `self * rhs`, saturating at the numeric bounds of the type instead of overflowing.
+    #[must_use]
+    pub const fn saturating_mul<const RHS: i32>(self, rhs: I32F<RHS>) -> Self {
+        let mut x = self.0 as i64 * rhs.0 as i64;
+
+        if const { RHS > 0 } {
+            if x != 0 && x.leading_zeros() | x.leading_ones() <= const { RHS.unsigned_abs() } {
+                if x < 0 {
+                    return Self::MIN;
+                } else {
+                    return Self::MAX;
+                }
+            }
+
+            if const { RHS.unsigned_abs() >= i64::BITS } {
+                x = 0;
+            } else {
+                x <<= const { RHS.unsigned_abs() };
+            }
+        } else if const { RHS < 0 } {
+            if const { RHS.unsigned_abs() >= i64::BITS } {
+                x = 0;
+            } else {
+                x += x >> const { RHS.unsigned_abs() } & 0x0000000000000001;
+                x += const { !((!0i64).unbounded_shl(RHS.unsigned_abs().saturating_sub(1))) };
+                x >>= const { RHS.unsigned_abs() };
+            }
+        }
+
+        if x < i32::MIN as i64 {
+            return Self::MIN;
+        } else if x > i32::MAX as i64 {
+            return Self::MAX;
+        }
+
+        let x = x as i32;
+
+        Self(x)
+    }
+
+    /// Computes `self * rhs`. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
+    #[must_use]
+    pub const fn overflowing_mul<const RHS: i32>(self, rhs: Self) -> (Self, bool) {
+        let mut x = self.0 as i64 * rhs.0 as i64;
+        let mut overflowed = false;
+
+        if const { RHS > 0 } {
+            overflowed |=
+                x != 0 && x.leading_zeros() | x.leading_ones() <= const { RHS.unsigned_abs() };
+
+            if const { RHS.unsigned_abs() >= i64::BITS } {
+                x = 0;
+            } else {
+                x <<= const { RHS.unsigned_abs() };
+            }
+        } else if const { RHS < 0 } {
+            if const { RHS.unsigned_abs() >= i64::BITS } {
+                x = 0;
+            } else {
+                x += x >> const { RHS.unsigned_abs() } & 0x0000000000000001;
+                x += const { !((!0i64).unbounded_shl(RHS.unsigned_abs().saturating_sub(1))) };
+                x >>= const { RHS.unsigned_abs() };
+            }
+        }
+
+        overflowed |= x < i32::MIN as i64 || x > i32::MAX as i64;
+        let x = x as i32;
+
+        (Self(x), overflowed)
+    }
+
+    /// Computes `self * rhs`, returning `None` if overflow occurred.
+    #[must_use]
+    pub const fn checked_mul<const RHS: i32>(self, rhs: Self) -> Option<Self> {
+        let mut x = self.0 as i64 * rhs.0 as i64;
+
+        if const { RHS > 0 } {
+            if x != 0 && x.leading_zeros() | x.leading_ones() <= const { RHS.unsigned_abs() } {
+                return None;
+            }
+
+            if const { RHS.unsigned_abs() >= i64::BITS } {
+                x = 0;
+            } else {
+                x <<= const { RHS.unsigned_abs() };
+            }
+        } else if const { RHS < 0 } {
+            if const { RHS.unsigned_abs() >= i64::BITS } {
+                x = 0;
+            } else {
+                x += x >> const { RHS.unsigned_abs() } & 0x0000000000000001;
+                x += const { !((!0i64).unbounded_shl(RHS.unsigned_abs().saturating_sub(1))) };
+                x >>= const { RHS.unsigned_abs() };
+            }
+        }
+
+        if x < i32::MIN as i64 || x > i32::MAX as i64 {
+            return None;
+        }
+
+        let x = x as i32;
+
+        Some(Self(x))
+    }
 }
 
 impl From<I32F<0>> for i32 {
@@ -512,6 +720,15 @@ impl<const E: i32> ops::Sub for I32F<E> {
     }
 }
 
+impl<const E: i32, const RHS: i32> ops::Mul<I32F<RHS>> for I32F<E> {
+    type Output = Self;
+
+    #[track_caller]
+    fn mul(self, rhs: I32F<RHS>) -> Self::Output {
+        Self::mul(self, rhs)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -632,6 +849,27 @@ mod tests {
         assert_eq!(
             I32F::<{ i32::MAX }>::try_new_from_f32(0.0),
             Ok(I32F::new(0))
+        );
+    }
+
+    #[test]
+    fn mul_three_times_half() {
+        assert_eq!(
+            I32F::<-16>::from_bits(0x00030000) * I32F::<-1>::new(1),
+            I32F::<-16>::from_bits(0x00018000)
+        );
+    }
+
+    #[test]
+    fn mul_three_times_three_sixteenths() {
+        assert_eq!(I32F::<0>::new(3) * I32F::<-4>::new(3), I32F::<0>::new(1));
+    }
+
+    #[test]
+    fn mul_three_times_two() {
+        assert_eq!(
+            I32F::<-16>::from_bits(0x00030000) * I32F::<1>::new(1),
+            I32F::<-16>::from_bits(0x00060000)
         );
     }
 }
