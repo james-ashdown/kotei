@@ -590,6 +590,303 @@ impl<const E: i32> I32F<E> {
 
         Some(Self(x))
     }
+
+    #[doc(hidden)]
+    #[must_use]
+    #[track_caller]
+    pub const fn div<const RHS: i32>(self, rhs: I32F<RHS>) -> Self {
+        let lhs = (self.0 as i64) << 32;
+        let rhs = rhs.0 as i64;
+        let (x, overflowed) = lhs.overflowing_div(rhs);
+        let negative = (x < 0) != overflowed;
+        let mut x = x.unsigned_abs();
+
+        if const { RHS < -32 } {
+            if cfg!(debug_assertions)
+                && x != 0
+                && x.leading_zeros() < const { (-32i32).wrapping_sub(RHS).cast_unsigned() }
+            {
+                crate::panic::div();
+            }
+
+            if const { (-32i32).wrapping_sub(RHS).cast_unsigned() >= i64::BITS } {
+                x = 0;
+            } else {
+                x <<= const { (-32i32).wrapping_sub(RHS).cast_unsigned() };
+            }
+        } else if const { RHS > -32 } {
+            if const { RHS.wrapping_sub(-32).cast_unsigned() >= i64::BITS } {
+                x = 0;
+            } else {
+                x += x >> const { RHS.wrapping_sub(-32).cast_unsigned() } & 0x0000000000000001;
+                x += const {
+                    !((!0u64)
+                        .unbounded_shl(RHS.wrapping_sub(-32).cast_unsigned().saturating_sub(1)))
+                };
+                x >>= const { RHS.wrapping_sub(-32).cast_unsigned() };
+            }
+        }
+
+        if cfg!(debug_assertions) && x > i32::MAX as u64 + negative as u64 {
+            crate::panic::div();
+        }
+
+        if negative {
+            x = x.wrapping_neg();
+        }
+
+        let x = x as i32;
+
+        Self(x)
+    }
+
+    /// Computes `self / rhs`, panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if `rhs == 0`.
+    ///
+    /// ## Overflow behavior
+    ///
+    /// This function will always panic on overflow, even if overflow checks are disabled.
+    #[must_use]
+    #[track_caller]
+    pub const fn strict_div<const RHS: i32>(self, rhs: I32F<RHS>) -> Self {
+        let lhs = (self.0 as i64) << 32;
+        let rhs = rhs.0 as i64;
+        let (x, overflowed) = lhs.overflowing_div(rhs);
+        let negative = (x < 0) != overflowed;
+        let mut x = x.unsigned_abs();
+
+        if const { RHS < -32 } {
+            if x != 0 && x.leading_zeros() < const { (-32i32).wrapping_sub(RHS).cast_unsigned() } {
+                crate::panic::div();
+            }
+
+            if const { (-32i32).wrapping_sub(RHS).cast_unsigned() >= i64::BITS } {
+                x = 0;
+            } else {
+                x <<= const { (-32i32).wrapping_sub(RHS).cast_unsigned() };
+            }
+        } else if const { RHS > -32 } {
+            if const { RHS.wrapping_sub(-32).cast_unsigned() >= i64::BITS } {
+                x = 0;
+            } else {
+                x += x >> const { RHS.wrapping_sub(-32).cast_unsigned() } & 0x0000000000000001;
+                x += const {
+                    !((!0u64)
+                        .unbounded_shl(RHS.wrapping_sub(-32).cast_unsigned().saturating_sub(1)))
+                };
+                x >>= const { RHS.wrapping_sub(-32).cast_unsigned() };
+            }
+        }
+
+        if x > i32::MAX as u64 + negative as u64 {
+            crate::panic::div();
+        }
+
+        if negative {
+            x = x.wrapping_neg();
+        }
+
+        let x = x as i32;
+
+        Self(x)
+    }
+
+    /// Computes `self / rhs`, wrapping around at the numeric bounds of the type.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if `rhs == 0`.
+    #[must_use]
+    #[track_caller]
+    pub const fn wrapping_div<const RHS: i32>(self, rhs: I32F<RHS>) -> Self {
+        let lhs = (self.0 as i64) << 32;
+        let rhs = rhs.0 as i64;
+        let (x, overflowed) = lhs.overflowing_div(rhs);
+        let negative = (x < 0) != overflowed;
+        let mut x = x.unsigned_abs();
+
+        if const { RHS < -32 } {
+            if const { (-32i32).wrapping_sub(RHS).cast_unsigned() >= i64::BITS } {
+                x = 0;
+            } else {
+                x <<= const { (-32i32).wrapping_sub(RHS).cast_unsigned() };
+            }
+        } else if const { RHS > -32 } {
+            if const { RHS.wrapping_sub(-32).cast_unsigned() >= i64::BITS } {
+                x = 0;
+            } else {
+                x += x >> const { RHS.wrapping_sub(-32).cast_unsigned() } & 0x0000000000000001;
+                x += const {
+                    !((!0u64)
+                        .unbounded_shl(RHS.wrapping_sub(-32).cast_unsigned().saturating_sub(1)))
+                };
+                x >>= const { RHS.wrapping_sub(-32).cast_unsigned() };
+            }
+        }
+
+        if negative {
+            x = x.wrapping_neg();
+        }
+
+        let x = x as i32;
+
+        Self(x)
+    }
+
+    /// Computes `self / rhs`, saturating at the numeric bounds of the type instead of overflowing.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if `rhs == 0`.
+    #[must_use]
+    #[track_caller]
+    pub const fn saturating_div<const RHS: i32>(self, rhs: I32F<RHS>) -> Self {
+        let lhs = (self.0 as i64) << 32;
+        let rhs = rhs.0 as i64;
+        let (x, overflowed) = lhs.overflowing_div(rhs);
+        let negative = (x < 0) != overflowed;
+        let mut x = x.unsigned_abs();
+
+        if const { RHS < -32 } {
+            if x != 0 && x.leading_zeros() < const { (-32i32).wrapping_sub(RHS).cast_unsigned() } {
+                if negative {
+                    return Self::MIN;
+                } else {
+                    return Self::MAX;
+                }
+            }
+
+            if const { (-32i32).wrapping_sub(RHS).cast_unsigned() >= i64::BITS } {
+                x = 0;
+            } else {
+                x <<= const { (-32i32).wrapping_sub(RHS).cast_unsigned() };
+            }
+        } else if const { RHS > -32 } {
+            if const { RHS.wrapping_sub(-32).cast_unsigned() >= i64::BITS } {
+                x = 0;
+            } else {
+                x += x >> const { RHS.wrapping_sub(-32).cast_unsigned() } & 0x0000000000000001;
+                x += const {
+                    !((!0u64)
+                        .unbounded_shl(RHS.wrapping_sub(-32).cast_unsigned().saturating_sub(1)))
+                };
+                x >>= const { RHS.wrapping_sub(-32).cast_unsigned() };
+            }
+        }
+
+        if x > i32::MAX as u64 + negative as u64 {
+            if negative {
+                return Self::MIN;
+            } else {
+                return Self::MAX;
+            }
+        }
+
+        if negative {
+            x = x.wrapping_neg();
+        }
+
+        let x = x as i32;
+
+        Self(x)
+    }
+
+    /// Computes `self / rhs`. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if `rhs == 0`.
+    #[must_use]
+    #[track_caller]
+    pub const fn overflowing_div<const RHS: i32>(self, rhs: Self) -> (Self, bool) {
+        let lhs = (self.0 as i64) << 32;
+        let rhs = rhs.0 as i64;
+        let (x, overflowed) = lhs.overflowing_div(rhs);
+        let negative = (x < 0) != overflowed;
+        let mut x = x.unsigned_abs();
+        let mut overflowed = false;
+
+        if const { RHS < -32 } {
+            overflowed |=
+                x != 0 && x.leading_zeros() < const { (-32i32).wrapping_sub(RHS).cast_unsigned() };
+
+            if const { (-32i32).wrapping_sub(RHS).cast_unsigned() >= i64::BITS } {
+                x = 0;
+            } else {
+                x <<= const { (-32i32).wrapping_sub(RHS).cast_unsigned() };
+            }
+        } else if const { RHS > -32 } {
+            if const { RHS.wrapping_sub(-32).cast_unsigned() >= i64::BITS } {
+                x = 0;
+            } else {
+                x += x >> const { RHS.wrapping_sub(-32).cast_unsigned() } & 0x0000000000000001;
+                x += const {
+                    !((!0u64)
+                        .unbounded_shl(RHS.wrapping_sub(-32).cast_unsigned().saturating_sub(1)))
+                };
+                x >>= const { RHS.wrapping_sub(-32).cast_unsigned() };
+            }
+        }
+
+        overflowed |= x > i32::MAX as u64 + negative as u64;
+
+        if negative {
+            x = x.wrapping_neg();
+        }
+
+        let x = x as i32;
+
+        (Self(x), overflowed)
+    }
+
+    /// Computes `self / rhs`, returning `None` if `rhs == 0` or overflow occurred.
+    #[must_use]
+    #[track_caller]
+    pub const fn checked_div<const RHS: i32>(self, rhs: Self) -> Option<Self> {
+        let lhs = (self.0 as i64) << 32;
+        let rhs = rhs.0 as i64;
+        let (x, overflowed) = lhs.overflowing_div(rhs);
+        let negative = (x < 0) != overflowed;
+        let mut x = x.unsigned_abs();
+
+        if const { RHS < -32 } {
+            if x != 0 && x.leading_zeros() < const { (-32i32).wrapping_sub(RHS).cast_unsigned() } {
+                return None;
+            }
+
+            if const { (-32i32).wrapping_sub(RHS).cast_unsigned() >= i64::BITS } {
+                x = 0;
+            } else {
+                x <<= const { (-32i32).wrapping_sub(RHS).cast_unsigned() };
+            }
+        } else if const { RHS > -32 } {
+            if const { RHS.wrapping_sub(-32).cast_unsigned() >= i64::BITS } {
+                x = 0;
+            } else {
+                x += x >> const { RHS.wrapping_sub(-32).cast_unsigned() } & 0x0000000000000001;
+                x += const {
+                    !((!0u64)
+                        .unbounded_shl(RHS.wrapping_sub(-32).cast_unsigned().saturating_sub(1)))
+                };
+                x >>= const { RHS.wrapping_sub(-32).cast_unsigned() };
+            }
+        }
+
+        if x > i32::MAX as u64 + negative as u64 {
+            return None;
+        }
+
+        if negative {
+            x = x.wrapping_neg();
+        }
+
+        let x = x as i32;
+
+        Some(Self(x))
+    }
 }
 
 impl From<I32F<0>> for i32 {
@@ -729,6 +1026,15 @@ impl<const E: i32, const RHS: i32> ops::Mul<I32F<RHS>> for I32F<E> {
     }
 }
 
+impl<const E: i32, const RHS: i32> ops::Div<I32F<RHS>> for I32F<E> {
+    type Output = Self;
+
+    // #[track_caller]
+    fn div(self, rhs: I32F<RHS>) -> Self::Output {
+        Self::div(self, rhs)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -737,6 +1043,46 @@ mod tests {
     fn cmp_greater_than_max() {
         assert!(I32F::<0>::new(1) > I32F::<-31>::MAX);
         assert!(I32F::<-31>::MAX < I32F::<0>::new(1));
+    }
+
+    #[test]
+    fn div_one_divide_by_eighth() {
+        assert_eq!(
+            I32F::<-16>::from_bits(0x00010000) / I32F::<-33>::from_bits(0x40000000),
+            I32F::<-16>::from_bits(0x00080000)
+        );
+        assert_eq!(
+            I32F::<-16>::from_bits(0x00010000) / I32F::<-32>::from_bits(0x20000000),
+            I32F::<-16>::from_bits(0x00080000)
+        );
+        assert_eq!(
+            I32F::<-16>::from_bits(0x00010000) / I32F::<-3>::new(1),
+            I32F::<-16>::from_bits(0x00080000)
+        );
+    }
+
+    #[test]
+    fn div_one_divide_by_three() {
+        assert_eq!(
+            I32F::<-30>::from_bits(0x40000000) / I32F::<0>::new(3),
+            I32F::<-30>::from_bits(0x15555555)
+        );
+    }
+
+    #[test]
+    fn div_one_divide_by_two() {
+        assert_eq!(
+            I32F::<-16>::from_bits(0x00010000) / I32F::<1>::new(1),
+            I32F::<-16>::from_bits(0x00008000)
+        );
+    }
+
+    #[test]
+    fn div_min_divide_negative_two_could_overflow() {
+        assert_eq!(
+            I32F::<0>::MIN / I32F::<1>::new(-1),
+            I32F::<0>::from_bits(0x40000000)
+        );
     }
 
     #[test]

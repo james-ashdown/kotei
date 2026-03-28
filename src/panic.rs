@@ -1,5 +1,11 @@
 #[cold]
 #[track_caller]
+pub(crate) const fn div() -> ! {
+    panic!("attempt to divide with overflow")
+}
+
+#[cold]
+#[track_caller]
 pub(crate) const fn mul() -> ! {
     panic!("attempt to multiply with overflow")
 }
