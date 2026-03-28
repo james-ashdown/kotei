@@ -844,7 +844,6 @@ impl<const E: i32> I32F<E> {
 
     /// Computes `self / rhs`, returning `None` if `rhs == 0` or overflow occurred.
     #[must_use]
-    #[track_caller]
     pub const fn checked_div<const RHS: i32>(self, rhs: Self) -> Option<Self> {
         if rhs.0 == 0 {
             return None;
