@@ -846,6 +846,10 @@ impl<const E: i32> I32F<E> {
     #[must_use]
     #[track_caller]
     pub const fn checked_div<const RHS: i32>(self, rhs: Self) -> Option<Self> {
+        if rhs.0 == 0 {
+            return None;
+        }
+
         let lhs = (self.0 as i64) << 32;
         let rhs = rhs.0 as i64;
         let (x, overflowed) = lhs.overflowing_div(rhs);
