@@ -8,6 +8,63 @@ use crate::error::TryFromFloatError;
 #[derive(Clone, Copy, Eq, Hash, Ord)]
 pub struct I32F<const E: i32>(pub(crate) i32);
 
+impl I32F<-32> {
+    /// 1/π
+    pub const FRAC_1_PI: Self = Self::from_bits(0x517CC1B7);
+    /// π/8
+    pub const FRAC_PI_8: Self = Self::from_bits(0x6487ED51);
+    /// log<sub>10</sub>(2)
+    pub const LOG10_2: Self = Self::from_bits(0x4D104D42);
+    /// log<sub>10</sub>(e)
+    pub const LOG10_E: Self = Self::from_bits(0x6F2DEC55);
+}
+
+impl I32F<-31> {
+    /// The Euler-Mascheroni constant (γ)
+    pub const EULER_GAMMA: Self = Self::from_bits(0x49E233F2);
+    /// 1/sqrt(2)
+    pub const FRAC_1_SQRT_2: Self = Self::from_bits(0x5A82799A);
+    /// 2/π
+    pub const FRAC_2_PI: Self = Self::from_bits(0x517CC1B7);
+    /// π/4
+    pub const FRAC_PI_4: Self = Self::from_bits(0x6487ED51);
+    /// π/6
+    pub const FRAC_PI_6: Self = Self::from_bits(0x430548E1);
+    /// ln(2)
+    pub const LN_2: Self = Self::from_bits(0x58B90BFC);
+}
+
+impl I32F<-30> {
+    /// 2/sqrt(π)
+    pub const FRAC_2_SQRT_PI: Self = Self::from_bits(0x48375D41);
+    /// π/2
+    pub const FRAC_PI_2: Self = Self::from_bits(0x6487ED51);
+    /// π/3
+    pub const FRAC_PI_3: Self = Self::from_bits(0x430548E1);
+    /// The golden ratio (φ)
+    pub const GOLDEN_RATIO: Self = Self::from_bits(0x678DDE6E);
+    /// log<sub>2</sub>(e)
+    pub const LOG2_E: Self = Self::from_bits(0x5C551D95);
+    /// sqrt(2)
+    pub const SQRT_2: Self = Self::from_bits(0x5A82799A);
+}
+
+impl I32F<-29> {
+    /// Euler's number (e)
+    pub const E: Self = Self::from_bits(0x56FC2A2C);
+    /// ln(10)
+    pub const LN_10: Self = Self::from_bits(0x49AEC6EF);
+    /// log<sub>2</sub>(10)
+    pub const LOG2_10: Self = Self::from_bits(0x6A4D3C26);
+    /// Archimedes’ constant (π)
+    pub const PI: Self = Self::from_bits(0x6487ED51);
+}
+
+impl I32F<-28> {
+    /// The full circle constant (τ)
+    pub const TAU: Self = Self::from_bits(0x6487ED51);
+}
+
 impl<const E: i32> I32F<E> {
     /// The smallest value that can be represented by this fixed-point type, equal to -2<sup>31</sup> ⋅ 2<sup>E</sup>.
     pub const MIN: Self = Self(i32::MIN);
