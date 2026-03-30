@@ -15,3 +15,9 @@ pub(crate) const fn mul() -> ! {
 pub(crate) const fn ilog2() -> ! {
     panic!("attempt to compute integer binary logarithm with overflow")
 }
+
+#[cold]
+#[track_caller]
+pub(crate) const fn rescale() -> ! {
+    panic!("attempt to rescale with overflow")
+}
