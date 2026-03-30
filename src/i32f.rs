@@ -464,7 +464,7 @@ impl<const E: i32> I32F<E> {
                 x = 0;
             } else {
                 x += x >> const { RHS.unsigned_abs() } & 0x0000000000000001;
-                x += const { !((!0i64).unbounded_shl(RHS.unsigned_abs().saturating_sub(1))) };
+                x += const { !(!0i64).unbounded_shl(RHS.unsigned_abs().saturating_sub(1)) };
                 x >>= const { RHS.unsigned_abs() };
             }
         }
@@ -503,7 +503,7 @@ impl<const E: i32> I32F<E> {
                 x = 0;
             } else {
                 x += x >> const { RHS.unsigned_abs() } & 0x0000000000000001;
-                x += const { !((!0i64).unbounded_shl(RHS.unsigned_abs().saturating_sub(1))) };
+                x += const { !(!0i64).unbounded_shl(RHS.unsigned_abs().saturating_sub(1)) };
                 x >>= const { RHS.unsigned_abs() };
             }
         }
@@ -533,7 +533,7 @@ impl<const E: i32> I32F<E> {
                 x = 0;
             } else {
                 x += x >> const { RHS.unsigned_abs() } & 0x0000000000000001;
-                x += const { !((!0i64).unbounded_shl(RHS.unsigned_abs().saturating_sub(1))) };
+                x += const { !(!0i64).unbounded_shl(RHS.unsigned_abs().saturating_sub(1)) };
                 x >>= const { RHS.unsigned_abs() };
             }
         }
@@ -567,7 +567,7 @@ impl<const E: i32> I32F<E> {
                 x = 0;
             } else {
                 x += x >> const { RHS.unsigned_abs() } & 0x0000000000000001;
-                x += const { !((!0i64).unbounded_shl(RHS.unsigned_abs().saturating_sub(1))) };
+                x += const { !(!0i64).unbounded_shl(RHS.unsigned_abs().saturating_sub(1)) };
                 x >>= const { RHS.unsigned_abs() };
             }
         }
@@ -603,7 +603,7 @@ impl<const E: i32> I32F<E> {
                 x = 0;
             } else {
                 x += x >> const { RHS.unsigned_abs() } & 0x0000000000000001;
-                x += const { !((!0i64).unbounded_shl(RHS.unsigned_abs().saturating_sub(1))) };
+                x += const { !(!0i64).unbounded_shl(RHS.unsigned_abs().saturating_sub(1)) };
                 x >>= const { RHS.unsigned_abs() };
             }
         }
@@ -634,7 +634,7 @@ impl<const E: i32> I32F<E> {
                 x = 0;
             } else {
                 x += x >> const { RHS.unsigned_abs() } & 0x0000000000000001;
-                x += const { !((!0i64).unbounded_shl(RHS.unsigned_abs().saturating_sub(1))) };
+                x += const { !(!0i64).unbounded_shl(RHS.unsigned_abs().saturating_sub(1)) };
                 x >>= const { RHS.unsigned_abs() };
             }
         }
@@ -677,8 +677,7 @@ impl<const E: i32> I32F<E> {
             } else {
                 x += x >> const { RHS.wrapping_sub(-32).cast_unsigned() } & 0x0000000000000001;
                 x += const {
-                    !((!0u64)
-                        .unbounded_shl(RHS.wrapping_sub(-32).cast_unsigned().saturating_sub(1)))
+                    !(!0u64).unbounded_shl(RHS.wrapping_sub(-32).cast_unsigned().saturating_sub(1))
                 };
                 x >>= const { RHS.wrapping_sub(-32).cast_unsigned() };
             }
@@ -731,8 +730,7 @@ impl<const E: i32> I32F<E> {
             } else {
                 x += x >> const { RHS.wrapping_sub(-32).cast_unsigned() } & 0x0000000000000001;
                 x += const {
-                    !((!0u64)
-                        .unbounded_shl(RHS.wrapping_sub(-32).cast_unsigned().saturating_sub(1)))
+                    !(!0u64).unbounded_shl(RHS.wrapping_sub(-32).cast_unsigned().saturating_sub(1))
                 };
                 x >>= const { RHS.wrapping_sub(-32).cast_unsigned() };
             }
@@ -777,8 +775,7 @@ impl<const E: i32> I32F<E> {
             } else {
                 x += x >> const { RHS.wrapping_sub(-32).cast_unsigned() } & 0x0000000000000001;
                 x += const {
-                    !((!0u64)
-                        .unbounded_shl(RHS.wrapping_sub(-32).cast_unsigned().saturating_sub(1)))
+                    !(!0u64).unbounded_shl(RHS.wrapping_sub(-32).cast_unsigned().saturating_sub(1))
                 };
                 x >>= const { RHS.wrapping_sub(-32).cast_unsigned() };
             }
@@ -827,8 +824,7 @@ impl<const E: i32> I32F<E> {
             } else {
                 x += x >> const { RHS.wrapping_sub(-32).cast_unsigned() } & 0x0000000000000001;
                 x += const {
-                    !((!0u64)
-                        .unbounded_shl(RHS.wrapping_sub(-32).cast_unsigned().saturating_sub(1)))
+                    !(!0u64).unbounded_shl(RHS.wrapping_sub(-32).cast_unsigned().saturating_sub(1))
                 };
                 x >>= const { RHS.wrapping_sub(-32).cast_unsigned() };
             }
@@ -881,8 +877,7 @@ impl<const E: i32> I32F<E> {
             } else {
                 x += x >> const { RHS.wrapping_sub(-32).cast_unsigned() } & 0x0000000000000001;
                 x += const {
-                    !((!0u64)
-                        .unbounded_shl(RHS.wrapping_sub(-32).cast_unsigned().saturating_sub(1)))
+                    !(!0u64).unbounded_shl(RHS.wrapping_sub(-32).cast_unsigned().saturating_sub(1))
                 };
                 x >>= const { RHS.wrapping_sub(-32).cast_unsigned() };
             }
@@ -928,8 +923,7 @@ impl<const E: i32> I32F<E> {
             } else {
                 x += x >> const { RHS.wrapping_sub(-32).cast_unsigned() } & 0x0000000000000001;
                 x += const {
-                    !((!0u64)
-                        .unbounded_shl(RHS.wrapping_sub(-32).cast_unsigned().saturating_sub(1)))
+                    !(!0u64).unbounded_shl(RHS.wrapping_sub(-32).cast_unsigned().saturating_sub(1))
                 };
                 x >>= const { RHS.wrapping_sub(-32).cast_unsigned() };
             }
