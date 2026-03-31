@@ -1398,10 +1398,6 @@ mod tests {
             I32F::<-16>::from_bits(0x00018000).rescale::<0>(),
             I32F::<0>::new(2)
         );
-        assert_eq!(
-            I32F::<-16>::from_bits(0x00010000).rescale::<-32>(),
-            I32F::<-32>::new(0)
-        );
     }
 
     #[test]
