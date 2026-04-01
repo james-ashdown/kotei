@@ -8,6 +8,11 @@ use crate::error::TryFromFloatError;
 #[derive(Clone, Copy, Eq, Hash, Ord)]
 pub struct I32F<const E: i32>(pub(crate) i32);
 
+impl I32F<-33> {
+    /// 1/τ
+    pub const FRAC_1_TAU: Self = Self::from_bits(0x517CC1B7);
+}
+
 impl I32F<-32> {
     /// 1/π
     pub const FRAC_1_PI: Self = Self::from_bits(0x517CC1B7);
