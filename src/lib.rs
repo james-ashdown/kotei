@@ -12,3 +12,6 @@ pub use i32f::*;
 
 mod u32f;
 pub use u32f::*;
+
+mod u64f;
+pub use u64f::*;
