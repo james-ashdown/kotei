@@ -3,6 +3,7 @@
 #![warn(missing_docs)]
 #![no_std]
 
+mod algorithm;
 pub mod error;
 mod panic;
 
