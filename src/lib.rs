@@ -7,6 +7,12 @@ mod algorithm;
 pub mod error;
 mod panic;
 
+mod i8f;
+pub use i8f::*;
+
+mod i16f;
+pub use i16f::*;
+
 mod i32f;
 pub use i32f::*;
 
@@ -15,6 +21,12 @@ pub use i64f::*;
 
 mod i128f;
 pub use i128f::*;
+
+mod u8f;
+pub use u8f::*;
+
+mod u16f;
+pub use u16f::*;
 
 mod u32f;
 pub use u32f::*;
