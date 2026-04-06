@@ -9,3 +9,6 @@ mod panic;
 
 mod i32f;
 pub use i32f::*;
+
+mod u32f;
+pub use u32f::*;
