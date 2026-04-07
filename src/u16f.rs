@@ -1,6 +1,8 @@
 use ::core::cmp;
 use ::core::fmt;
 
+use crate::U8F;
+
 /// The 32-bit unsigned fixed-point type.
 #[derive(Clone, Copy, Eq, Hash, Ord)]
 pub struct U16F<const E: i32>(pub(crate) u16);
@@ -19,6 +21,12 @@ impl<const E: i32> U16F<E> {
     #[must_use]
     pub const fn new(significand: u16) -> Self {
         Self(significand)
+    }
+
+    /// Converts from [`U8F<E>`] losslessly.
+    #[must_use]
+    pub const fn from_u8f(value: U8F<E>) -> Self {
+        Self(value.0 as u16)
     }
 
     /// Raw transutation from [`u16`].
@@ -122,6 +130,12 @@ impl From<U16F<0>> for u16 {
 impl From<u16> for U16F<0> {
     fn from(value: u16) -> Self {
         Self(value)
+    }
+}
+
+impl<const E: i32> From<U8F<E>> for U16F<E> {
+    fn from(value: U8F<E>) -> Self {
+        Self::from_u8f(value)
     }
 }
 

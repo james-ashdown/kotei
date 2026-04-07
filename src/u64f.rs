@@ -1,6 +1,10 @@
 use ::core::cmp;
 use ::core::fmt;
 
+use crate::U8F;
+use crate::U16F;
+use crate::U32F;
+
 /// The 32-bit unsigned fixed-point type.
 #[derive(Clone, Copy, Eq, Hash, Ord)]
 pub struct U64F<const E: i32>(pub(crate) u64);
@@ -19,6 +23,24 @@ impl<const E: i32> U64F<E> {
     #[must_use]
     pub const fn new(significand: u64) -> Self {
         Self(significand)
+    }
+
+    /// Converts from [`U8F<E>`] losslessly.
+    #[must_use]
+    pub const fn from_u8f(value: U8F<E>) -> Self {
+        Self(value.0 as u64)
+    }
+
+    /// Converts from [`U16F<E>`] losslessly.
+    #[must_use]
+    pub const fn from_u16f(value: U16F<E>) -> Self {
+        Self(value.0 as u64)
+    }
+
+    /// Converts from [`U32F<E>`] losslessly.
+    #[must_use]
+    pub const fn from_u32f(value: U32F<E>) -> Self {
+        Self(value.0 as u64)
     }
 
     /// Raw transutation from [`u64`].
@@ -122,6 +144,27 @@ impl From<U64F<0>> for u64 {
 impl From<u64> for U64F<0> {
     fn from(value: u64) -> Self {
         Self(value)
+    }
+}
+
+impl<const E: i32> From<U8F<E>> for U64F<E> {
+    /// Converts from [`U8F<E>`] losslessly.
+    fn from(value: U8F<E>) -> Self {
+        Self::from_u8f(value)
+    }
+}
+
+impl<const E: i32> From<U16F<E>> for U64F<E> {
+    /// Converts from [`U16F<E>`] losslessly.
+    fn from(value: U16F<E>) -> Self {
+        Self::from_u16f(value)
+    }
+}
+
+impl<const E: i32> From<U32F<E>> for U64F<E> {
+    /// Converts from [`U32F<E>`] losslessly.
+    fn from(value: U32F<E>) -> Self {
+        Self::from_u32f(value)
     }
 }
 

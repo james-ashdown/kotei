@@ -2,6 +2,11 @@ use ::core::cmp;
 use ::core::fmt;
 use ::core::ops;
 
+use crate::I8F;
+use crate::I16F;
+use crate::U8F;
+use crate::U16F;
+
 use crate::error::TryFromFloatError;
 
 /// The 32-bit signed fixed-point type.
@@ -145,6 +150,30 @@ impl<const E: i32> I32F<E> {
         }
 
         Ok(Self(significand))
+    }
+
+    /// Converts from [`I8F<E>`] losslessly.
+    #[must_use]
+    pub const fn from_i8f(value: I8F<E>) -> Self {
+        Self(value.0 as i32)
+    }
+
+    /// Converts from [`I16F<E>`] losslessly.
+    #[must_use]
+    pub const fn from_i16f(value: I16F<E>) -> Self {
+        Self(value.0 as i32)
+    }
+
+    /// Converts from [`U8F<E>`] losslessly.
+    #[must_use]
+    pub const fn from_u8f(value: U8F<E>) -> Self {
+        Self(value.0 as i32)
+    }
+
+    /// Converts from [`U16F<E>`] losslessly.
+    #[must_use]
+    pub const fn from_u16f(value: U16F<E>) -> Self {
+        Self(value.0 as i32)
     }
 
     /// Raw transutation from [`u32`].
@@ -1363,6 +1392,30 @@ impl From<I32F<0>> for i32 {
 impl From<i32> for I32F<0> {
     fn from(value: i32) -> Self {
         Self(value)
+    }
+}
+
+impl<const E: i32> From<I8F<E>> for I32F<E> {
+    fn from(value: I8F<E>) -> Self {
+        Self::from_i8f(value)
+    }
+}
+
+impl<const E: i32> From<I16F<E>> for I32F<E> {
+    fn from(value: I16F<E>) -> Self {
+        Self::from_i16f(value)
+    }
+}
+
+impl<const E: i32> From<U8F<E>> for I32F<E> {
+    fn from(value: U8F<E>) -> Self {
+        Self::from_u8f(value)
+    }
+}
+
+impl<const E: i32> From<U16F<E>> for I32F<E> {
+    fn from(value: U16F<E>) -> Self {
+        Self::from_u16f(value)
     }
 }
 

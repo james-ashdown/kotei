@@ -1,6 +1,15 @@
 use ::core::cmp;
 use ::core::fmt;
 
+use crate::I8F;
+use crate::I16F;
+use crate::I32F;
+use crate::I64F;
+use crate::U8F;
+use crate::U16F;
+use crate::U32F;
+use crate::U64F;
+
 /// The 32-bit unsigned fixed-point type.
 #[derive(Clone, Copy, Eq, Hash, Ord)]
 pub struct I128F<const E: i32>(pub(crate) i128);
@@ -19,6 +28,54 @@ impl<const E: i32> I128F<E> {
     #[must_use]
     pub const fn new(significand: i128) -> Self {
         Self(significand)
+    }
+
+    /// Converts from [`I8F<E>`] losslessly.
+    #[must_use]
+    pub const fn from_i8f(value: I8F<E>) -> Self {
+        Self(value.0 as i128)
+    }
+
+    /// Converts from [`I16F<E>`] losslessly.
+    #[must_use]
+    pub const fn from_i16f(value: I16F<E>) -> Self {
+        Self(value.0 as i128)
+    }
+
+    /// Converts from [`I32F<E>`] losslessly.
+    #[must_use]
+    pub const fn from_i32f(value: I32F<E>) -> Self {
+        Self(value.0 as i128)
+    }
+
+    /// Converts from [`I64F<E>`] losslessly.
+    #[must_use]
+    pub const fn from_i64f(value: I64F<E>) -> Self {
+        Self(value.0 as i128)
+    }
+
+    /// Converts from [`U8F<E>`] losslessly.
+    #[must_use]
+    pub const fn from_u8f(value: U8F<E>) -> Self {
+        Self(value.0 as i128)
+    }
+
+    /// Converts from [`U16F<E>`] losslessly.
+    #[must_use]
+    pub const fn from_u16f(value: U16F<E>) -> Self {
+        Self(value.0 as i128)
+    }
+
+    /// Converts from [`U32F<E>`] losslessly.
+    #[must_use]
+    pub const fn from_u32f(value: U32F<E>) -> Self {
+        Self(value.0 as i128)
+    }
+
+    /// Converts from [`U64F<E>`] losslessly.
+    #[must_use]
+    pub const fn from_u64f(value: U64F<E>) -> Self {
+        Self(value.0 as i128)
     }
 
     /// Raw transutation from [`u128`].
@@ -122,6 +179,54 @@ impl From<I128F<0>> for i128 {
 impl From<i128> for I128F<0> {
     fn from(value: i128) -> Self {
         Self(value)
+    }
+}
+
+impl<const E: i32> From<I8F<E>> for I128F<E> {
+    fn from(value: I8F<E>) -> Self {
+        Self::from_i8f(value)
+    }
+}
+
+impl<const E: i32> From<I16F<E>> for I128F<E> {
+    fn from(value: I16F<E>) -> Self {
+        Self::from_i16f(value)
+    }
+}
+
+impl<const E: i32> From<I32F<E>> for I128F<E> {
+    fn from(value: I32F<E>) -> Self {
+        Self::from_i32f(value)
+    }
+}
+
+impl<const E: i32> From<I64F<E>> for I128F<E> {
+    fn from(value: I64F<E>) -> Self {
+        Self::from_i64f(value)
+    }
+}
+
+impl<const E: i32> From<U8F<E>> for I128F<E> {
+    fn from(value: U8F<E>) -> Self {
+        Self::from_u8f(value)
+    }
+}
+
+impl<const E: i32> From<U16F<E>> for I128F<E> {
+    fn from(value: U16F<E>) -> Self {
+        Self::from_u16f(value)
+    }
+}
+
+impl<const E: i32> From<U32F<E>> for I128F<E> {
+    fn from(value: U32F<E>) -> Self {
+        Self::from_u32f(value)
+    }
+}
+
+impl<const E: i32> From<U64F<E>> for I128F<E> {
+    fn from(value: U64F<E>) -> Self {
+        Self::from_u64f(value)
     }
 }
 
