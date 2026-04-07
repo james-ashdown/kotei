@@ -1,5 +1,6 @@
 use ::core::cmp;
 use ::core::fmt;
+use ::core::ops;
 
 use crate::I8F;
 use crate::U8F;
@@ -126,6 +127,150 @@ impl<const E: i32> I16F<E> {
 
         Some(x)
     }
+
+    #[doc(hidden)]
+    #[must_use]
+    #[track_caller]
+    pub const fn neg(self) -> Self {
+        Self(-self.0)
+    }
+
+    /// Computes `-self`, panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will always panic on overflow, even if overflow checks are disabled.
+    #[must_use]
+    #[track_caller]
+    pub const fn strict_neg(self) -> Self {
+        Self(self.0.strict_neg())
+    }
+
+    /// Computes `-self`, wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn wrapping_neg(self) -> Self {
+        Self(self.0.wrapping_neg())
+    }
+
+    /// Computes `-self`, saturating at the numeric bounds of the type instead of overflowing.
+    #[must_use]
+    pub const fn saturating_neg(self) -> Self {
+        Self(self.0.saturating_neg())
+    }
+
+    /// Computes `-self`. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
+    #[must_use]
+    pub const fn overflowing_neg(self) -> (Self, bool) {
+        let (x, overflow) = self.0.overflowing_neg();
+
+        (Self(x), overflow)
+    }
+
+    /// Computes `-self`, returning `None` if overflow occurred.
+    #[must_use]
+    pub const fn checked_neg(self) -> Option<Self> {
+        let Some(x) = self.0.checked_neg() else {
+            return None;
+        };
+
+        Some(Self(x))
+    }
+
+    #[doc(hidden)]
+    #[must_use]
+    #[track_caller]
+    pub const fn add(self, rhs: Self) -> Self {
+        Self(self.0 + rhs.0)
+    }
+
+    /// Computes `self + rhs`, panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will always panic on overflow, even if overflow checks are disabled.
+    #[must_use]
+    #[track_caller]
+    pub const fn strict_add(self, rhs: Self) -> Self {
+        Self(self.0.strict_add(rhs.0))
+    }
+
+    /// Computes `self + rhs`, wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn wrapping_add(self, rhs: Self) -> Self {
+        Self(self.0.wrapping_add(rhs.0))
+    }
+
+    /// Computes `self + rhs`, saturating at the numeric bounds of the type instead of overflowing.
+    #[must_use]
+    pub const fn saturating_add(self, rhs: Self) -> Self {
+        Self(self.0.saturating_add(rhs.0))
+    }
+
+    /// Computes `self + rhs`. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
+    #[must_use]
+    pub const fn overflowing_add(self, rhs: Self) -> (Self, bool) {
+        let (x, overflowed) = self.0.overflowing_add(rhs.0);
+
+        (Self(x), overflowed)
+    }
+
+    /// Computes `self + rhs`, returning `None` if overflow occurred.
+    #[must_use]
+    pub const fn checked_add(self, rhs: Self) -> Option<Self> {
+        let Some(x) = self.0.checked_add(rhs.0) else {
+            return None;
+        };
+
+        Some(Self(x))
+    }
+
+    #[doc(hidden)]
+    #[must_use]
+    #[track_caller]
+    pub const fn sub(self, rhs: Self) -> Self {
+        Self(self.0 - rhs.0)
+    }
+
+    /// Computes `self - rhs`, panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will always panic on overflow, even if overflow checks are disabled.
+    #[must_use]
+    #[track_caller]
+    pub const fn strict_sub(self, rhs: Self) -> Self {
+        Self(self.0.strict_sub(rhs.0))
+    }
+
+    /// Computes `self - rhs`, wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn wrapping_sub(self, rhs: Self) -> Self {
+        Self(self.0.wrapping_sub(rhs.0))
+    }
+
+    /// Computes `self - rhs`, saturating at the numeric bounds of the type instead of overflowing.
+    #[must_use]
+    pub const fn saturating_sub(self, rhs: Self) -> Self {
+        Self(self.0.saturating_sub(rhs.0))
+    }
+
+    /// Computes `self - rhs`. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
+    #[must_use]
+    pub const fn overflowing_sub(self, rhs: Self) -> (Self, bool) {
+        let (x, overflowed) = self.0.overflowing_sub(rhs.0);
+
+        (Self(x), overflowed)
+    }
+
+    /// Computes `self - rhs`, returning `None` if overflow occurred.
+    #[must_use]
+    pub const fn checked_sub(self, rhs: Self) -> Option<Self> {
+        let Some(x) = self.0.checked_sub(rhs.0) else {
+            return None;
+        };
+
+        Some(Self(x))
+    }
 }
 
 impl From<I16F<0>> for i16 {
@@ -239,5 +384,32 @@ impl<const E: i32> fmt::LowerHex for I16F<E> {
 impl<const E: i32> fmt::UpperHex for I16F<E> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         fmt::UpperHex::fmt(&self.to_bits(), f)
+    }
+}
+
+impl<const E: i32> ops::Neg for I16F<E> {
+    type Output = Self;
+
+    #[track_caller]
+    fn neg(self) -> Self::Output {
+        Self(-self.0)
+    }
+}
+
+impl<const E: i32> ops::Add for I16F<E> {
+    type Output = Self;
+
+    #[track_caller]
+    fn add(self, rhs: Self) -> Self::Output {
+        Self(self.0 + rhs.0)
+    }
+}
+
+impl<const E: i32> ops::Sub for I16F<E> {
+    type Output = Self;
+
+    #[track_caller]
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self(self.0 - rhs.0)
     }
 }
