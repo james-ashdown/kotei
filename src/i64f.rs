@@ -14,6 +14,68 @@ use crate::U64F;
 #[derive(Clone, Copy, Eq, Hash, Ord)]
 pub struct I64F<const E: i32>(pub(crate) i64);
 
+impl I64F<-65> {
+    /// 1/τ
+    pub const FRAC_1_TAU: Self = Self::from_bits(0x517CC1B727220A95);
+}
+
+impl I64F<-64> {
+    /// 1/π
+    pub const FRAC_1_PI: Self = Self::from_bits(0x517CC1B727220A95);
+    /// π/8
+    pub const FRAC_PI_8: Self = Self::from_bits(0x6487ED5110B4611A);
+    /// log<sub>10</sub>(2)
+    pub const LOG10_2: Self = Self::from_bits(0x4D104D427DE7FBCC);
+    /// log<sub>10</sub>(e)
+    pub const LOG10_E: Self = Self::from_bits(0x6F2DEC549B9438CB);
+}
+
+impl I64F<-63> {
+    /// The Euler-Mascheroni constant (γ)
+    pub const EULER_GAMMA: Self = Self::from_bits(0x49E233F1BED863D2);
+    /// 1/sqrt(2)
+    pub const FRAC_1_SQRT_2: Self = Self::from_bits(0x5A827999FCEF3242);
+    /// 2/π
+    pub const FRAC_2_PI: Self = Self::from_bits(0x517CC1B727220A95);
+    /// π/4
+    pub const FRAC_PI_4: Self = Self::from_bits(0x6487ED5110B4611A);
+    /// π/6
+    pub const FRAC_PI_6: Self = Self::from_bits(0x430548E0B5CD9612);
+    /// ln(2)
+    pub const LN_2: Self = Self::from_bits(0x58B90BFBE8E7BCD6);
+}
+
+impl I64F<-62> {
+    /// 2/sqrt(π)
+    pub const FRAC_2_SQRT_PI: Self = Self::from_bits(0x48375D410A6DB447);
+    /// π/2
+    pub const FRAC_PI_2: Self = Self::from_bits(0x6487ED5110B4611A);
+    /// π/3
+    pub const FRAC_PI_3: Self = Self::from_bits(0x430548E0B5CD9612);
+    /// The golden ratio (φ)
+    pub const GOLDEN_RATIO: Self = Self::from_bits(0x678DDE6E5FD29F05);
+    /// log<sub>2</sub>(e)
+    pub const LOG2_E: Self = Self::from_bits(0x5C551D94AE0BF85E);
+    /// sqrt(2)
+    pub const SQRT_2: Self = Self::from_bits(0x5A827999FCEF3242);
+}
+
+impl I64F<-61> {
+    /// Euler's number (e)
+    pub const E: Self = Self::from_bits(0x56FC2A2C515DA54D);
+    /// ln(10)
+    pub const LN_10: Self = Self::from_bits(0x49AEC6EED554560B);
+    /// log<sub>2</sub>(10)
+    pub const LOG2_10: Self = Self::from_bits(0x6A4D3C25E68DC57F);
+    /// Archimedes’ constant (π)
+    pub const PI: Self = Self::from_bits(0x6487ED5110B4611A);
+}
+
+impl I64F<-60> {
+    /// The full circle constant (τ)
+    pub const TAU: Self = Self::from_bits(0x6487ED5110B4611A);
+}
+
 impl<const E: i32> I64F<E> {
     /// The smallest value that can be represented by this fixed-point type, equal to -2<sup>63</sup> ⋅ 2<sup>E</sup>.
     pub const MIN: Self = Self(i64::MIN);

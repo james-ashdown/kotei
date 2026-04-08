@@ -10,6 +10,68 @@ use crate::U16F;
 #[derive(Clone, Copy, Eq, Hash, Ord)]
 pub struct I16F<const E: i32>(pub(crate) i16);
 
+impl I16F<-17> {
+    /// 1/τ
+    pub const FRAC_1_TAU: Self = Self::from_bits(0x517D);
+}
+
+impl I16F<-16> {
+    /// 1/π
+    pub const FRAC_1_PI: Self = Self::from_bits(0x517D);
+    /// π/8
+    pub const FRAC_PI_8: Self = Self::from_bits(0x6488);
+    /// log<sub>10</sub>(2)
+    pub const LOG10_2: Self = Self::from_bits(0x4D10);
+    /// log<sub>10</sub>(e)
+    pub const LOG10_E: Self = Self::from_bits(0x6F2E);
+}
+
+impl I16F<-15> {
+    /// The Euler-Mascheroni constant (γ)
+    pub const EULER_GAMMA: Self = Self::from_bits(0x49E2);
+    /// 1/sqrt(2)
+    pub const FRAC_1_SQRT_2: Self = Self::from_bits(0x5A82);
+    /// 2/π
+    pub const FRAC_2_PI: Self = Self::from_bits(0x517D);
+    /// π/4
+    pub const FRAC_PI_4: Self = Self::from_bits(0x6488);
+    /// π/6
+    pub const FRAC_PI_6: Self = Self::from_bits(0x4305);
+    /// ln(2)
+    pub const LN_2: Self = Self::from_bits(0x58B9);
+}
+
+impl I16F<-14> {
+    /// 2/sqrt(π)
+    pub const FRAC_2_SQRT_PI: Self = Self::from_bits(0x4837);
+    /// π/2
+    pub const FRAC_PI_2: Self = Self::from_bits(0x6488);
+    /// π/3
+    pub const FRAC_PI_3: Self = Self::from_bits(0x4305);
+    /// The golden ratio (φ)
+    pub const GOLDEN_RATIO: Self = Self::from_bits(0x678E);
+    /// log<sub>2</sub>(e)
+    pub const LOG2_E: Self = Self::from_bits(0x5C55);
+    /// sqrt(2)
+    pub const SQRT_2: Self = Self::from_bits(0x5A82);
+}
+
+impl I16F<-13> {
+    /// Euler's number (e)
+    pub const E: Self = Self::from_bits(0x56FC);
+    /// ln(10)
+    pub const LN_10: Self = Self::from_bits(0x49AF);
+    /// log<sub>2</sub>(10)
+    pub const LOG2_10: Self = Self::from_bits(0x6A4D);
+    /// Archimedes’ constant (π)
+    pub const PI: Self = Self::from_bits(0x6488);
+}
+
+impl I16F<-12> {
+    /// The full circle constant (τ)
+    pub const TAU: Self = Self::from_bits(0x6488);
+}
+
 impl<const E: i32> I16F<E> {
     /// The smallest value that can be represented by this fixed-point type, equal to -2<sup>15</sup> ⋅ 2<sup>E</sup>.
     pub const MIN: Self = Self(i16::MIN);

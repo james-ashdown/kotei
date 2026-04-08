@@ -8,6 +8,68 @@ use crate::I8F;
 #[derive(Clone, Copy, Eq, Hash, Ord)]
 pub struct U8F<const E: i32>(pub(crate) u8);
 
+impl U8F<-10> {
+    /// 1/τ
+    pub const FRAC_1_TAU: Self = Self::from_bits(0xA3);
+}
+
+impl U8F<-9> {
+    /// 1/π
+    pub const FRAC_1_PI: Self = Self::from_bits(0xA3);
+    /// π/8
+    pub const FRAC_PI_8: Self = Self::from_bits(0xC9);
+    /// log<sub>10</sub>(2)
+    pub const LOG10_2: Self = Self::from_bits(0x9A);
+    /// log<sub>10</sub>(e)
+    pub const LOG10_E: Self = Self::from_bits(0xDE);
+}
+
+impl U8F<-8> {
+    /// The Euler-Mascheroni constant (γ)
+    pub const EULER_GAMMA: Self = Self::from_bits(0x94);
+    /// 1/sqrt(2)
+    pub const FRAC_1_SQRT_2: Self = Self::from_bits(0xB5);
+    /// 2/π
+    pub const FRAC_2_PI: Self = Self::from_bits(0xA3);
+    /// π/4
+    pub const FRAC_PI_4: Self = Self::from_bits(0xC9);
+    /// π/6
+    pub const FRAC_PI_6: Self = Self::from_bits(0x86);
+    /// ln(2)
+    pub const LN_2: Self = Self::from_bits(0xB1);
+}
+
+impl U8F<-7> {
+    /// 2/sqrt(π)
+    pub const FRAC_2_SQRT_PI: Self = Self::from_bits(0x90);
+    /// π/2
+    pub const FRAC_PI_2: Self = Self::from_bits(0xC9);
+    /// π/3
+    pub const FRAC_PI_3: Self = Self::from_bits(0x86);
+    /// The golden ratio (φ)
+    pub const GOLDEN_RATIO: Self = Self::from_bits(0xCF);
+    /// log<sub>2</sub>(e)
+    pub const LOG2_E: Self = Self::from_bits(0xB9);
+    /// sqrt(2)
+    pub const SQRT_2: Self = Self::from_bits(0xB5);
+}
+
+impl U8F<-6> {
+    /// Euler's number (e)
+    pub const E: Self = Self::from_bits(0xAE);
+    /// ln(10)
+    pub const LN_10: Self = Self::from_bits(0x93);
+    /// log<sub>2</sub>(10)
+    pub const LOG2_10: Self = Self::from_bits(0xD5);
+    /// Archimedes’ constant (π)
+    pub const PI: Self = Self::from_bits(0xC9);
+}
+
+impl U8F<-5> {
+    /// The full circle constant (τ)
+    pub const TAU: Self = Self::from_bits(0xC9);
+}
+
 impl<const E: i32> U8F<E> {
     /// The smallest value that can be represented by this fixed-point type, equal to 0.
     pub const MIN: Self = Self(u8::MIN);

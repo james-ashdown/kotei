@@ -12,6 +12,68 @@ use crate::U64F;
 #[derive(Clone, Copy, Eq, Hash, Ord)]
 pub struct U128F<const E: i32>(pub(crate) u128);
 
+impl U128F<-130> {
+    /// 1/τ
+    pub const FRAC_1_TAU: Self = Self::from_bits(0xA2F9836E4E441529FC2757D1F534DDC1);
+}
+
+impl U128F<-129> {
+    /// 1/π
+    pub const FRAC_1_PI: Self = Self::from_bits(0xA2F9836E4E441529FC2757D1F534DDC1);
+    /// π/8
+    pub const FRAC_PI_8: Self = Self::from_bits(0xC90FDAA22168C234C4C6628B80DC1CD1);
+    /// log<sub>10</sub>(2)
+    pub const LOG10_2: Self = Self::from_bits(0x9A209A84FBCFF7988F8959AC0B7C9178);
+    /// log<sub>10</sub>(e)
+    pub const LOG10_E: Self = Self::from_bits(0xDE5BD8A937287195355BAAAFAD33DC32);
+}
+
+impl U128F<-128> {
+    /// The Euler-Mascheroni constant (γ)
+    pub const EULER_GAMMA: Self = Self::from_bits(0x93C467E37DB0C7A4D1BE3F810152CB57);
+    /// 1/sqrt(2)
+    pub const FRAC_1_SQRT_2: Self = Self::from_bits(0xB504F333F9DE6484597D89B3754ABE9F);
+    /// 2/π
+    pub const FRAC_2_PI: Self = Self::from_bits(0xA2F9836E4E441529FC2757D1F534DDC1);
+    /// π/4
+    pub const FRAC_PI_4: Self = Self::from_bits(0xC90FDAA22168C234C4C6628B80DC1CD1);
+    /// π/6
+    pub const FRAC_PI_6: Self = Self::from_bits(0x860A91C16B9B2C232DD99707AB3D688B);
+    /// ln(2)
+    pub const LN_2: Self = Self::from_bits(0xB17217F7D1CF79ABC9E3B39803F2F6AF);
+}
+
+impl U128F<-127> {
+    /// 2/sqrt(π)
+    pub const FRAC_2_SQRT_PI: Self = Self::from_bits(0x906EBA8214DB688D71D48A7F6BFEC344);
+    /// π/2
+    pub const FRAC_PI_2: Self = Self::from_bits(0xC90FDAA22168C234C4C6628B80DC1CD1);
+    /// π/3
+    pub const FRAC_PI_3: Self = Self::from_bits(0x860A91C16B9B2C232DD99707AB3D688B);
+    /// The golden ratio (φ)
+    pub const GOLDEN_RATIO: Self = Self::from_bits(0xCF1BBCDCBFA53E0AF9CE60302E76E41A);
+    /// log<sub>2</sub>(e)
+    pub const LOG2_E: Self = Self::from_bits(0xB8AA3B295C17F0BBBE87FED0691D3E89);
+    /// sqrt(2)
+    pub const SQRT_2: Self = Self::from_bits(0xB504F333F9DE6484597D89B3754ABE9F);
+}
+
+impl U128F<-126> {
+    /// Euler's number (e)
+    pub const E: Self = Self::from_bits(0xADF85458A2BB4A9AAFDC5620273D3CF2);
+    /// ln(10)
+    pub const LN_10: Self = Self::from_bits(0x935D8DDDAAA8AC16EA56D62B82D30A29);
+    /// log<sub>2</sub>(10)
+    pub const LOG2_10: Self = Self::from_bits(0xD49A784BCD1B8AFE492BF6FF4DAFDB4D);
+    /// Archimedes’ constant (π)
+    pub const PI: Self = Self::from_bits(0xC90FDAA22168C234C4C6628B80DC1CD1);
+}
+
+impl U128F<-125> {
+    /// The full circle constant (τ)
+    pub const TAU: Self = Self::from_bits(0xC90FDAA22168C234C4C6628B80DC1CD1);
+}
+
 impl<const E: i32> U128F<E> {
     /// The smallest value that can be represented by this fixed-point type, equal to 0.
     pub const MIN: Self = Self(u128::MIN);

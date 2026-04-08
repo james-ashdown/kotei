@@ -8,6 +8,68 @@ use crate::U8F;
 #[derive(Clone, Copy, Eq, Hash, Ord)]
 pub struct I8F<const E: i32>(pub(crate) i8);
 
+impl I8F<-9> {
+    /// 1/τ
+    pub const FRAC_1_TAU: Self = Self::from_bits(0x51);
+}
+
+impl I8F<-8> {
+    /// 1/π
+    pub const FRAC_1_PI: Self = Self::from_bits(0x51);
+    /// π/8
+    pub const FRAC_PI_8: Self = Self::from_bits(0x65);
+    /// log<sub>10</sub>(2)
+    pub const LOG10_2: Self = Self::from_bits(0x4D);
+    /// log<sub>10</sub>(e)
+    pub const LOG10_E: Self = Self::from_bits(0x6F);
+}
+
+impl I8F<-7> {
+    /// The Euler-Mascheroni constant (γ)
+    pub const EULER_GAMMA: Self = Self::from_bits(0x4A);
+    /// 1/sqrt(2)
+    pub const FRAC_1_SQRT_2: Self = Self::from_bits(0x5B);
+    /// 2/π
+    pub const FRAC_2_PI: Self = Self::from_bits(0x51);
+    /// π/4
+    pub const FRAC_PI_4: Self = Self::from_bits(0x65);
+    /// π/6
+    pub const FRAC_PI_6: Self = Self::from_bits(0x43);
+    /// ln(2)
+    pub const LN_2: Self = Self::from_bits(0x59);
+}
+
+impl I8F<-6> {
+    /// 2/sqrt(π)
+    pub const FRAC_2_SQRT_PI: Self = Self::from_bits(0x48);
+    /// π/2
+    pub const FRAC_PI_2: Self = Self::from_bits(0x65);
+    /// π/3
+    pub const FRAC_PI_3: Self = Self::from_bits(0x43);
+    /// The golden ratio (φ)
+    pub const GOLDEN_RATIO: Self = Self::from_bits(0x68);
+    /// log<sub>2</sub>(e)
+    pub const LOG2_E: Self = Self::from_bits(0x5C);
+    /// sqrt(2)
+    pub const SQRT_2: Self = Self::from_bits(0x5B);
+}
+
+impl I8F<-5> {
+    /// Euler's number (e)
+    pub const E: Self = Self::from_bits(0x57);
+    /// ln(10)
+    pub const LN_10: Self = Self::from_bits(0x4A);
+    /// log<sub>2</sub>(10)
+    pub const LOG2_10: Self = Self::from_bits(0x6A);
+    /// Archimedes’ constant (π)
+    pub const PI: Self = Self::from_bits(0x65);
+}
+
+impl I8F<-4> {
+    /// The full circle constant (τ)
+    pub const TAU: Self = Self::from_bits(0x65);
+}
+
 impl<const E: i32> I8F<E> {
     /// The smallest value that can be represented by this fixed-point type, equal to -2<sup>7</sup> ⋅ 2<sup>E</sup>.
     pub const MIN: Self = Self(i8::MIN);

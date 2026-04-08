@@ -10,6 +10,68 @@ use crate::U16F;
 #[derive(Clone, Copy, Eq, Hash, Ord)]
 pub struct U32F<const E: i32>(pub(crate) u32);
 
+impl U32F<-34> {
+    /// 1/τ
+    pub const FRAC_1_TAU: Self = Self::from_bits(0xA2F9836E);
+}
+
+impl U32F<-33> {
+    /// 1/π
+    pub const FRAC_1_PI: Self = Self::from_bits(0xA2F9836E);
+    /// π/8
+    pub const FRAC_PI_8: Self = Self::from_bits(0xC90FDAA2);
+    /// log<sub>10</sub>(2)
+    pub const LOG10_2: Self = Self::from_bits(0x9A209A85);
+    /// log<sub>10</sub>(e)
+    pub const LOG10_E: Self = Self::from_bits(0xDE5BD8A9);
+}
+
+impl U32F<-32> {
+    /// The Euler-Mascheroni constant (γ)
+    pub const EULER_GAMMA: Self = Self::from_bits(0x93C467E3);
+    /// 1/sqrt(2)
+    pub const FRAC_1_SQRT_2: Self = Self::from_bits(0xB504F334);
+    /// 2/π
+    pub const FRAC_2_PI: Self = Self::from_bits(0xA2F9836E);
+    /// π/4
+    pub const FRAC_PI_4: Self = Self::from_bits(0xC90FDAA2);
+    /// π/6
+    pub const FRAC_PI_6: Self = Self::from_bits(0x860A91C1);
+    /// ln(2)
+    pub const LN_2: Self = Self::from_bits(0xB17217F8);
+}
+
+impl U32F<-31> {
+    /// 2/sqrt(π)
+    pub const FRAC_2_SQRT_PI: Self = Self::from_bits(0x906EBA82);
+    /// π/2
+    pub const FRAC_PI_2: Self = Self::from_bits(0xC90FDAA2);
+    /// π/3
+    pub const FRAC_PI_3: Self = Self::from_bits(0x860A91C1);
+    /// The golden ratio (φ)
+    pub const GOLDEN_RATIO: Self = Self::from_bits(0xCF1BBCDD);
+    /// log<sub>2</sub>(e)
+    pub const LOG2_E: Self = Self::from_bits(0xB8AA3B29);
+    /// sqrt(2)
+    pub const SQRT_2: Self = Self::from_bits(0xB504F334);
+}
+
+impl U32F<-30> {
+    /// Euler's number (e)
+    pub const E: Self = Self::from_bits(0xADF85459);
+    /// ln(10)
+    pub const LN_10: Self = Self::from_bits(0x935D8DDE);
+    /// log<sub>2</sub>(10)
+    pub const LOG2_10: Self = Self::from_bits(0xD49A784C);
+    /// Archimedes’ constant (π)
+    pub const PI: Self = Self::from_bits(0xC90FDAA2);
+}
+
+impl U32F<-29> {
+    /// The full circle constant (τ)
+    pub const TAU: Self = Self::from_bits(0xC90FDAA2);
+}
+
 impl<const E: i32> U32F<E> {
     /// The smallest value that can be represented by this fixed-point type, equal to 0.
     pub const MIN: Self = Self(u32::MIN);

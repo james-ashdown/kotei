@@ -9,6 +9,68 @@ use crate::U8F;
 #[derive(Clone, Copy, Eq, Hash, Ord)]
 pub struct U16F<const E: i32>(pub(crate) u16);
 
+impl U16F<-18> {
+    /// 1/τ
+    pub const FRAC_1_TAU: Self = Self::from_bits(0xA2FA);
+}
+
+impl U16F<-17> {
+    /// 1/π
+    pub const FRAC_1_PI: Self = Self::from_bits(0xA2FA);
+    /// π/8
+    pub const FRAC_PI_8: Self = Self::from_bits(0xC910);
+    /// log<sub>10</sub>(2)
+    pub const LOG10_2: Self = Self::from_bits(0x9A21);
+    /// log<sub>10</sub>(e)
+    pub const LOG10_E: Self = Self::from_bits(0xDE5C);
+}
+
+impl U16F<-16> {
+    /// The Euler-Mascheroni constant (γ)
+    pub const EULER_GAMMA: Self = Self::from_bits(0x93C4);
+    /// 1/sqrt(2)
+    pub const FRAC_1_SQRT_2: Self = Self::from_bits(0xB505);
+    /// 2/π
+    pub const FRAC_2_PI: Self = Self::from_bits(0xA2FA);
+    /// π/4
+    pub const FRAC_PI_4: Self = Self::from_bits(0xC910);
+    /// π/6
+    pub const FRAC_PI_6: Self = Self::from_bits(0x860B);
+    /// ln(2)
+    pub const LN_2: Self = Self::from_bits(0xB172);
+}
+
+impl U16F<-15> {
+    /// 2/sqrt(π)
+    pub const FRAC_2_SQRT_PI: Self = Self::from_bits(0x906F);
+    /// π/2
+    pub const FRAC_PI_2: Self = Self::from_bits(0xC910);
+    /// π/3
+    pub const FRAC_PI_3: Self = Self::from_bits(0x860B);
+    /// The golden ratio (φ)
+    pub const GOLDEN_RATIO: Self = Self::from_bits(0xCF1C);
+    /// log<sub>2</sub>(e)
+    pub const LOG2_E: Self = Self::from_bits(0xB8AA);
+    /// sqrt(2)
+    pub const SQRT_2: Self = Self::from_bits(0xB505);
+}
+
+impl U16F<-14> {
+    /// Euler's number (e)
+    pub const E: Self = Self::from_bits(0xADF8);
+    /// ln(10)
+    pub const LN_10: Self = Self::from_bits(0x935E);
+    /// log<sub>2</sub>(10)
+    pub const LOG2_10: Self = Self::from_bits(0xD49A);
+    /// Archimedes’ constant (π)
+    pub const PI: Self = Self::from_bits(0xC910);
+}
+
+impl U16F<-13> {
+    /// The full circle constant (τ)
+    pub const TAU: Self = Self::from_bits(0xC910);
+}
+
 impl<const E: i32> U16F<E> {
     /// The smallest value that can be represented by this fixed-point type, equal to 0.
     pub const MIN: Self = Self(u16::MIN);
