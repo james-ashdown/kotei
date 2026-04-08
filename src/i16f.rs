@@ -4,6 +4,7 @@ use ::core::ops;
 
 use crate::I8F;
 use crate::U8F;
+use crate::U16F;
 
 /// The 32-bit unsigned fixed-point type.
 #[derive(Clone, Copy, Eq, Hash, Ord)]
@@ -224,6 +225,78 @@ impl<const E: i32> I16F<E> {
         Some(Self(x))
     }
 
+    /// Computes `self + rhs`, panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic on overflow for debug builds, or return a wrapping result for release builds.
+    #[must_use]
+    #[track_caller]
+    pub const fn add_unsigned(self, rhs: U16F<E>) -> Self {
+        let x = self.0.wrapping_add_unsigned(rhs.0);
+
+        if cfg!(debug_assertions) && x < self.0 {
+            crate::panic::add();
+        }
+
+        Self(x)
+    }
+
+    /// Computes `self + rhs`, panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will always panic on overflow, even if overflow checks are disabled.
+    #[must_use]
+    #[track_caller]
+    pub const fn strict_add_unsigned(self, rhs: U16F<E>) -> Self {
+        let x = self.0.wrapping_add_unsigned(rhs.0);
+
+        if x < self.0 {
+            crate::panic::add();
+        }
+
+        Self(x)
+    }
+
+    /// Computes `self + rhs`, wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn wrapping_add_unsigned(self, rhs: U16F<E>) -> Self {
+        Self(self.0.wrapping_add_unsigned(rhs.0))
+    }
+
+    /// Computes `self + rhs`, saturating at the numeric bounds of the type instead of overflowing.
+    #[must_use]
+    pub const fn saturating_add_unsigned(self, rhs: U16F<E>) -> Self {
+        let x = self.0.wrapping_add_unsigned(rhs.0);
+
+        if x < self.0 {
+            return Self::MAX;
+        }
+
+        Self(x)
+    }
+
+    /// Computes `self + rhs`. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
+    #[must_use]
+    pub const fn overflowing_add_unsigned(self, rhs: U16F<E>) -> (Self, bool) {
+        let x = self.0.wrapping_add_unsigned(rhs.0);
+
+        (Self(x), x < self.0)
+    }
+
+    /// Computes `self + rhs`, returning `None` if overflow occurred.
+    #[must_use]
+    pub const fn checked_add_unsigned(self, rhs: U16F<E>) -> Option<Self> {
+        let x = self.0.wrapping_add_unsigned(rhs.0);
+
+        if x < self.0 {
+            return None;
+        }
+
+        Some(Self(x))
+    }
+
     #[doc(hidden)]
     #[must_use]
     #[track_caller]
@@ -268,6 +341,78 @@ impl<const E: i32> I16F<E> {
         let Some(x) = self.0.checked_sub(rhs.0) else {
             return None;
         };
+
+        Some(Self(x))
+    }
+
+    /// Computes `self - rhs`, panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic on overflow for debug builds, or return a wrapping result for release builds.
+    #[must_use]
+    #[track_caller]
+    pub const fn sub_unsigned(self, rhs: U16F<E>) -> Self {
+        let x = self.0.wrapping_sub_unsigned(rhs.0);
+
+        if cfg!(debug_assertions) && x > self.0 {
+            crate::panic::sub();
+        }
+
+        Self(x)
+    }
+
+    /// Computes `self - rhs`, panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will always panic on overflow, even if overflow checks are disabled.
+    #[must_use]
+    #[track_caller]
+    pub const fn strict_sub_unsigned(self, rhs: U16F<E>) -> Self {
+        let x = self.0.wrapping_sub_unsigned(rhs.0);
+
+        if x > self.0 {
+            crate::panic::sub();
+        }
+
+        Self(x)
+    }
+
+    /// Computes `self - rhs`, wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn wrapping_sub_unsigned(self, rhs: U16F<E>) -> Self {
+        Self(self.0.wrapping_sub_unsigned(rhs.0))
+    }
+
+    /// Computes `self - rhs`, saturating at the numeric bounds of the type instead of overflowing.
+    #[must_use]
+    pub const fn saturating_sub_unsigned(self, rhs: U16F<E>) -> Self {
+        let x = self.0.wrapping_sub_unsigned(rhs.0);
+
+        if x > self.0 {
+            return Self::MIN;
+        }
+
+        Self(x)
+    }
+
+    /// Computes `self - rhs`. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
+    #[must_use]
+    pub const fn overflowing_sub_unsigned(self, rhs: U16F<E>) -> (Self, bool) {
+        let x = self.0.wrapping_sub_unsigned(rhs.0);
+
+        (Self(x), x > self.0)
+    }
+
+    /// Computes `self - rhs`, returning `None` if overflow occurred.
+    #[must_use]
+    pub const fn checked_sub_unsigned(self, rhs: U16F<E>) -> Option<Self> {
+        let x = self.0.wrapping_sub_unsigned(rhs.0);
+
+        if x > self.0 {
+            return None;
+        }
 
         Some(Self(x))
     }

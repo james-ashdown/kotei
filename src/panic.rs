@@ -1,5 +1,11 @@
 #[cold]
 #[track_caller]
+pub(crate) const fn add() -> ! {
+    panic!("attempt to add with overflow")
+}
+
+#[cold]
+#[track_caller]
 pub(crate) const fn div() -> ! {
     panic!("attempt to divide with overflow")
 }
@@ -20,4 +26,10 @@ pub(crate) const fn mul() -> ! {
 #[track_caller]
 pub(crate) const fn rescale() -> ! {
     panic!("attempt to rescale with overflow")
+}
+
+#[cold]
+#[track_caller]
+pub(crate) const fn sub() -> ! {
+    panic!("attempt to subtract with overflow")
 }
