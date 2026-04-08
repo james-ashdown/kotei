@@ -144,7 +144,7 @@ impl<const E: i32> I32F<E> {
             if shift >= i32::BITS {
                 significand = 0;
             } else {
-                significand += significand >> shift & 0x00000001;
+                significand += significand >> shift & 0x1;
                 significand += !(!0 << (shift - 1));
                 significand >>= shift;
             }
@@ -210,8 +210,8 @@ impl<const E: i32> I32F<E> {
             let scaling_factor = const {
                 let mut exponent = 127u32.saturating_add_signed(E);
 
-                if exponent > 0x000000FF {
-                    exponent = 0x000000FF;
+                if exponent > 0xFF {
+                    exponent = 0xFF;
                 }
 
                 let bits = exponent << 23;
@@ -247,7 +247,7 @@ impl<const E: i32> I32F<E> {
                 if shift >= u32::BITS {
                     significand = 0;
                 } else {
-                    significand += significand >> shift & 0x00000001;
+                    significand += significand >> shift & 0x1;
                     significand += !(!0 << (shift - 1));
                     significand >>= shift;
 
@@ -260,7 +260,7 @@ impl<const E: i32> I32F<E> {
 
             exponent = exponent.saturating_add_signed(E);
             bits |= exponent << 23;
-            bits |= significand & 0x007FFFFF;
+            bits |= significand & 0x7FFFFF;
 
             f32::from_bits(bits)
         }
@@ -363,8 +363,7 @@ impl<const E: i32> I32F<E> {
                 round += const {
                     !(!0u32).unbounded_shl(E2.wrapping_sub(E).cast_unsigned().saturating_sub(1))
                 };
-                round +=
-                    x.cast_unsigned() >> const { E2.wrapping_sub(E).cast_unsigned() } & 0x00000001;
+                round += x.cast_unsigned() >> const { E2.wrapping_sub(E).cast_unsigned() } & 0x1;
                 round >>= const { E2.wrapping_sub(E).cast_unsigned() };
                 x >>= const { E2.wrapping_sub(E).cast_unsigned() };
                 x += round.cast_signed();
@@ -403,8 +402,7 @@ impl<const E: i32> I32F<E> {
                 round += const {
                     !(!0u32).unbounded_shl(E2.wrapping_sub(E).cast_unsigned().saturating_sub(1))
                 };
-                round +=
-                    x.cast_unsigned() >> const { E2.wrapping_sub(E).cast_unsigned() } & 0x00000001;
+                round += x.cast_unsigned() >> const { E2.wrapping_sub(E).cast_unsigned() } & 0x1;
                 round >>= const { E2.wrapping_sub(E).cast_unsigned() };
                 x >>= const { E2.wrapping_sub(E).cast_unsigned() };
                 x += round.cast_signed();
@@ -434,8 +432,7 @@ impl<const E: i32> I32F<E> {
                 round += const {
                     !(!0u32).unbounded_shl(E2.wrapping_sub(E).cast_unsigned().saturating_sub(1))
                 };
-                round +=
-                    x.cast_unsigned() >> const { E2.wrapping_sub(E).cast_unsigned() } & 0x00000001;
+                round += x.cast_unsigned() >> const { E2.wrapping_sub(E).cast_unsigned() } & 0x1;
                 round >>= const { E2.wrapping_sub(E).cast_unsigned() };
                 x >>= const { E2.wrapping_sub(E).cast_unsigned() };
                 x += round.cast_signed();
@@ -477,8 +474,7 @@ impl<const E: i32> I32F<E> {
                 round += const {
                     !(!0u32).unbounded_shl(E2.wrapping_sub(E).cast_unsigned().saturating_sub(1))
                 };
-                round +=
-                    x.cast_unsigned() >> const { E2.wrapping_sub(E).cast_unsigned() } & 0x00000001;
+                round += x.cast_unsigned() >> const { E2.wrapping_sub(E).cast_unsigned() } & 0x1;
                 round >>= const { E2.wrapping_sub(E).cast_unsigned() };
                 x >>= const { E2.wrapping_sub(E).cast_unsigned() };
                 x += round.cast_signed();
@@ -512,8 +508,7 @@ impl<const E: i32> I32F<E> {
                 round += const {
                     !(!0u32).unbounded_shl(E2.wrapping_sub(E).cast_unsigned().saturating_sub(1))
                 };
-                round +=
-                    x.cast_unsigned() >> const { E2.wrapping_sub(E).cast_unsigned() } & 0x00000001;
+                round += x.cast_unsigned() >> const { E2.wrapping_sub(E).cast_unsigned() } & 0x1;
                 round >>= const { E2.wrapping_sub(E).cast_unsigned() };
                 x >>= const { E2.wrapping_sub(E).cast_unsigned() };
                 x += round.cast_signed();
@@ -547,8 +542,7 @@ impl<const E: i32> I32F<E> {
                 round += const {
                     !(!0u32).unbounded_shl(E2.wrapping_sub(E).cast_unsigned().saturating_sub(1))
                 };
-                round +=
-                    x.cast_unsigned() >> const { E2.wrapping_sub(E).cast_unsigned() } & 0x00000001;
+                round += x.cast_unsigned() >> const { E2.wrapping_sub(E).cast_unsigned() } & 0x1;
                 round >>= const { E2.wrapping_sub(E).cast_unsigned() };
                 x >>= const { E2.wrapping_sub(E).cast_unsigned() };
                 x += round.cast_signed();
@@ -869,7 +863,7 @@ impl<const E: i32> I32F<E> {
             if const { RHS.unsigned_abs() >= i64::BITS } {
                 x = 0;
             } else {
-                x += x >> const { RHS.unsigned_abs() } & 0x0000000000000001;
+                x += x >> const { RHS.unsigned_abs() } & 0x1;
                 x += const { !(!0i64).unbounded_shl(RHS.unsigned_abs().saturating_sub(1)) };
                 x >>= const { RHS.unsigned_abs() };
             }
@@ -908,7 +902,7 @@ impl<const E: i32> I32F<E> {
             if const { RHS.unsigned_abs() >= i64::BITS } {
                 x = 0;
             } else {
-                x += x >> const { RHS.unsigned_abs() } & 0x0000000000000001;
+                x += x >> const { RHS.unsigned_abs() } & 0x1;
                 x += const { !(!0i64).unbounded_shl(RHS.unsigned_abs().saturating_sub(1)) };
                 x >>= const { RHS.unsigned_abs() };
             }
@@ -938,7 +932,7 @@ impl<const E: i32> I32F<E> {
             if const { RHS.unsigned_abs() >= i64::BITS } {
                 x = 0;
             } else {
-                x += x >> const { RHS.unsigned_abs() } & 0x0000000000000001;
+                x += x >> const { RHS.unsigned_abs() } & 0x1;
                 x += const { !(!0i64).unbounded_shl(RHS.unsigned_abs().saturating_sub(1)) };
                 x >>= const { RHS.unsigned_abs() };
             }
@@ -972,7 +966,7 @@ impl<const E: i32> I32F<E> {
             if const { RHS.unsigned_abs() >= i64::BITS } {
                 x = 0;
             } else {
-                x += x >> const { RHS.unsigned_abs() } & 0x0000000000000001;
+                x += x >> const { RHS.unsigned_abs() } & 0x1;
                 x += const { !(!0i64).unbounded_shl(RHS.unsigned_abs().saturating_sub(1)) };
                 x >>= const { RHS.unsigned_abs() };
             }
@@ -1008,7 +1002,7 @@ impl<const E: i32> I32F<E> {
             if const { RHS.unsigned_abs() >= i64::BITS } {
                 x = 0;
             } else {
-                x += x >> const { RHS.unsigned_abs() } & 0x0000000000000001;
+                x += x >> const { RHS.unsigned_abs() } & 0x1;
                 x += const { !(!0i64).unbounded_shl(RHS.unsigned_abs().saturating_sub(1)) };
                 x >>= const { RHS.unsigned_abs() };
             }
@@ -1039,7 +1033,7 @@ impl<const E: i32> I32F<E> {
             if const { RHS.unsigned_abs() >= i64::BITS } {
                 x = 0;
             } else {
-                x += x >> const { RHS.unsigned_abs() } & 0x0000000000000001;
+                x += x >> const { RHS.unsigned_abs() } & 0x1;
                 x += const { !(!0i64).unbounded_shl(RHS.unsigned_abs().saturating_sub(1)) };
                 x >>= const { RHS.unsigned_abs() };
             }
@@ -1081,7 +1075,7 @@ impl<const E: i32> I32F<E> {
             if const { RHS.wrapping_sub(-32).cast_unsigned() >= i64::BITS } {
                 x = 0;
             } else {
-                x += x >> const { RHS.wrapping_sub(-32).cast_unsigned() } & 0x0000000000000001;
+                x += x >> const { RHS.wrapping_sub(-32).cast_unsigned() } & 0x1;
                 x += const {
                     !(!0u64).unbounded_shl(RHS.wrapping_sub(-32).cast_unsigned().saturating_sub(1))
                 };
@@ -1134,7 +1128,7 @@ impl<const E: i32> I32F<E> {
             if const { RHS.wrapping_sub(-32).cast_unsigned() >= i64::BITS } {
                 x = 0;
             } else {
-                x += x >> const { RHS.wrapping_sub(-32).cast_unsigned() } & 0x0000000000000001;
+                x += x >> const { RHS.wrapping_sub(-32).cast_unsigned() } & 0x1;
                 x += const {
                     !(!0u64).unbounded_shl(RHS.wrapping_sub(-32).cast_unsigned().saturating_sub(1))
                 };
@@ -1179,7 +1173,7 @@ impl<const E: i32> I32F<E> {
             if const { RHS.wrapping_sub(-32).cast_unsigned() >= i64::BITS } {
                 x = 0;
             } else {
-                x += x >> const { RHS.wrapping_sub(-32).cast_unsigned() } & 0x0000000000000001;
+                x += x >> const { RHS.wrapping_sub(-32).cast_unsigned() } & 0x1;
                 x += const {
                     !(!0u64).unbounded_shl(RHS.wrapping_sub(-32).cast_unsigned().saturating_sub(1))
                 };
@@ -1228,7 +1222,7 @@ impl<const E: i32> I32F<E> {
             if const { RHS.wrapping_sub(-32).cast_unsigned() >= i64::BITS } {
                 x = 0;
             } else {
-                x += x >> const { RHS.wrapping_sub(-32).cast_unsigned() } & 0x0000000000000001;
+                x += x >> const { RHS.wrapping_sub(-32).cast_unsigned() } & 0x1;
                 x += const {
                     !(!0u64).unbounded_shl(RHS.wrapping_sub(-32).cast_unsigned().saturating_sub(1))
                 };
@@ -1281,7 +1275,7 @@ impl<const E: i32> I32F<E> {
             if const { RHS.wrapping_sub(-32).cast_unsigned() >= i64::BITS } {
                 x = 0;
             } else {
-                x += x >> const { RHS.wrapping_sub(-32).cast_unsigned() } & 0x0000000000000001;
+                x += x >> const { RHS.wrapping_sub(-32).cast_unsigned() } & 0x1;
                 x += const {
                     !(!0u64).unbounded_shl(RHS.wrapping_sub(-32).cast_unsigned().saturating_sub(1))
                 };
@@ -1327,7 +1321,7 @@ impl<const E: i32> I32F<E> {
             if const { RHS.wrapping_sub(-32).cast_unsigned() >= i64::BITS } {
                 x = 0;
             } else {
-                x += x >> const { RHS.wrapping_sub(-32).cast_unsigned() } & 0x0000000000000001;
+                x += x >> const { RHS.wrapping_sub(-32).cast_unsigned() } & 0x1;
                 x += const {
                     !(!0u64).unbounded_shl(RHS.wrapping_sub(-32).cast_unsigned().saturating_sub(1))
                 };
@@ -1710,10 +1704,7 @@ mod tests {
 
     #[test]
     fn costau_2_exact_right_angles() {
-        assert_eq!(
-            I32F::<-32>::from_bits(0x00000000).costau_2(),
-            I32F::<0>::new(1)
-        );
+        assert_eq!(I32F::<-32>::from_bits(0x0).costau_2(), I32F::<0>::new(1));
         assert_eq!(
             I32F::<-32>::from_bits(0x40000000).costau_2(),
             I32F::<0>::new(0)
@@ -1730,10 +1721,7 @@ mod tests {
 
     #[test]
     fn costau_4_exact_right_angles() {
-        assert_eq!(
-            I32F::<-32>::from_bits(0x00000000).costau_4(),
-            I32F::<0>::new(1)
-        );
+        assert_eq!(I32F::<-32>::from_bits(0x0).costau_4(), I32F::<0>::new(1));
         assert_eq!(
             I32F::<-32>::from_bits(0x40000000).costau_4(),
             I32F::<0>::new(0)
@@ -1750,10 +1738,7 @@ mod tests {
 
     #[test]
     fn costau_6_exact_right_angles() {
-        assert_eq!(
-            I32F::<-32>::from_bits(0x00000000).costau_6(),
-            I32F::<0>::new(1)
-        );
+        assert_eq!(I32F::<-32>::from_bits(0x0).costau_6(), I32F::<0>::new(1));
         assert_eq!(
             I32F::<-32>::from_bits(0x40000000).costau_6(),
             I32F::<0>::new(0)
@@ -1770,10 +1755,7 @@ mod tests {
 
     #[test]
     fn costau_8_exact_right_angles() {
-        assert_eq!(
-            I32F::<-32>::from_bits(0x00000000).costau_8(),
-            I32F::<0>::new(1)
-        );
+        assert_eq!(I32F::<-32>::from_bits(0x0).costau_8(), I32F::<0>::new(1));
         assert_eq!(
             I32F::<-32>::from_bits(0x40000000).costau_8(),
             I32F::<0>::new(0)
@@ -1790,10 +1772,7 @@ mod tests {
 
     #[test]
     fn costau_10_exact_right_angles() {
-        assert_eq!(
-            I32F::<-32>::from_bits(0x00000000).costau_10(),
-            I32F::<0>::new(1)
-        );
+        assert_eq!(I32F::<-32>::from_bits(0x0).costau_10(), I32F::<0>::new(1));
         assert_eq!(
             I32F::<-32>::from_bits(0x40000000).costau_10(),
             I32F::<0>::new(0)
@@ -1811,16 +1790,16 @@ mod tests {
     #[test]
     fn div_one_divide_by_eighth() {
         assert_eq!(
-            I32F::<-16>::from_bits(0x00010000) / I32F::<-33>::from_bits(0x40000000),
-            I32F::<-16>::from_bits(0x00080000)
+            I32F::<-16>::from_bits(0x10000) / I32F::<-33>::from_bits(0x40000000),
+            I32F::<-16>::from_bits(0x80000)
         );
         assert_eq!(
-            I32F::<-16>::from_bits(0x00010000) / I32F::<-32>::from_bits(0x20000000),
-            I32F::<-16>::from_bits(0x00080000)
+            I32F::<-16>::from_bits(0x10000) / I32F::<-32>::from_bits(0x20000000),
+            I32F::<-16>::from_bits(0x80000)
         );
         assert_eq!(
-            I32F::<-16>::from_bits(0x00010000) / I32F::<-3>::new(1),
-            I32F::<-16>::from_bits(0x00080000)
+            I32F::<-16>::from_bits(0x10000) / I32F::<-3>::new(1),
+            I32F::<-16>::from_bits(0x80000)
         );
     }
 
@@ -1835,8 +1814,8 @@ mod tests {
     #[test]
     fn div_one_divide_by_two() {
         assert_eq!(
-            I32F::<-16>::from_bits(0x00010000) / I32F::<1>::new(1),
-            I32F::<-16>::from_bits(0x00008000)
+            I32F::<-16>::from_bits(0x10000) / I32F::<1>::new(1),
+            I32F::<-16>::from_bits(0x8000)
         );
     }
 
@@ -1865,29 +1844,26 @@ mod tests {
     #[test]
     fn scale_round_ties_even() {
         assert_eq!(
-            I32F::<-16>::from_bits(0x00008000).rescale::<0>(),
+            I32F::<-16>::from_bits(0x8000).rescale::<0>(),
             I32F::<0>::new(0)
         );
         assert_eq!(
-            I32F::<-16>::from_bits(0x00008001).rescale::<0>(),
+            I32F::<-16>::from_bits(0x8001).rescale::<0>(),
             I32F::<0>::new(1)
         );
         assert_eq!(
-            I32F::<-16>::from_bits(0x00017FFF).rescale::<0>(),
+            I32F::<-16>::from_bits(0x17FFF).rescale::<0>(),
             I32F::<0>::new(1)
         );
         assert_eq!(
-            I32F::<-16>::from_bits(0x00018000).rescale::<0>(),
+            I32F::<-16>::from_bits(0x18000).rescale::<0>(),
             I32F::<0>::new(2)
         );
     }
 
     #[test]
     fn sintau_2_exact_right_angles() {
-        assert_eq!(
-            I32F::<-32>::from_bits(0x00000000).sintau_2(),
-            I32F::<0>::new(0)
-        );
+        assert_eq!(I32F::<-32>::from_bits(0x0).sintau_2(), I32F::<0>::new(0));
         assert_eq!(
             I32F::<-32>::from_bits(0x40000000).sintau_2(),
             I32F::<0>::new(1)
@@ -1904,10 +1880,7 @@ mod tests {
 
     #[test]
     fn sintau_4_exact_right_angles() {
-        assert_eq!(
-            I32F::<-32>::from_bits(0x00000000).sintau_4(),
-            I32F::<0>::new(0)
-        );
+        assert_eq!(I32F::<-32>::from_bits(0x0).sintau_4(), I32F::<0>::new(0));
         assert_eq!(
             I32F::<-32>::from_bits(0x40000000).sintau_4(),
             I32F::<0>::new(1)
@@ -1924,10 +1897,7 @@ mod tests {
 
     #[test]
     fn sintau_6_exact_right_angles() {
-        assert_eq!(
-            I32F::<-32>::from_bits(0x00000000).sintau_6(),
-            I32F::<0>::new(0)
-        );
+        assert_eq!(I32F::<-32>::from_bits(0x0).sintau_6(), I32F::<0>::new(0));
         assert_eq!(
             I32F::<-32>::from_bits(0x40000000).sintau_6(),
             I32F::<0>::new(1)
@@ -1944,10 +1914,7 @@ mod tests {
 
     #[test]
     fn sintau_8_exact_right_angles() {
-        assert_eq!(
-            I32F::<-32>::from_bits(0x00000000).sintau_8(),
-            I32F::<0>::new(0)
-        );
+        assert_eq!(I32F::<-32>::from_bits(0x0).sintau_8(), I32F::<0>::new(0));
         assert_eq!(
             I32F::<-32>::from_bits(0x40000000).sintau_8(),
             I32F::<0>::new(1)
@@ -1964,10 +1931,7 @@ mod tests {
 
     #[test]
     fn sintau_10_exact_right_angles() {
-        assert_eq!(
-            I32F::<-32>::from_bits(0x00000000).sintau_10(),
-            I32F::<0>::new(0)
-        );
+        assert_eq!(I32F::<-32>::from_bits(0x0).sintau_10(), I32F::<0>::new(0));
         assert_eq!(
             I32F::<-32>::from_bits(0x40000000).sintau_10(),
             I32F::<0>::new(1)
@@ -1991,7 +1955,7 @@ mod tests {
     fn to_f32_max() {
         assert!(I32F::<{ f32::MAX_EXP }>::new(1).to_f32() > f32::MAX);
         assert_eq!(
-            I32F::<{ f32::MAX_EXP - 24 }>::from_bits(0x00FFFFFF).to_f32(),
+            I32F::<{ f32::MAX_EXP - 24 }>::from_bits(0xFFFFFF).to_f32(),
             f32::MAX
         );
     }
@@ -2038,11 +2002,11 @@ mod tests {
 
     #[test]
     fn to_f32_round_once() {
-        let x = 0x01000005;
-        assert_eq!(I32F::<-152>::from_bits(x).to_f32().to_bits(), 0x00200001);
+        let x = 0x1000005;
+        assert_eq!(I32F::<-152>::from_bits(x).to_f32().to_bits(), 0x200001);
         assert_eq!(
             (x as f32 * 2.0f32.powi(-76) * 2.0f32.powi(-76)).to_bits(),
-            0x00200000
+            0x200000
         );
     }
 
@@ -2084,8 +2048,8 @@ mod tests {
     #[test]
     fn mul_three_times_half() {
         assert_eq!(
-            I32F::<-16>::from_bits(0x00030000) * I32F::<-1>::new(1),
-            I32F::<-16>::from_bits(0x00018000)
+            I32F::<-16>::from_bits(0x30000) * I32F::<-1>::new(1),
+            I32F::<-16>::from_bits(0x18000)
         );
     }
 
@@ -2097,8 +2061,8 @@ mod tests {
     #[test]
     fn mul_three_times_two() {
         assert_eq!(
-            I32F::<-16>::from_bits(0x00030000) * I32F::<1>::new(1),
-            I32F::<-16>::from_bits(0x00060000)
+            I32F::<-16>::from_bits(0x30000) * I32F::<1>::new(1),
+            I32F::<-16>::from_bits(0x60000)
         );
     }
 }
