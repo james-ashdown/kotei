@@ -247,6 +247,140 @@ impl<const E: i32> I8F<E> {
         Self(i8::from_le_bytes(bytes))
     }
 
+    /// Returns the nearest [`f32`] to `self`, rounded to the number with even least significant digits if `self` is halfway between two representable [`f32`] numbers, saturating at [`f32::INFINITY`] or [`f32::NEG_INFINITY`] if `self` rounds to a value greater than [`f32::MAX`] or less than [`f32::MIN`], respectively.
+    #[must_use]
+    pub const fn to_f32(self) -> f32 {
+        const BIAS: u32 = 127;
+
+        if const { E >= f32::MIN_EXP - 1 } {
+            let scaling_factor = const {
+                let mut exponent = 127u32.saturating_add_signed(E);
+
+                if exponent > 0xFF {
+                    exponent = 0xFF;
+                }
+
+                let bits = exponent << 23;
+
+                f32::from_bits(bits)
+            };
+
+            if scaling_factor == f32::INFINITY && self.0 == 0 {
+                0.0
+            } else {
+                self.0 as f32 * scaling_factor
+            }
+        } else {
+            let mut bits = 0;
+            let mut significand = self.0 as u32;
+
+            if self.0 < 0 {
+                bits |= 0x80000000;
+                significand = significand.wrapping_neg();
+            }
+
+            let leading_zeros = significand.leading_zeros();
+            let mut exponent = const { BIAS + u32::BITS - 1 }.wrapping_sub(leading_zeros);
+            let mut align = const { u32::BITS - f32::MANTISSA_DIGITS };
+            align = align.wrapping_add(leading_zeros.saturating_sub_signed(
+                const { E.saturating_add_unsigned((BIAS - 1) + (u32::BITS - 1)) },
+            ));
+
+            if leading_zeros >= align {
+                let shift = leading_zeros - align;
+                significand <<= shift;
+            } else {
+                let shift = align - leading_zeros;
+
+                if shift >= u32::BITS {
+                    significand = 0;
+                } else {
+                    significand = significand.wrapping_add(significand >> shift & 0x1);
+                    significand = significand.wrapping_add(!(!0 << shift.wrapping_sub(1)));
+                    significand >>= shift;
+
+                    if significand.leading_zeros() < 8 {
+                        significand >>= 1;
+                        exponent += 1;
+                    }
+                }
+            }
+
+            exponent = exponent.saturating_add_signed(E);
+            bits |= exponent << 23;
+            bits |= significand & 0x7FFFFF;
+
+            f32::from_bits(bits)
+        }
+    }
+
+    /// Returns the nearest [`f32`] to `self`, rounded to the number with even least significant digits if `self` is halfway between two representable [`f32`] numbers, saturating at [`f32::INFINITY`] or [`f32::NEG_INFINITY`] if `self` rounds to a value greater than [`f32::MAX`] or less than [`f32::MIN`], respectively.
+    #[must_use]
+    pub const fn to_f64(self) -> f64 {
+        const BIAS: u32 = 1023;
+
+        if const { E >= f64::MIN_EXP - 1 } {
+            let scaling_factor = const {
+                let mut exponent = 1023u64.saturating_add_signed(E as i64);
+
+                if exponent > 0x7FF {
+                    exponent = 0x7FF;
+                }
+
+                let bits = exponent << 52;
+
+                f64::from_bits(bits)
+            };
+
+            if scaling_factor == f64::INFINITY && self.0 == 0 {
+                0.0
+            } else {
+                self.0 as f64 * scaling_factor
+            }
+        } else {
+            let mut bits = 0;
+            let mut significand = self.0 as u64;
+
+            if self.0 < 0 {
+                bits |= 0x8000000000000000;
+                significand = significand.wrapping_neg();
+            }
+
+            let leading_zeros = significand.leading_zeros();
+            let mut exponent = const { BIAS + u64::BITS - 1 }.wrapping_sub(leading_zeros);
+            let mut align = const { u64::BITS - f64::MANTISSA_DIGITS };
+            align = align.wrapping_add(leading_zeros.saturating_sub_signed(
+                const { E.saturating_add_unsigned((BIAS - 1) + (u64::BITS - 1)) },
+            ));
+
+            if leading_zeros >= align {
+                let shift = leading_zeros.wrapping_sub(align);
+                significand <<= shift;
+            } else {
+                let shift = align.wrapping_sub(leading_zeros);
+
+                if shift >= u64::BITS {
+                    significand = 0;
+                } else {
+                    significand = significand.wrapping_add(significand >> shift & 0x1);
+                    significand = significand.wrapping_add(!(!0 << shift.wrapping_sub(1)));
+                    significand >>= shift;
+
+                    if significand.leading_zeros() < 8 {
+                        significand >>= 1;
+                        exponent += 1;
+                    }
+                }
+            }
+
+            exponent = exponent.saturating_add_signed(E);
+            bits |= (exponent as u64) << 52;
+            bits |= significand & 0xFFFFFFFFFFFFF;
+
+            f64::from_bits(bits)
+        }
+    }
+
     /// Raw transmutation to [`u8`].
     #[must_use]
     pub const fn to_bits(self) -> u8 {
