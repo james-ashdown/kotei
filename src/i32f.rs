@@ -118,16 +118,16 @@ impl<const E: i32> I32F<E> {
             exponent = 1;
         }
 
-        let mut significand = significand.cast_signed();
+        let mut significand = significand as i32;
 
         if negative {
             significand = significand.wrapping_neg();
         }
 
-        let exponent = exponent.cast_signed() - const { 127 + 23 };
+        let exponent = exponent as i32 - const { 127 + 23 };
 
         if exponent >= E {
-            let shift = exponent.wrapping_sub(E).cast_unsigned();
+            let shift = exponent.wrapping_sub(E) as u32;
 
             if shift >= significand.leading_zeros() | significand.leading_ones() {
                 if negative {
@@ -139,7 +139,7 @@ impl<const E: i32> I32F<E> {
                 significand <<= shift;
             }
         } else {
-            let shift = E.wrapping_sub(exponent).cast_unsigned();
+            let shift = E.wrapping_sub(exponent) as u32;
 
             if shift >= i32::BITS {
                 significand = 0;
@@ -151,6 +151,73 @@ impl<const E: i32> I32F<E> {
         }
 
         Ok(Self(significand))
+    }
+
+    /// Tries to create a new fixed-point number from [`f64`]. Returns the nearest multiple of 2<sup>E</sup> to `value`, rounded to the number with even least significant digits if `value` is halfway between two multiples of 2<sup>E</sup>. Returns an error if `value` is not a number, less than [`Self::MIN`], or greater than [`Self::MAX`].
+    pub const fn try_new_from_f64(value: f64) -> Result<Self, TryFromFloatError> {
+        let bits = value.to_bits();
+
+        if bits & 0x7FFFFFFFFFFFFFFF == 0 {
+            return Ok(Self(0));
+        }
+
+        let mut significand = bits & 0xFFFFFFFFFFFFF;
+        let mut exponent = bits >> 52 & 0x7FF;
+        let negative = bits >> 63 != 0;
+
+        if exponent == 0x7FF {
+            if significand != 0 {
+                return Err(TryFromFloatError::Nan);
+            } else if negative {
+                return Err(TryFromFloatError::Underflow);
+            } else {
+                return Err(TryFromFloatError::Overflow);
+            }
+        } else if exponent > 0 {
+            significand |= 0x10000000000000;
+        } else {
+            exponent = 1;
+        }
+
+        let mut significand = significand as i64;
+
+        if negative {
+            significand = significand.wrapping_neg();
+        }
+
+        let exponent = (exponent as i32).wrapping_sub(const { 1023 + 52 });
+
+        if exponent >= E {
+            let shift = exponent.wrapping_sub(E) as u32;
+
+            if shift >= significand.leading_zeros() | significand.leading_ones() {
+                if negative {
+                    return Err(TryFromFloatError::Underflow);
+                } else {
+                    return Err(TryFromFloatError::Overflow);
+                }
+            } else {
+                significand <<= shift;
+            }
+        } else {
+            let shift = E.wrapping_sub(exponent) as u32;
+
+            if shift >= i64::BITS {
+                significand = 0;
+            } else {
+                significand += significand >> shift & 0x1;
+                significand += !(!0 << (shift - 1));
+                significand >>= shift;
+            }
+        }
+
+        if significand < i32::MIN as i64 {
+            return Err(TryFromFloatError::Underflow);
+        } else if significand > i32::MAX as i64 {
+            return Err(TryFromFloatError::Overflow);
+        }
+
+        Ok(Self(significand as i32))
     }
 
     /// Converts from [`I8F<E>`] losslessly.
