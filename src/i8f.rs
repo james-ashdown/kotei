@@ -119,7 +119,7 @@ impl<const E: i32> I8F<E> {
             significand = significand.wrapping_neg();
         }
 
-        let exponent = exponent as i32 - const { 127 + 23 };
+        let exponent = (exponent as i32).wrapping_sub(const { 127 + 23 });
 
         if exponent >= E {
             let shift = exponent.wrapping_sub(E) as u32;
@@ -139,8 +139,8 @@ impl<const E: i32> I8F<E> {
             if shift >= i32::BITS {
                 significand = 0;
             } else {
-                significand += significand >> shift & 0x1;
-                significand += !(!0 << (shift - 1));
+                significand = significand.wrapping_add(significand >> shift & 0x1);
+                significand = significand.wrapping_add(!(!0 << shift.wrapping_sub(1)));
                 significand >>= shift;
             }
         }
@@ -206,8 +206,8 @@ impl<const E: i32> I8F<E> {
             if shift >= i64::BITS {
                 significand = 0;
             } else {
-                significand += significand >> shift & 0x1;
-                significand += !(!0 << (shift - 1));
+                significand = significand.wrapping_add(significand >> shift & 0x1);
+                significand = significand.wrapping_add(!(!0 << shift.wrapping_sub(1)));
                 significand >>= shift;
             }
         }
@@ -287,10 +287,10 @@ impl<const E: i32> I8F<E> {
             ));
 
             if leading_zeros >= align {
-                let shift = leading_zeros - align;
+                let shift = leading_zeros.wrapping_sub(align);
                 significand <<= shift;
             } else {
-                let shift = align - leading_zeros;
+                let shift = align.wrapping_sub(leading_zeros);
 
                 if shift >= u32::BITS {
                     significand = 0;
@@ -301,7 +301,7 @@ impl<const E: i32> I8F<E> {
 
                     if significand.leading_zeros() < 8 {
                         significand >>= 1;
-                        exponent += 1;
+                        exponent = exponent.wrapping_add(1);
                     }
                 }
             }
@@ -368,7 +368,7 @@ impl<const E: i32> I8F<E> {
 
                     if significand.leading_zeros() < 8 {
                         significand >>= 1;
-                        exponent += 1;
+                        exponent = exponent.wrapping_add(1);
                     }
                 }
             }

@@ -145,8 +145,8 @@ impl<const E: i32> I64F<E> {
             if shift >= i64::BITS {
                 significand = 0;
             } else {
-                significand += significand >> shift & 0x1;
-                significand += !(!0 << (shift - 1));
+                significand = significand.wrapping_add(significand >> shift & 0x1);
+                significand = significand.wrapping_add(!(!0 << shift.wrapping_sub(1)));
                 significand >>= shift;
             }
         }
@@ -206,8 +206,8 @@ impl<const E: i32> I64F<E> {
             if shift >= i64::BITS {
                 significand = 0;
             } else {
-                significand += significand >> shift & 0x1;
-                significand += !(!0 << (shift - 1));
+                significand = significand.wrapping_add(significand >> shift & 0x1);
+                significand = significand.wrapping_add(!(!0 << shift.wrapping_sub(1)));
                 significand >>= shift;
             }
         }
@@ -317,10 +317,10 @@ impl<const E: i32> I64F<E> {
             ));
 
             if leading_zeros >= align {
-                let shift = leading_zeros - align;
+                let shift = leading_zeros.wrapping_sub(align);
                 significand <<= shift;
             } else {
-                let shift = align - leading_zeros;
+                let shift = align.wrapping_sub(leading_zeros);
 
                 if shift >= u64::BITS {
                     significand = 0;
@@ -331,7 +331,7 @@ impl<const E: i32> I64F<E> {
 
                     if significand.leading_zeros() < 8 {
                         significand >>= 1;
-                        exponent += 1;
+                        exponent = exponent.wrapping_add(1);
                     }
                 }
             }
@@ -398,7 +398,7 @@ impl<const E: i32> I64F<E> {
 
                     if significand.leading_zeros() < 8 {
                         significand >>= 1;
-                        exponent += 1;
+                        exponent = exponent.wrapping_add(1);
                     }
                 }
             }
