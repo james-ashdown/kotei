@@ -2139,7 +2139,16 @@ impl<const E: i32> ops::Add for U64F<E> {
 
     #[track_caller]
     fn add(self, rhs: Self) -> Self::Output {
-        Self(self.0 + rhs.0)
+        Self::add(self, rhs)
+    }
+}
+
+impl<const E: i32> ops::Add<I64F<E>> for U64F<E> {
+    type Output = Self;
+
+    #[track_caller]
+    fn add(self, rhs: I64F<E>) -> Self::Output {
+        Self::add_signed(self, rhs)
     }
 }
 
@@ -2148,7 +2157,16 @@ impl<const E: i32> ops::Sub for U64F<E> {
 
     #[track_caller]
     fn sub(self, rhs: Self) -> Self::Output {
-        Self(self.0 - rhs.0)
+        Self::sub(self, rhs)
+    }
+}
+
+impl<const E: i32> ops::Sub<I64F<E>> for U64F<E> {
+    type Output = Self;
+
+    #[track_caller]
+    fn sub(self, rhs: I64F<E>) -> Self::Output {
+        Self::sub_signed(self, rhs)
     }
 }
 

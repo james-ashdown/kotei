@@ -2112,7 +2112,7 @@ impl<const E: i32> ops::Neg for I64F<E> {
 
     #[track_caller]
     fn neg(self) -> Self::Output {
-        Self(-self.0)
+        Self::neg(self)
     }
 }
 
@@ -2121,7 +2121,16 @@ impl<const E: i32> ops::Add for I64F<E> {
 
     #[track_caller]
     fn add(self, rhs: Self) -> Self::Output {
-        Self(self.0 + rhs.0)
+        Self::add(self, rhs)
+    }
+}
+
+impl<const E: i32> ops::Add<U64F<E>> for I64F<E> {
+    type Output = Self;
+
+    #[track_caller]
+    fn add(self, rhs: U64F<E>) -> Self::Output {
+        Self::add_unsigned(self, rhs)
     }
 }
 
@@ -2130,7 +2139,16 @@ impl<const E: i32> ops::Sub for I64F<E> {
 
     #[track_caller]
     fn sub(self, rhs: Self) -> Self::Output {
-        Self(self.0 - rhs.0)
+        Self::sub(self, rhs)
+    }
+}
+
+impl<const E: i32> ops::Sub<U64F<E>> for I64F<E> {
+    type Output = Self;
+
+    #[track_caller]
+    fn sub(self, rhs: U64F<E>) -> Self::Output {
+        Self::sub_unsigned(self, rhs)
     }
 }
 
