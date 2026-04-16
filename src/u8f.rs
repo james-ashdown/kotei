@@ -995,7 +995,9 @@ impl<const E: i32> U8F<E> {
             if shift > u16::BITS {
                 x = 0;
             } else if shift == u16::BITS {
-                x = (x > 0x8000) as u16;
+                let threshold = const { 1 << (u16::BITS - 1) };
+
+                x = (x > threshold) as u16;
             } else {
                 let mask = const {
                     let shift = R.wrapping_neg().cast_unsigned();
@@ -1051,7 +1053,9 @@ impl<const E: i32> U8F<E> {
             if shift > u16::BITS {
                 x = 0;
             } else if shift == u16::BITS {
-                x = (x > 0x8000) as u16;
+                let threshold = const { 1 << (u16::BITS - 1) };
+
+                x = (x > threshold) as u16;
             } else {
                 let mask = const {
                     let shift = R.wrapping_neg().cast_unsigned();
@@ -1098,7 +1102,9 @@ impl<const E: i32> U8F<E> {
             if shift > u16::BITS {
                 x = 0;
             } else if shift == u16::BITS {
-                x = (x > 0x8000) as u16;
+                let threshold = const { 1 << (u16::BITS - 1) };
+
+                x = (x > threshold) as u16;
             } else {
                 let mask = const {
                     let shift = R.wrapping_neg().cast_unsigned();
@@ -1145,7 +1151,9 @@ impl<const E: i32> U8F<E> {
             if shift > u16::BITS {
                 x = 0;
             } else if shift == u16::BITS {
-                x = (x > 0x8000) as u16;
+                let threshold = const { 1 << (u16::BITS - 1) };
+
+                x = (x > threshold) as u16;
             } else {
                 let mask = const {
                     let shift = R.wrapping_neg().cast_unsigned();
@@ -1195,7 +1203,9 @@ impl<const E: i32> U8F<E> {
             if shift > u16::BITS {
                 x = 0;
             } else if shift == u16::BITS {
-                x = (x > 0x8000) as u16;
+                let threshold = const { 1 << (u16::BITS - 1) };
+
+                x = (x > threshold) as u16;
             } else {
                 let mask = const {
                     let shift = R.wrapping_neg().cast_unsigned();
@@ -1244,7 +1254,9 @@ impl<const E: i32> U8F<E> {
             if shift > u16::BITS {
                 x = 0;
             } else if shift == u16::BITS {
-                x = (x > 0x8000) as u16;
+                let threshold = const { 1 << (u16::BITS - 1) };
+
+                x = (x > threshold) as u16;
             } else {
                 let mask = const {
                     let shift = R.wrapping_neg().cast_unsigned();
