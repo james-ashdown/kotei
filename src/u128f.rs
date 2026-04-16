@@ -866,24 +866,28 @@ impl<const E: i32> ops::Sub<I128F<E>> for U128F<E> {
 }
 
 impl<const E: i32> ops::AddAssign for U128F<E> {
+    #[track_caller]
     fn add_assign(&mut self, rhs: Self) {
         *self = Self::add(*self, rhs)
     }
 }
 
 impl<const E: i32> ops::AddAssign<I128F<E>> for U128F<E> {
+    #[track_caller]
     fn add_assign(&mut self, rhs: I128F<E>) {
         *self = Self::add_signed(*self, rhs)
     }
 }
 
 impl<const E: i32> ops::SubAssign for U128F<E> {
+    #[track_caller]
     fn sub_assign(&mut self, rhs: Self) {
         *self = Self::sub(*self, rhs)
     }
 }
 
 impl<const E: i32> ops::SubAssign<I128F<E>> for U128F<E> {
+    #[track_caller]
     fn sub_assign(&mut self, rhs: I128F<E>) {
         *self = Self::sub_signed(*self, rhs)
     }

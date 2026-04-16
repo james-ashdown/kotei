@@ -2168,48 +2168,56 @@ impl<const E: i32, const R: i32> ops::Div<I8F<R>> for U8F<E> {
 }
 
 impl<const E: i32> ops::AddAssign for U8F<E> {
+    #[track_caller]
     fn add_assign(&mut self, rhs: Self) {
         *self = Self::add(*self, rhs)
     }
 }
 
 impl<const E: i32> ops::AddAssign<I8F<E>> for U8F<E> {
+    #[track_caller]
     fn add_assign(&mut self, rhs: I8F<E>) {
         *self = Self::add_signed(*self, rhs)
     }
 }
 
 impl<const E: i32> ops::SubAssign for U8F<E> {
+    #[track_caller]
     fn sub_assign(&mut self, rhs: Self) {
         *self = Self::sub(*self, rhs)
     }
 }
 
 impl<const E: i32> ops::SubAssign<I8F<E>> for U8F<E> {
+    #[track_caller]
     fn sub_assign(&mut self, rhs: I8F<E>) {
         *self = Self::sub_signed(*self, rhs)
     }
 }
 
 impl<const E: i32, const R: i32> ops::MulAssign<U8F<R>> for U8F<E> {
+    #[track_caller]
     fn mul_assign(&mut self, rhs: U8F<R>) {
         *self = Self::mul(*self, rhs)
     }
 }
 
 impl<const E: i32, const R: i32> ops::MulAssign<I8F<R>> for U8F<E> {
+    #[track_caller]
     fn mul_assign(&mut self, rhs: I8F<R>) {
         *self = Self::mul_signed(*self, rhs)
     }
 }
 
 impl<const E: i32, const R: i32> ops::DivAssign<U8F<R>> for U8F<E> {
+    #[track_caller]
     fn div_assign(&mut self, rhs: U8F<R>) {
         *self = Self::div(*self, rhs)
     }
 }
 
 impl<const E: i32, const R: i32> ops::DivAssign<I8F<R>> for U8F<E> {
+    #[track_caller]
     fn div_assign(&mut self, rhs: I8F<R>) {
         *self = Self::div_signed(*self, rhs)
     }
