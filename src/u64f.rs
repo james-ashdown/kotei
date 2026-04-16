@@ -689,6 +689,1340 @@ impl<const E: i32> U64F<E> {
 
         Some(Self(x))
     }
+
+    #[doc(hidden)]
+    #[must_use]
+    #[track_caller]
+    pub const fn mul<const R: i32>(self, rhs: U64F<R>) -> Self {
+        let mut x = (self.0 as u128).wrapping_mul(rhs.0 as u128);
+
+        if const { R > 0 } {
+            let shift = const { R.cast_unsigned() };
+
+            if cfg!(debug_assertions) {
+                if x != 0 && shift >= x.leading_zeros() {
+                    crate::panic::mul();
+                }
+            }
+
+            if shift >= u128::BITS {
+                x = 0;
+            } else {
+                x <<= shift;
+            }
+        } else if const { R < 0 } {
+            let shift = const { R.wrapping_neg().cast_unsigned() };
+
+            if shift > u128::BITS {
+                x = 0;
+            } else if shift == u128::BITS {
+                x = (x > 0x64000) as u128;
+            } else {
+                let mask = const {
+                    let shift = R.wrapping_neg().cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+                let round = const {
+                    let shift = R.wrapping_neg().wrapping_sub(1).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+
+                let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
+                temp = temp.wrapping_add(round);
+                temp >>= shift;
+                x >>= shift;
+                x = x.wrapping_add(temp);
+            }
+        }
+
+        if cfg!(debug_assertions) {
+            if x > u64::MAX as u128 {
+                crate::panic::mul();
+            }
+        }
+
+        Self(x as u64)
+    }
+
+    /// Computes `self * rhs`, panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will always panic on overflow, even if overflow checks are disabled.
+    #[must_use]
+    #[track_caller]
+    pub const fn strict_mul<const R: i32>(self, rhs: U64F<R>) -> Self {
+        let mut x = (self.0 as u128).wrapping_mul(rhs.0 as u128);
+
+        if const { R > 0 } {
+            let shift = const { R.cast_unsigned() };
+
+            if x != 0 && shift >= x.leading_zeros() {
+                crate::panic::mul();
+            }
+
+            if shift >= u128::BITS {
+                x = 0;
+            } else {
+                x <<= shift;
+            }
+        } else if const { R < 0 } {
+            let shift = const { R.wrapping_neg().cast_unsigned() };
+
+            if shift > u128::BITS {
+                x = 0;
+            } else if shift == u128::BITS {
+                x = (x > 0x64000) as u128;
+            } else {
+                let mask = const {
+                    let shift = R.wrapping_neg().cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+                let round = const {
+                    let shift = R.wrapping_neg().wrapping_sub(1).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+
+                let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
+                temp = temp.wrapping_add(round);
+                temp >>= shift;
+                x >>= shift;
+                x = x.wrapping_add(temp);
+            }
+        }
+
+        if x > u64::MAX as u128 {
+            crate::panic::mul();
+        }
+
+        Self(x as u64)
+    }
+
+    /// Computes `self * rhs`, wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn wrapping_mul<const R: i32>(self, rhs: U64F<R>) -> Self {
+        let mut x = (self.0 as u128).wrapping_mul(rhs.0 as u128);
+
+        if const { R > 0 } {
+            let shift = const { R.cast_unsigned() };
+
+            if shift >= u128::BITS {
+                x = 0;
+            } else {
+                x <<= shift;
+            }
+        } else if const { R < 0 } {
+            let shift = const { R.wrapping_neg().cast_unsigned() };
+
+            if shift > u128::BITS {
+                x = 0;
+            } else if shift == u128::BITS {
+                x = (x > 0x64000) as u128;
+            } else {
+                let mask = const {
+                    let shift = R.wrapping_neg().cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+                let round = const {
+                    let shift = R.wrapping_neg().wrapping_sub(1).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+
+                let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
+                temp = temp.wrapping_add(round);
+                temp >>= shift;
+                x >>= shift;
+                x = x.wrapping_add(temp);
+            }
+        }
+
+        Self(x as u64)
+    }
+
+    /// Computes `self * rhs`, saturating at the numeric bounds of the type instead of overflowing.
+    #[must_use]
+    pub const fn saturating_mul<const R: i32>(self, rhs: U64F<R>) -> Self {
+        let mut x = (self.0 as u128).wrapping_mul(rhs.0 as u128);
+
+        if const { R > 0 } {
+            let shift = const { R.cast_unsigned() };
+
+            if x != 0 && shift >= x.leading_zeros() {
+                return Self::MAX;
+            }
+
+            if shift >= u128::BITS {
+                x = 0;
+            } else {
+                x <<= shift;
+            }
+        } else if const { R < 0 } {
+            let shift = const { R.wrapping_neg().cast_unsigned() };
+
+            if shift > u128::BITS {
+                x = 0;
+            } else if shift == u128::BITS {
+                x = (x > 0x64000) as u128;
+            } else {
+                let mask = const {
+                    let shift = R.wrapping_neg().cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+                let round = const {
+                    let shift = R.wrapping_neg().wrapping_sub(1).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+
+                let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
+                temp = temp.wrapping_add(round);
+                temp >>= shift;
+                x >>= shift;
+                x = x.wrapping_add(temp);
+            }
+        }
+
+        if x > u64::MAX as u128 {
+            return Self::MAX;
+        }
+
+        Self(x as u64)
+    }
+
+    /// Computes `self * rhs`. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
+    #[must_use]
+    pub const fn overflowing_mul<const R: i32>(self, rhs: U64F<R>) -> (Self, bool) {
+        let mut x = (self.0 as u128).wrapping_mul(rhs.0 as u128);
+        let mut overflowed = false;
+
+        if const { R > 0 } {
+            let shift = const { R.cast_unsigned() };
+
+            overflowed |= x != 0 && shift >= x.leading_zeros();
+
+            if shift >= u128::BITS {
+                x = 0;
+            } else {
+                x <<= shift;
+            }
+        } else if const { R < 0 } {
+            let shift = const { R.wrapping_neg().cast_unsigned() };
+
+            if shift > u128::BITS {
+                x = 0;
+            } else if shift == u128::BITS {
+                x = (x > 0x64000) as u128;
+            } else {
+                let mask = const {
+                    let shift = R.wrapping_neg().cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+                let round = const {
+                    let shift = R.wrapping_neg().wrapping_sub(1).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+
+                let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
+                temp = temp.wrapping_add(round);
+                temp >>= shift;
+                x >>= shift;
+                x = x.wrapping_add(temp);
+            }
+        }
+
+        overflowed |= x > u64::MAX as u128;
+
+        (Self(x as u64), overflowed)
+    }
+
+    /// Computes `self * rhs`, returning `None` if overflow occurred.
+    #[must_use]
+    pub const fn checked_mul<const R: i32>(self, rhs: U64F<R>) -> Option<Self> {
+        let mut x = (self.0 as u128).wrapping_mul(rhs.0 as u128);
+
+        if const { R > 0 } {
+            let shift = const { R.cast_unsigned() };
+
+            if x != 0 && shift >= x.leading_zeros() {
+                return None;
+            }
+
+            if shift >= u128::BITS {
+                x = 0;
+            } else {
+                x <<= shift;
+            }
+        } else if const { R < 0 } {
+            let shift = const { R.wrapping_neg().cast_unsigned() };
+
+            if shift > u128::BITS {
+                x = 0;
+            } else if shift == u128::BITS {
+                x = (x > 0x64000) as u128;
+            } else {
+                let mask = const {
+                    let shift = R.wrapping_neg().cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+                let round = const {
+                    let shift = R.wrapping_neg().wrapping_sub(1).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+
+                let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
+                temp = temp.wrapping_add(round);
+                temp >>= shift;
+                x >>= shift;
+                x = x.wrapping_add(temp);
+            }
+        }
+
+        if x > u64::MAX as u128 {
+            return None;
+        }
+
+        Some(Self(x as u64))
+    }
+
+    /// Computes `self * rhs`, panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic on overflow for debug builds, or return a wrapping result for release builds.
+    #[must_use]
+    #[track_caller]
+    pub const fn mul_signed<const R: i32>(self, rhs: I64F<R>) -> Self {
+        let mut x = (self.0 as i128).wrapping_mul(rhs.0 as i128);
+
+        if const { R > 0 } {
+            let shift = const { R.cast_unsigned() };
+
+            if cfg!(debug_assertions) {
+                if x != 0 && shift >= x.leading_zeros() | x.leading_ones() {
+                    crate::panic::mul();
+                }
+            }
+
+            if shift >= i128::BITS {
+                x = 0;
+            } else {
+                x <<= shift;
+            }
+        } else if const { R < 0 } {
+            let shift = const { R.wrapping_neg().cast_unsigned() };
+
+            if shift >= i128::BITS {
+                x = 0;
+            } else {
+                let mask = const {
+                    let shift = R.wrapping_neg().cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+                let round = const {
+                    let shift = R.wrapping_neg().wrapping_sub(1).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+
+                let mut temp = x as u128;
+                temp = (temp & mask).wrapping_add(temp >> shift & 0x1);
+                temp = temp.wrapping_add(round);
+                temp >>= shift;
+                x >>= shift;
+                x = x.wrapping_add_unsigned(temp);
+            }
+        }
+
+        if cfg!(debug_assertions) {
+            if x < u64::MIN as i128 || x > u64::MAX as i128 {
+                crate::panic::mul();
+            }
+        }
+
+        Self(x as u64)
+    }
+
+    /// Computes `self * rhs`, panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will always panic on overflow, even if overflow checks are disabled.
+    #[must_use]
+    #[track_caller]
+    pub const fn strict_mul_signed<const R: i32>(self, rhs: I64F<R>) -> Self {
+        let mut x = (self.0 as i128).wrapping_mul(rhs.0 as i128);
+
+        if const { R > 0 } {
+            let shift = const { R.cast_unsigned() };
+
+            if x != 0 && shift >= x.leading_zeros() | x.leading_ones() {
+                crate::panic::mul();
+            }
+
+            if shift >= i128::BITS {
+                x = 0;
+            } else {
+                x <<= shift;
+            }
+        } else if const { R < 0 } {
+            let shift = const { R.wrapping_neg().cast_unsigned() };
+
+            if shift >= i128::BITS {
+                x = 0;
+            } else {
+                let mask = const {
+                    let shift = R.wrapping_neg().cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+                let round = const {
+                    let shift = R.wrapping_neg().wrapping_sub(1).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+
+                let mut temp = x as u128;
+                temp = (temp & mask).wrapping_add(temp >> shift & 0x1);
+                temp = temp.wrapping_add(round);
+                temp >>= shift;
+                x >>= shift;
+                x = x.wrapping_add_unsigned(temp);
+            }
+        }
+
+        if x < u64::MIN as i128 || x > u64::MAX as i128 {
+            crate::panic::mul();
+        }
+
+        Self(x as u64)
+    }
+
+    /// Computes `self * rhs`, wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn wrapping_mul_signed<const R: i32>(self, rhs: I64F<R>) -> Self {
+        let mut x = (self.0 as i128).wrapping_mul(rhs.0 as i128);
+
+        if const { R > 0 } {
+            let shift = const { R.cast_unsigned() };
+
+            if shift >= i128::BITS {
+                x = 0;
+            } else {
+                x <<= shift;
+            }
+        } else if const { R < 0 } {
+            let shift = const { R.wrapping_neg().cast_unsigned() };
+
+            if shift >= i128::BITS {
+                x = 0;
+            } else {
+                let mask = const {
+                    let shift = R.wrapping_neg().cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+                let round = const {
+                    let shift = R.wrapping_neg().wrapping_sub(1).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+
+                let mut temp = x as u128;
+                temp = (temp & mask).wrapping_add(temp >> shift & 0x1);
+                temp = temp.wrapping_add(round);
+                temp >>= shift;
+                x >>= shift;
+                x = x.wrapping_add_unsigned(temp);
+            }
+        }
+
+        Self(x as u64)
+    }
+
+    /// Computes `self * rhs`, saturating at the numeric bounds of the type instead of overflowing.
+    #[must_use]
+    pub const fn saturating_mul_signed<const R: i32>(self, rhs: I64F<R>) -> Self {
+        let mut x = (self.0 as i128).wrapping_mul(rhs.0 as i128);
+
+        if const { R > 0 } {
+            let shift = const { R.cast_unsigned() };
+
+            if x != 0 && shift >= x.leading_zeros() | x.leading_ones() {
+                if x < 0 {
+                    return Self::MIN;
+                } else {
+                    return Self::MAX;
+                }
+            }
+
+            if shift >= i128::BITS {
+                x = 0;
+            } else {
+                x <<= shift;
+            }
+        } else if const { R < 0 } {
+            let shift = const { R.wrapping_neg().cast_unsigned() };
+
+            if shift >= i128::BITS {
+                x = 0;
+            } else {
+                let mask = const {
+                    let shift = R.wrapping_neg().cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+                let round = const {
+                    let shift = R.wrapping_neg().wrapping_sub(1).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+
+                let mut temp = x as u128;
+                temp = (temp & mask).wrapping_add(temp >> shift & 0x1);
+                temp = temp.wrapping_add(round);
+                temp >>= shift;
+                x >>= shift;
+                x = x.wrapping_add_unsigned(temp);
+            }
+        }
+
+        if x < u64::MIN as i128 {
+            return Self::MIN;
+        } else if x > u64::MAX as i128 {
+            return Self::MAX;
+        }
+
+        Self(x as u64)
+    }
+
+    /// Computes `self * rhs`. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
+    #[must_use]
+    pub const fn overflowing_mul_signed<const R: i32>(self, rhs: I64F<R>) -> (Self, bool) {
+        let mut x = (self.0 as i128).wrapping_mul(rhs.0 as i128);
+        let mut overflowed = false;
+
+        if const { R > 0 } {
+            let shift = const { R.cast_unsigned() };
+
+            overflowed |= x != 0 && shift >= x.leading_zeros() | x.leading_ones();
+
+            if shift >= i128::BITS {
+                x = 0;
+            } else {
+                x <<= shift;
+            }
+        } else if const { R < 0 } {
+            let shift = const { R.wrapping_neg().cast_unsigned() };
+
+            if shift >= i128::BITS {
+                x = 0;
+            } else {
+                let mask = const {
+                    let shift = R.wrapping_neg().cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+                let round = const {
+                    let shift = R.wrapping_neg().wrapping_sub(1).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+
+                let mut temp = x as u128;
+                temp = (temp & mask).wrapping_add(temp >> shift & 0x1);
+                temp = temp.wrapping_add(round);
+                temp >>= shift;
+                x >>= shift;
+                x = x.wrapping_add_unsigned(temp);
+            }
+        }
+
+        overflowed |= x < u64::MIN as i128 || x > u64::MAX as i128;
+
+        (Self(x as u64), overflowed)
+    }
+
+    /// Computes `self * rhs`, returning `None` if overflow occurred.
+    #[must_use]
+    pub const fn checked_mul_signed<const R: i32>(self, rhs: I64F<R>) -> Option<Self> {
+        let mut x = (self.0 as i128).wrapping_mul(rhs.0 as i128);
+
+        if const { R > 0 } {
+            let shift = const { R.cast_unsigned() };
+
+            if x != 0 && shift >= x.leading_zeros() | x.leading_ones() {
+                return None;
+            }
+
+            if shift >= i128::BITS {
+                x = 0;
+            } else {
+                x <<= shift;
+            }
+        } else if const { R < 0 } {
+            let shift = const { R.wrapping_neg().cast_unsigned() };
+
+            if shift >= i128::BITS {
+                x = 0;
+            } else {
+                let mask = const {
+                    let shift = R.wrapping_neg().cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+                let round = const {
+                    let shift = R.wrapping_neg().wrapping_sub(1).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+
+                let mut temp = x as u128;
+                temp = (temp & mask).wrapping_add(temp >> shift & 0x1);
+                temp = temp.wrapping_add(round);
+                temp >>= shift;
+                x >>= shift;
+                x = x.wrapping_add_unsigned(temp);
+            }
+        }
+
+        if x < u64::MIN as i128 || x > u64::MAX as i128 {
+            return None;
+        }
+
+        Some(Self(x as u64))
+    }
+
+    #[doc(hidden)]
+    #[must_use]
+    #[track_caller]
+    pub const fn div<const R: i32>(self, rhs: U64F<R>) -> Self {
+        const OFFSET: i32 = u64::BITS.cast_signed() - u128::BITS.cast_signed();
+
+        let mut x = ((self.0 as u128) << -OFFSET) / rhs.0 as u128;
+
+        if const { R < OFFSET } {
+            let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
+
+            if cfg!(debug_assertions) {
+                if x != 0 && shift > x.leading_zeros() {
+                    crate::panic::div();
+                }
+            }
+
+            if shift >= u128::BITS {
+                x = 0;
+            } else {
+                x <<= shift;
+            }
+        } else if const { R > OFFSET } {
+            let shift = const { R.wrapping_sub(OFFSET).cast_unsigned() };
+
+            if shift >= u128::BITS {
+                x = 0;
+            } else {
+                let mask = const {
+                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+                let round = const {
+                    let shift = R.wrapping_sub(OFFSET).wrapping_sub(1).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+
+                let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
+                temp = temp.wrapping_add(round);
+                temp >>= shift;
+                x >>= shift;
+                x = x.wrapping_add(temp);
+            }
+        }
+
+        if cfg!(debug_assertions) {
+            if x > u64::MAX as u128 {
+                crate::panic::div();
+            }
+        }
+
+        Self(x as u64)
+    }
+
+    /// Computes `self / rhs`, panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if `rhs == 0`.
+    ///
+    /// ## Overflow behavior
+    ///
+    /// This function will always panic on overflow, even if overflow checks are disabled.
+    #[must_use]
+    #[track_caller]
+    pub const fn strict_div<const R: i32>(self, rhs: U64F<R>) -> Self {
+        const OFFSET: i32 = u64::BITS.cast_signed() - u128::BITS.cast_signed();
+
+        let mut x = ((self.0 as u128) << -OFFSET) / rhs.0 as u128;
+
+        if const { R < OFFSET } {
+            let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
+
+            if x != 0 && shift > x.leading_zeros() {
+                crate::panic::div();
+            }
+
+            if shift >= u128::BITS {
+                x = 0;
+            } else {
+                x <<= shift;
+            }
+        } else if const { R > OFFSET } {
+            let shift = const { R.wrapping_sub(OFFSET).cast_unsigned() };
+
+            if shift >= u128::BITS {
+                x = 0;
+            } else {
+                let mask = const {
+                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+                let round = const {
+                    let shift = R.wrapping_sub(OFFSET).wrapping_sub(1).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+
+                let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
+                temp = temp.wrapping_add(round);
+                temp >>= shift;
+                x >>= shift;
+                x = x.wrapping_add(temp);
+            }
+        }
+
+        if x > u64::MAX as u128 {
+            crate::panic::div();
+        }
+
+        Self(x as u64)
+    }
+
+    /// Computes `self / rhs`, wrapping around at the numeric bounds of the type.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if `rhs == 0`.
+    #[must_use]
+    #[track_caller]
+    pub const fn wrapping_div<const R: i32>(self, rhs: U64F<R>) -> Self {
+        const OFFSET: i32 = u64::BITS.cast_signed() - u128::BITS.cast_signed();
+
+        let mut x = ((self.0 as u128) << -OFFSET) / rhs.0 as u128;
+
+        if const { R < OFFSET } {
+            let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
+
+            if shift >= u128::BITS {
+                x = 0;
+            } else {
+                x <<= shift;
+            }
+        } else if const { R > OFFSET } {
+            let shift = const { R.wrapping_sub(OFFSET).cast_unsigned() };
+
+            if shift >= u128::BITS {
+                x = 0;
+            } else {
+                let mask = const {
+                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+                let round = const {
+                    let shift = R.wrapping_sub(OFFSET).wrapping_sub(1).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+
+                let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
+                temp = temp.wrapping_add(round);
+                temp >>= shift;
+                x >>= shift;
+                x = x.wrapping_add(temp);
+            }
+        }
+
+        Self(x as u64)
+    }
+
+    /// Computes `self / rhs`, saturating at the numeric bounds of the type instead of overflowing.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if `rhs == 0`.
+    #[must_use]
+    #[track_caller]
+    pub const fn saturating_div<const R: i32>(self, rhs: U64F<R>) -> Self {
+        const OFFSET: i32 = u64::BITS.cast_signed() - u128::BITS.cast_signed();
+
+        let mut x = ((self.0 as u128) << -OFFSET) / rhs.0 as u128;
+
+        if const { R < OFFSET } {
+            let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
+
+            if x != 0 && shift > x.leading_zeros() {
+                return Self::MAX;
+            }
+
+            if shift >= u128::BITS {
+                x = 0;
+            } else {
+                x <<= shift;
+            }
+        } else if const { R > OFFSET } {
+            let shift = const { R.wrapping_sub(OFFSET).cast_unsigned() };
+
+            if shift >= u128::BITS {
+                x = 0;
+            } else {
+                let mask = const {
+                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+                let round = const {
+                    let shift = R.wrapping_sub(OFFSET).wrapping_sub(1).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+
+                let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
+                temp = temp.wrapping_add(round);
+                temp >>= shift;
+                x >>= shift;
+                x = x.wrapping_add(temp);
+            }
+        }
+
+        if x > u64::MAX as u128 {
+            return Self::MAX;
+        }
+
+        Self(x as u64)
+    }
+
+    /// Computes `self / rhs`. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if `rhs == 0`.
+    #[must_use]
+    #[track_caller]
+    pub const fn overflowing_div<const R: i32>(self, rhs: U64F<R>) -> (Self, bool) {
+        const OFFSET: i32 = u64::BITS.cast_signed() - u128::BITS.cast_signed();
+
+        let mut x = ((self.0 as u128) << -OFFSET) / rhs.0 as u128;
+        let mut overflowed = false;
+
+        if const { R < OFFSET } {
+            let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
+
+            overflowed |= x != 0 && shift > x.leading_zeros();
+
+            if shift >= u128::BITS {
+                x = 0;
+            } else {
+                x <<= shift;
+            }
+        } else if const { R > OFFSET } {
+            let shift = const { R.wrapping_sub(OFFSET).cast_unsigned() };
+
+            if shift >= u128::BITS {
+                x = 0;
+            } else {
+                let mask = const {
+                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+                let round = const {
+                    let shift = R.wrapping_sub(OFFSET).wrapping_sub(1).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+
+                let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
+                temp = temp.wrapping_add(round);
+                temp >>= shift;
+                x >>= shift;
+                x = x.wrapping_add(temp);
+            }
+        }
+
+        overflowed |= x > u64::MAX as u128;
+
+        (Self(x as u64), overflowed)
+    }
+
+    /// Computes `self / rhs`, returning `None` if `rhs == 0` or overflow occurred.
+    #[must_use]
+    pub const fn checked_div<const R: i32>(self, rhs: U64F<R>) -> Option<Self> {
+        const OFFSET: i32 = u64::BITS.cast_signed() - u128::BITS.cast_signed();
+
+        if rhs.0 == 0 {
+            return None;
+        }
+
+        let mut x = ((self.0 as u128) << -OFFSET) / rhs.0 as u128;
+
+        if const { R < OFFSET } {
+            let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
+
+            if x != 0 && shift > x.leading_zeros() {
+                return None;
+            }
+
+            if shift >= u128::BITS {
+                x = 0;
+            } else {
+                x <<= shift;
+            }
+        } else if const { R > OFFSET } {
+            let shift = const { R.wrapping_sub(OFFSET).cast_unsigned() };
+
+            if shift >= u128::BITS {
+                x = 0;
+            } else {
+                let mask = const {
+                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+                let round = const {
+                    let shift = R.wrapping_sub(OFFSET).wrapping_sub(1).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+
+                let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
+                temp = temp.wrapping_add(round);
+                temp >>= shift;
+                x >>= shift;
+                x = x.wrapping_add(temp);
+            }
+        }
+
+        if x > u64::MAX as u128 {
+            return None;
+        }
+
+        Some(Self(x as u64))
+    }
+
+    /// Computes `self / rhs`, panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if `rhs == 0`.
+    ///
+    /// ## Overflow behavior
+    ///
+    /// This function will panic on overflow for debug builds, or return a wrapping result for release builds.
+    #[must_use]
+    #[track_caller]
+    pub const fn div_signed<const R: i32>(self, rhs: I64F<R>) -> Self {
+        const OFFSET: i32 = u64::BITS.cast_signed() - u128::BITS.cast_signed();
+
+        let negative = rhs.0 < 0;
+        let mut rhs = rhs.0 as u64;
+
+        if negative {
+            rhs = rhs.wrapping_neg();
+        }
+
+        let mut x = ((self.0 as u128) << -OFFSET) / rhs as u128;
+
+        if const { R < OFFSET } {
+            let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
+
+            if cfg!(debug_assertions) {
+                if x != 0 && shift > x.leading_zeros() {
+                    crate::panic::div();
+                }
+            }
+
+            if shift >= u128::BITS {
+                x = 0;
+            } else {
+                x <<= shift;
+            }
+        } else if const { R > OFFSET } {
+            let shift = const { R.wrapping_sub(OFFSET).cast_unsigned() };
+
+            if shift >= u128::BITS {
+                x = 0;
+            } else {
+                let mask = const {
+                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+                let round = const {
+                    let shift = R.wrapping_sub(OFFSET).wrapping_sub(1).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+
+                let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
+                temp = temp.wrapping_add(round);
+                temp >>= shift;
+                x >>= shift;
+                x = x.wrapping_add(temp);
+            }
+        }
+
+        if cfg!(debug_assertions) {
+            if (negative && x != 0) || x > u64::MAX as u128 {
+                crate::panic::div();
+            }
+        } else {
+            if negative {
+                x = x.wrapping_neg();
+            }
+        }
+
+        Self(x as u64)
+    }
+
+    /// Computes `self / rhs`, panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if `rhs == 0`.
+    ///
+    /// ## Overflow behavior
+    ///
+    /// This function will always panic on overflow, even if overflow checks are disabled.
+    #[must_use]
+    #[track_caller]
+    pub const fn strict_div_signed<const R: i32>(self, rhs: I64F<R>) -> Self {
+        const OFFSET: i32 = u64::BITS.cast_signed() - u128::BITS.cast_signed();
+
+        let negative = rhs.0 < 0;
+        let mut rhs = rhs.0 as u64;
+
+        if negative {
+            rhs = rhs.wrapping_neg();
+        }
+
+        let mut x = ((self.0 as u128) << -OFFSET) / rhs as u128;
+
+        if const { R < OFFSET } {
+            let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
+
+            if x != 0 && shift > x.leading_zeros() {
+                crate::panic::div();
+            }
+
+            if shift >= u128::BITS {
+                x = 0;
+            } else {
+                x <<= shift;
+            }
+        } else if const { R > OFFSET } {
+            let shift = const { R.wrapping_sub(OFFSET).cast_unsigned() };
+
+            if shift >= u128::BITS {
+                x = 0;
+            } else {
+                let mask = const {
+                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+                let round = const {
+                    let shift = R.wrapping_sub(OFFSET).wrapping_sub(1).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+
+                let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
+                temp = temp.wrapping_add(round);
+                temp >>= shift;
+                x >>= shift;
+                x = x.wrapping_add(temp);
+            }
+        }
+
+        if (negative && x != 0) || x > u64::MAX as u128 {
+            crate::panic::div();
+        }
+
+        Self(x as u64)
+    }
+
+    /// Computes `self / rhs`, wrapping around at the numeric bounds of the type.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if `rhs == 0`.
+    #[must_use]
+    #[track_caller]
+    pub const fn wrapping_div_signed<const R: i32>(self, rhs: I64F<R>) -> Self {
+        const OFFSET: i32 = u64::BITS.cast_signed() - u128::BITS.cast_signed();
+
+        let negative = rhs.0 < 0;
+        let mut rhs = rhs.0 as u64;
+
+        if negative {
+            rhs = rhs.wrapping_neg();
+        }
+
+        let mut x = ((self.0 as u128) << -OFFSET) / rhs as u128;
+
+        if const { R < OFFSET } {
+            let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
+
+            if shift >= u128::BITS {
+                x = 0;
+            } else {
+                x <<= shift;
+            }
+        } else if const { R > OFFSET } {
+            let shift = const { R.wrapping_sub(OFFSET).cast_unsigned() };
+
+            if shift >= u128::BITS {
+                x = 0;
+            } else {
+                let mask = const {
+                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+                let round = const {
+                    let shift = R.wrapping_sub(OFFSET).wrapping_sub(1).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+
+                let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
+                temp = temp.wrapping_add(round);
+                temp >>= shift;
+                x >>= shift;
+                x = x.wrapping_add(temp);
+            }
+        }
+
+        if negative {
+            x = x.wrapping_neg();
+        }
+
+        Self(x as u64)
+    }
+
+    /// Computes `self / rhs`, saturating at the numeric bounds of the type instead of overflowing.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if `rhs == 0`.
+    #[must_use]
+    #[track_caller]
+    pub const fn saturating_div_signed<const R: i32>(self, rhs: I64F<R>) -> Self {
+        const OFFSET: i32 = u64::BITS.cast_signed() - u128::BITS.cast_signed();
+
+        let negative = rhs.0 < 0;
+        let mut rhs = rhs.0 as u64;
+
+        if negative {
+            rhs = rhs.wrapping_neg();
+        }
+
+        let mut x = ((self.0 as u128) << -OFFSET) / rhs as u128;
+
+        if const { R < OFFSET } {
+            let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
+
+            if x != 0 && shift > x.leading_zeros() {
+                if negative {
+                    return Self::MIN;
+                } else {
+                    return Self::MAX;
+                }
+            }
+
+            if shift >= u128::BITS {
+                x = 0;
+            } else {
+                x <<= shift;
+            }
+        } else if const { R > OFFSET } {
+            let shift = const { R.wrapping_sub(OFFSET).cast_unsigned() };
+
+            if shift >= u128::BITS {
+                x = 0;
+            } else {
+                let mask = const {
+                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+                let round = const {
+                    let shift = R.wrapping_sub(OFFSET).wrapping_sub(1).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+
+                let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
+                temp = temp.wrapping_add(round);
+                temp >>= shift;
+                x >>= shift;
+                x = x.wrapping_add(temp);
+            }
+        }
+
+        if negative && x != 0 {
+            return Self::MIN;
+        } else if x > u64::MAX as u128 {
+            return Self::MAX;
+        }
+
+        Self(x as u64)
+    }
+
+    /// Computes `self / rhs`. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if `rhs == 0`.
+    #[must_use]
+    #[track_caller]
+    pub const fn overflowing_div_signed<const R: i32>(self, rhs: I64F<R>) -> (Self, bool) {
+        const OFFSET: i32 = u64::BITS.cast_signed() - u128::BITS.cast_signed();
+
+        let negative = rhs.0 < 0;
+        let mut rhs = rhs.0 as u64;
+
+        if negative {
+            rhs = rhs.wrapping_neg();
+        }
+
+        let mut x = ((self.0 as u128) << -OFFSET) / rhs as u128;
+        let mut overflowed = false;
+
+        if const { R < OFFSET } {
+            let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
+
+            overflowed |= x != 0 && shift > x.leading_zeros();
+
+            if shift >= u128::BITS {
+                x = 0;
+            } else {
+                x <<= shift;
+            }
+        } else if const { R > OFFSET } {
+            let shift = const { R.wrapping_sub(OFFSET).cast_unsigned() };
+
+            if shift >= u128::BITS {
+                x = 0;
+            } else {
+                let mask = const {
+                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+                let round = const {
+                    let shift = R.wrapping_sub(OFFSET).wrapping_sub(1).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+
+                let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
+                temp = temp.wrapping_add(round);
+                temp >>= shift;
+                x >>= shift;
+                x = x.wrapping_add(temp);
+            }
+        }
+
+        overflowed |= (negative && x != 0) || x > u64::MAX as u128;
+
+        (Self(x as u64), overflowed)
+    }
+
+    /// Computes `self / rhs`, returning `None` if `rhs == 0` or overflow occurred.
+    #[must_use]
+    pub const fn checked_div_signed<const R: i32>(self, rhs: I64F<R>) -> Option<Self> {
+        const OFFSET: i32 = u64::BITS.cast_signed() - u128::BITS.cast_signed();
+
+        if rhs.0 == 0 {
+            return None;
+        }
+
+        let negative = rhs.0 < 0;
+        let mut rhs = rhs.0 as u64;
+
+        if negative {
+            rhs = rhs.wrapping_neg();
+        }
+
+        let mut x = ((self.0 as u128) << -OFFSET) / rhs as u128;
+
+        if const { R < OFFSET } {
+            let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
+
+            if x != 0 && shift > x.leading_zeros() {
+                return None;
+            }
+
+            if shift >= u128::BITS {
+                x = 0;
+            } else {
+                x <<= shift;
+            }
+        } else if const { R > OFFSET } {
+            let shift = const { R.wrapping_sub(OFFSET).cast_unsigned() };
+
+            if shift >= u128::BITS {
+                x = 0;
+            } else {
+                let mask = const {
+                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+                let round = const {
+                    let shift = R.wrapping_sub(OFFSET).wrapping_sub(1).cast_unsigned();
+
+                    !(!0u128).unbounded_shl(shift)
+                };
+
+                let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
+                temp = temp.wrapping_add(round);
+                temp >>= shift;
+                x >>= shift;
+                x = x.wrapping_add(temp);
+            }
+        }
+
+        if (negative && x != 0) || x > u64::MAX as u128 {
+            return None;
+        }
+
+        Some(Self(x as u64))
+    }
 }
 
 impl From<U64F<0>> for u64 {
@@ -829,5 +2163,41 @@ impl<const E: i32> ops::Sub for U64F<E> {
     #[track_caller]
     fn sub(self, rhs: Self) -> Self::Output {
         Self(self.0 - rhs.0)
+    }
+}
+
+impl<const E: i32, const R: i32> ops::Mul<U64F<R>> for U64F<E> {
+    type Output = Self;
+
+    #[track_caller]
+    fn mul(self, rhs: U64F<R>) -> Self::Output {
+        Self::mul(self, rhs)
+    }
+}
+
+impl<const E: i32, const R: i32> ops::Mul<I64F<R>> for U64F<E> {
+    type Output = Self;
+
+    #[track_caller]
+    fn mul(self, rhs: I64F<R>) -> Self::Output {
+        Self::mul_signed(self, rhs)
+    }
+}
+
+impl<const E: i32, const R: i32> ops::Div<U64F<R>> for U64F<E> {
+    type Output = Self;
+
+    #[track_caller]
+    fn div(self, rhs: U64F<R>) -> Self::Output {
+        Self::div(self, rhs)
+    }
+}
+
+impl<const E: i32, const R: i32> ops::Div<I64F<R>> for U64F<E> {
+    type Output = Self;
+
+    #[track_caller]
+    fn div(self, rhs: I64F<R>) -> Self::Output {
+        Self::div_signed(self, rhs)
     }
 }
