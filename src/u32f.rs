@@ -693,10 +693,8 @@ impl<const E: i32> U32F<E> {
         if const { R > 0 } {
             let shift = const { R.cast_unsigned() };
 
-            if cfg!(debug_assertions) {
-                if x != 0 && shift >= x.leading_zeros() {
-                    crate::panic::mul();
-                }
+            if cfg!(debug_assertions) && x != 0 && shift >= x.leading_zeros() {
+                crate::panic::mul();
             }
 
             if shift >= u64::BITS {
@@ -731,10 +729,8 @@ impl<const E: i32> U32F<E> {
             }
         }
 
-        if cfg!(debug_assertions) {
-            if x > u32::MAX as u64 {
-                crate::panic::mul();
-            }
+        if cfg!(debug_assertions) && x > u32::MAX as u64 {
+            crate::panic::mul();
         }
 
         Self(x as u32)
@@ -1002,10 +998,8 @@ impl<const E: i32> U32F<E> {
         if const { R > 0 } {
             let shift = const { R.cast_unsigned() };
 
-            if cfg!(debug_assertions) {
-                if x != 0 && shift >= x.leading_zeros() | x.leading_ones() {
-                    crate::panic::mul();
-                }
+            if cfg!(debug_assertions) && x != 0 && shift >= x.leading_zeros() | x.leading_ones() {
+                crate::panic::mul();
             }
 
             if shift >= i64::BITS {
@@ -1039,10 +1033,8 @@ impl<const E: i32> U32F<E> {
             }
         }
 
-        if cfg!(debug_assertions) {
-            if x < u32::MIN as i64 || x > u32::MAX as i64 {
-                crate::panic::mul();
-            }
+        if cfg!(debug_assertions) && (x < u32::MIN as i64 || x > u32::MAX as i64) {
+            crate::panic::mul();
         }
 
         Self(x as u32)
@@ -1309,10 +1301,8 @@ impl<const E: i32> U32F<E> {
         if const { R < OFFSET } {
             let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
 
-            if cfg!(debug_assertions) {
-                if x != 0 && shift > x.leading_zeros() {
-                    crate::panic::div();
-                }
+            if cfg!(debug_assertions) && x != 0 && shift > x.leading_zeros() {
+                crate::panic::div();
             }
 
             if shift >= u64::BITS {
@@ -1345,10 +1335,8 @@ impl<const E: i32> U32F<E> {
             }
         }
 
-        if cfg!(debug_assertions) {
-            if x > u32::MAX as u64 {
-                crate::panic::div();
-            }
+        if cfg!(debug_assertions) && x > u32::MAX as u64 {
+            crate::panic::div();
         }
 
         Self(x as u32)
@@ -1652,10 +1640,8 @@ impl<const E: i32> U32F<E> {
         if const { R < OFFSET } {
             let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
 
-            if cfg!(debug_assertions) {
-                if x != 0 && shift > x.leading_zeros() {
-                    crate::panic::div();
-                }
+            if cfg!(debug_assertions) && x != 0 && shift > x.leading_zeros() {
+                crate::panic::div();
             }
 
             if shift >= u64::BITS {
