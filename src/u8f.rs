@@ -2131,6 +2131,42 @@ impl<const E: i32> ops::Sub<I8F<E>> for U8F<E> {
     }
 }
 
+impl<const E: i32, const R: i32> ops::Mul<U8F<R>> for U8F<E> {
+    type Output = Self;
+
+    #[track_caller]
+    fn mul(self, rhs: U8F<R>) -> Self::Output {
+        Self::mul(self, rhs)
+    }
+}
+
+impl<const E: i32, const R: i32> ops::Mul<I8F<R>> for U8F<E> {
+    type Output = Self;
+
+    #[track_caller]
+    fn mul(self, rhs: I8F<R>) -> Self::Output {
+        Self::mul_signed(self, rhs)
+    }
+}
+
+impl<const E: i32, const R: i32> ops::Div<U8F<R>> for U8F<E> {
+    type Output = Self;
+
+    #[track_caller]
+    fn div(self, rhs: U8F<R>) -> Self::Output {
+        Self::div(self, rhs)
+    }
+}
+
+impl<const E: i32, const R: i32> ops::Div<I8F<R>> for U8F<E> {
+    type Output = Self;
+
+    #[track_caller]
+    fn div(self, rhs: I8F<R>) -> Self::Output {
+        Self::div_signed(self, rhs)
+    }
+}
+
 impl<const E: i32> ops::AddAssign for U8F<E> {
     fn add_assign(&mut self, rhs: Self) {
         *self = Self::add(*self, rhs)
