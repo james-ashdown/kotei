@@ -424,6 +424,305 @@ impl<const E: i32> U8F<E> {
         Some(x)
     }
 
+    /// Returns the nearest multiple of 2<sup>E2</sup> to `self`, rounded to the number with even least significant digits if `self` is halfway between two multiples of 2<sup>E2</sup>.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic on overflow for debug builds, or return a wrapping result for release builds.
+    #[must_use]
+    #[track_caller]
+    pub const fn rescale<const E2: i32>(self) -> U8F<E2> {
+        let mut x = self.0;
+
+        if const { E > E2 } {
+            let shift = const { E.wrapping_sub(E2).cast_unsigned() };
+
+            if cfg!(debug_assertions) && x != 0 && shift > x.leading_zeros() {
+                crate::panic::rescale();
+            }
+
+            if shift >= u8::BITS {
+                x = 0;
+            } else {
+                x <<= shift;
+            }
+        } else if const { E < E2 } {
+            let shift = const { E2.wrapping_sub(E).cast_unsigned() };
+
+            if shift >= u8::BITS {
+                x = 0;
+            } else if shift == u8::BITS {
+                let threshold = const { 1 << (u8::BITS - 1) };
+
+                x = (x > threshold) as u8;
+            } else {
+                let mask = const {
+                    let shift = E2.wrapping_sub(E).cast_unsigned();
+
+                    !(!0u8).unbounded_shl(shift)
+                };
+                let round = const {
+                    let shift = E2.wrapping_sub(E).wrapping_sub(1).cast_unsigned();
+
+                    !(!0u8).unbounded_shl(shift)
+                };
+
+                let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
+                temp = temp.wrapping_add(round);
+                temp >>= shift;
+                x >>= shift;
+                x = x.wrapping_add(temp);
+            }
+        }
+
+        U8F(x)
+    }
+
+    /// Returns the nearest multiple of 2<sup>E2</sup> to `self`, rounded to the number with even least significant digits if `self` is halfway between two multiples of 2<sup>E2</sup>.
+    ///
+    /// # Panics
+    ///
+    /// This function will always panic on overflow, even if overflow checks are disabled.
+    #[must_use]
+    #[track_caller]
+    pub const fn strict_rescale<const E2: i32>(self) -> U8F<E2> {
+        let mut x = self.0;
+
+        if const { E > E2 } {
+            let shift = const { E.wrapping_sub(E2).cast_unsigned() };
+
+            if x != 0 && shift > x.leading_zeros() {
+                crate::panic::rescale();
+            }
+
+            if shift >= u8::BITS {
+                x = 0;
+            } else {
+                x <<= shift;
+            }
+        } else if const { E < E2 } {
+            let shift = const { E2.wrapping_sub(E).cast_unsigned() };
+
+            if shift >= u8::BITS {
+                x = 0;
+            } else if shift == u8::BITS {
+                let threshold = const { 1 << (u8::BITS - 1) };
+
+                x = (x > threshold) as u8;
+            } else {
+                let mask = const {
+                    let shift = E2.wrapping_sub(E).cast_unsigned();
+
+                    !(!0u8).unbounded_shl(shift)
+                };
+                let round = const {
+                    let shift = E2.wrapping_sub(E).wrapping_sub(1).cast_unsigned();
+
+                    !(!0u8).unbounded_shl(shift)
+                };
+
+                let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
+                temp = temp.wrapping_add(round);
+                temp >>= shift;
+                x >>= shift;
+                x = x.wrapping_add(temp);
+            }
+        }
+
+        U8F(x)
+    }
+
+    /// Returns the nearest multiple of 2<sup>E2</sup> to `self`, rounded to the number with even least significant digits if `self` is halfway between two multiples of 2<sup>E2</sup>, wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn wrapping_rescale<const E2: i32>(self) -> U8F<E2> {
+        let mut x = self.0;
+
+        if const { E > E2 } {
+            let shift = const { E.wrapping_sub(E2).cast_unsigned() };
+
+            if shift >= u8::BITS {
+                x = 0;
+            } else {
+                x <<= shift;
+            }
+        } else if const { E < E2 } {
+            let shift = const { E2.wrapping_sub(E).cast_unsigned() };
+
+            if shift >= u8::BITS {
+                x = 0;
+            } else if shift == u8::BITS {
+                let threshold = const { 1 << (u8::BITS - 1) };
+
+                x = (x > threshold) as u8;
+            } else {
+                let mask = const {
+                    let shift = E2.wrapping_sub(E).cast_unsigned();
+
+                    !(!0u8).unbounded_shl(shift)
+                };
+                let round = const {
+                    let shift = E2.wrapping_sub(E).wrapping_sub(1).cast_unsigned();
+
+                    !(!0u8).unbounded_shl(shift)
+                };
+
+                let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
+                temp = temp.wrapping_add(round);
+                temp >>= shift;
+                x >>= shift;
+                x = x.wrapping_add(temp);
+            }
+        }
+
+        U8F(x)
+    }
+
+    /// Returns the nearest multiple of 2<sup>E2</sup> to `self`, rounded to the number with even least significant digits if `self` is halfway between two multiples of 2<sup>E2</sup>, saturating at the numeric bounds of the type instead of overflowing.
+    #[must_use]
+    pub const fn saturating_rescale<const E2: i32>(self) -> U8F<E2> {
+        let mut x = self.0;
+
+        if const { E > E2 } {
+            let shift = const { E.wrapping_sub(E2).cast_unsigned() };
+
+            if x != 0 && shift > x.leading_zeros() {
+                return U8F::MAX;
+            }
+
+            if shift >= u8::BITS {
+                x = 0;
+            } else {
+                x <<= shift;
+            }
+        } else if const { E < E2 } {
+            let shift = const { E2.wrapping_sub(E).cast_unsigned() };
+
+            if shift >= u8::BITS {
+                x = 0;
+            } else if shift == u8::BITS {
+                let threshold = const { 1 << (u8::BITS - 1) };
+
+                x = (x > threshold) as u8;
+            } else {
+                let mask = const {
+                    let shift = E2.wrapping_sub(E).cast_unsigned();
+
+                    !(!0u8).unbounded_shl(shift)
+                };
+                let round = const {
+                    let shift = E2.wrapping_sub(E).wrapping_sub(1).cast_unsigned();
+
+                    !(!0u8).unbounded_shl(shift)
+                };
+
+                let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
+                temp = temp.wrapping_add(round);
+                temp >>= shift;
+                x >>= shift;
+                x = x.wrapping_add(temp);
+            }
+        }
+
+        U8F(x)
+    }
+
+    /// Returns the nearest multiple of 2<sup>E2</sup> to `self`, rounded to the number with even least significant digits if `self` is halfway between two multiples of 2<sup>E2</sup>. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
+    #[must_use]
+    pub const fn overflowing_rescale<const E2: i32>(self) -> (U8F<E2>, bool) {
+        let mut x = self.0;
+        let mut overflowed = false;
+
+        if const { E > E2 } {
+            let shift = const { E.wrapping_sub(E2).cast_unsigned() };
+
+            overflowed |= x != 0 && shift > x.leading_zeros();
+
+            if shift >= u8::BITS {
+                x = 0;
+            } else {
+                x <<= shift;
+            }
+        } else if const { E < E2 } {
+            let shift = const { E2.wrapping_sub(E).cast_unsigned() };
+
+            if shift >= u8::BITS {
+                x = 0;
+            } else if shift == u8::BITS {
+                let threshold = const { 1 << (u8::BITS - 1) };
+
+                x = (x > threshold) as u8;
+            } else {
+                let mask = const {
+                    let shift = E2.wrapping_sub(E).cast_unsigned();
+
+                    !(!0u8).unbounded_shl(shift)
+                };
+                let round = const {
+                    let shift = E2.wrapping_sub(E).wrapping_sub(1).cast_unsigned();
+
+                    !(!0u8).unbounded_shl(shift)
+                };
+
+                let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
+                temp = temp.wrapping_add(round);
+                temp >>= shift;
+                x >>= shift;
+                x = x.wrapping_add(temp);
+            }
+        }
+
+        (U8F(x), overflowed)
+    }
+
+    /// Returns the nearest multiple of 2<sup>E2</sup> to `self`, rounded to the number with even least significant digits if `self` is halfway between two multiples of 2<sup>E2</sup>, returning `None` if overflow occurred.
+    #[must_use]
+    pub const fn checked_rescale<const E2: i32>(self) -> Option<U8F<E2>> {
+        let mut x = self.0;
+
+        if const { E > E2 } {
+            let shift = const { E.wrapping_sub(E2).cast_unsigned() };
+
+            if x != 0 && shift > x.leading_zeros() {
+                return None;
+            }
+
+            if shift >= u8::BITS {
+                x = 0;
+            } else {
+                x <<= shift;
+            }
+        } else if const { E < E2 } {
+            let shift = const { E2.wrapping_sub(E).cast_unsigned() };
+
+            if shift >= u8::BITS {
+                x = 0;
+            } else if shift == u8::BITS {
+                let threshold = const { 1 << (u8::BITS - 1) };
+
+                x = (x > threshold) as u8;
+            } else {
+                let mask = const {
+                    let shift = E2.wrapping_sub(E).cast_unsigned();
+
+                    !(!0u8).unbounded_shl(shift)
+                };
+                let round = const {
+                    let shift = E2.wrapping_sub(E).wrapping_sub(1).cast_unsigned();
+
+                    !(!0u8).unbounded_shl(shift)
+                };
+
+                let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
+                temp = temp.wrapping_add(round);
+                temp >>= shift;
+                x >>= shift;
+                x = x.wrapping_add(temp);
+            }
+        }
+
+        Some(U8F(x))
+    }
+
     #[doc(hidden)]
     #[must_use]
     #[track_caller]
