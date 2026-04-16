@@ -2161,3 +2161,51 @@ impl<const E: i32, const R: i32> ops::Div<I16F<R>> for U16F<E> {
         Self::div_signed(self, rhs)
     }
 }
+
+impl<const E: i32> ops::AddAssign for U16F<E> {
+    fn add_assign(&mut self, rhs: Self) {
+        *self = Self::add(*self, rhs)
+    }
+}
+
+impl<const E: i32> ops::AddAssign<I16F<E>> for U16F<E> {
+    fn add_assign(&mut self, rhs: I16F<E>) {
+        *self = Self::add_signed(*self, rhs)
+    }
+}
+
+impl<const E: i32> ops::SubAssign for U16F<E> {
+    fn sub_assign(&mut self, rhs: Self) {
+        *self = Self::sub(*self, rhs)
+    }
+}
+
+impl<const E: i32> ops::SubAssign<I16F<E>> for U16F<E> {
+    fn sub_assign(&mut self, rhs: I16F<E>) {
+        *self = Self::sub_signed(*self, rhs)
+    }
+}
+
+impl<const E: i32, const R: i32> ops::MulAssign<U16F<R>> for U16F<E> {
+    fn mul_assign(&mut self, rhs: U16F<R>) {
+        *self = Self::mul(*self, rhs)
+    }
+}
+
+impl<const E: i32, const R: i32> ops::MulAssign<I16F<R>> for U16F<E> {
+    fn mul_assign(&mut self, rhs: I16F<R>) {
+        *self = Self::mul_signed(*self, rhs)
+    }
+}
+
+impl<const E: i32, const R: i32> ops::DivAssign<U16F<R>> for U16F<E> {
+    fn div_assign(&mut self, rhs: U16F<R>) {
+        *self = Self::div(*self, rhs)
+    }
+}
+
+impl<const E: i32, const R: i32> ops::DivAssign<I16F<R>> for U16F<E> {
+    fn div_assign(&mut self, rhs: I16F<R>) {
+        *self = Self::div_signed(*self, rhs)
+    }
+}

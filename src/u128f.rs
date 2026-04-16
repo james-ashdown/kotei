@@ -846,3 +846,27 @@ impl<const E: i32> ops::Sub for U128F<E> {
         Self(self.0 - rhs.0)
     }
 }
+
+impl<const E: i32> ops::AddAssign for U128F<E> {
+    fn add_assign(&mut self, rhs: Self) {
+        *self = Self::add(*self, rhs)
+    }
+}
+
+impl<const E: i32> ops::AddAssign<I128F<E>> for U128F<E> {
+    fn add_assign(&mut self, rhs: I128F<E>) {
+        *self = Self::add_signed(*self, rhs)
+    }
+}
+
+impl<const E: i32> ops::SubAssign for U128F<E> {
+    fn sub_assign(&mut self, rhs: Self) {
+        *self = Self::sub(*self, rhs)
+    }
+}
+
+impl<const E: i32> ops::SubAssign<I128F<E>> for U128F<E> {
+    fn sub_assign(&mut self, rhs: I128F<E>) {
+        *self = Self::sub_signed(*self, rhs)
+    }
+}
