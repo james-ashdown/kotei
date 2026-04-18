@@ -2245,184 +2245,77 @@ impl<const E: i32> I32F<E> {
 
         Some(Self(x as i32))
     }
+}
 
-    /// Computes `cos(self)`, where `self` is in radians.
+impl I32F<-31> {
+    /// Computes `cos(π * self)` using a minimax second-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 5.60096 ⋅ 10<sup>-2</sup>.
     #[must_use]
-    pub const fn cos(self) -> I32F<-30> {
-        self.cos_10()
+    pub const fn cospi_2(self) -> I32F<-30> {
+        I32F(crate::algorithm::cospi_i32_2(self.0))
     }
 
-    /// Computes `sin(self)`, where `self` is in radians.
+    /// Computes `cos(π * self)` using a minimax fourth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 9.18799 ⋅ 10<sup>-4</sup>.
     #[must_use]
-    pub const fn sin(self) -> I32F<-30> {
-        self.sin_10()
+    pub const fn cospi_4(self) -> I32F<-30> {
+        I32F(crate::algorithm::cospi_i32_4(self.0))
     }
 
-    /// Computes `cos(self)`, where `self` is in full turns.
+    /// Computes `cos(π * self)` using a minimax sixth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 9.20285 ⋅ 10<sup>-6</sup>.
     #[must_use]
-    pub const fn costau(self) -> I32F<-30> {
-        self.costau_10()
+    pub const fn cospi_6(self) -> I32F<-30> {
+        I32F(crate::algorithm::cospi_i32_6(self.0))
     }
 
-    /// Computes `sin(self)`, where `self` is in full turns.
+    /// Computes `cos(π * self)` using a minimax eighth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 5.98045 ⋅ 10<sup>-8</sup>.
     #[must_use]
-    pub const fn sintau(self) -> I32F<-30> {
-        self.sintau_10()
+    pub const fn cospi_8(self) -> I32F<-30> {
+        I32F(crate::algorithm::cospi_i32_8(self.0))
     }
 
-    /// Computes `cos(self)` using a minimax second-order Taylor series approximation, where `self` is in radians. The error is bounded by 5.60096 ⋅ 10<sup>-2</sup>.
+    /// Computes `cos(π * self)` using a minimax tenth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 2.70068 ⋅ 10<sup>-10</sup>.
     #[must_use]
-    pub const fn cos_2(self) -> I32F<-30> {
-        self.wrapping_mul(I32F::FRAC_1_TAU).costau_2()
+    pub const fn cospi_10(self) -> I32F<-30> {
+        I32F(crate::algorithm::cospi_i32_10(self.0))
     }
 
-    /// Computes `cos(self)` using a minimax fourth-order Taylor series approximation, where `self` is in radians. The error is bounded by 9.18799 ⋅ 10<sup>-4</sup>.
+    /// Computes `sin(π * self)` using a minimax second-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 5.60096 ⋅ 10<sup>-2</sup>.
     #[must_use]
-    pub const fn cos_4(self) -> I32F<-30> {
-        self.wrapping_mul(I32F::FRAC_1_TAU).costau_4()
+    pub const fn sinpi_2(self) -> I32F<-30> {
+        I32F(crate::algorithm::cospi_i32_2(
+            self.0.wrapping_add_unsigned(0xC0000000),
+        ))
     }
 
-    /// Computes `cos(self)` using a minimax sixth-order Taylor series approximation, where `self` is in radians. The error is bounded by 9.20285 ⋅ 10<sup>-6</sup>.
+    /// Computes `sin(π * self)` using a minimax fourth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 9.18799 ⋅ 10<sup>-4</sup>.
     #[must_use]
-    pub const fn cos_6(self) -> I32F<-30> {
-        self.wrapping_mul(I32F::FRAC_1_TAU).costau_6()
+    pub const fn sinpi_4(self) -> I32F<-30> {
+        I32F(crate::algorithm::cospi_i32_4(
+            self.0.wrapping_add_unsigned(0xC0000000),
+        ))
     }
 
-    /// Computes `cos(self)` using a minimax eighth-order Taylor series approximation, where `self` is in radians. The error is bounded by 5.98045 ⋅ 10<sup>-8</sup>.
+    /// Computes `sin(π * self)` using a minimax sixth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 9.20285 ⋅ 10<sup>-6</sup>.
     #[must_use]
-    pub const fn cos_8(self) -> I32F<-30> {
-        self.wrapping_mul(I32F::FRAC_1_TAU).costau_8()
+    pub const fn sinpi_6(self) -> I32F<-30> {
+        I32F(crate::algorithm::cospi_i32_6(
+            self.0.wrapping_add_unsigned(0xC0000000),
+        ))
     }
 
-    /// Computes `cos(self)` using a minimax tenth-order Taylor series approximation, where `self` is in radians. The error is bounded by 2.70068 ⋅ 10<sup>-10</sup>.
+    /// Computes `sin(π * self)` using a minimax eighth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 5.98045 ⋅ 10<sup>-8</sup>.
     #[must_use]
-    pub const fn cos_10(self) -> I32F<-30> {
-        self.wrapping_mul(I32F::FRAC_1_TAU).costau_10()
+    pub const fn sinpi_8(self) -> I32F<-30> {
+        I32F(crate::algorithm::cospi_i32_8(
+            self.0.wrapping_add_unsigned(0xC0000000),
+        ))
     }
 
-    /// Computes `sin(self)` using a minimax second-order Taylor series approximation, where `self` is in radians. The error is bounded by 5.60096 ⋅ 10<sup>-2</sup>.
+    /// Computes `sin(π * self)` using a minimax tenth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 2.70068 ⋅ 10<sup>-10</sup>.
     #[must_use]
-    pub const fn sin_2(self) -> I32F<-30> {
-        self.wrapping_mul(I32F::FRAC_1_TAU).sintau_2()
-    }
-
-    /// Computes `sin(self)` using a minimax fourth-order Taylor series approximation, where `self` is in radians. The error is bounded by 9.18799 ⋅ 10<sup>-4</sup>.
-    #[must_use]
-    pub const fn sin_4(self) -> I32F<-30> {
-        self.wrapping_mul(I32F::FRAC_1_TAU).sintau_4()
-    }
-
-    /// Computes `sin(self)` using a minimax sixth-order Taylor series approximation, where `self` is in radians. The error is bounded by 9.20285 ⋅ 10<sup>-6</sup>.
-    #[must_use]
-    pub const fn sin_6(self) -> I32F<-30> {
-        self.wrapping_mul(I32F::FRAC_1_TAU).sintau_6()
-    }
-
-    /// Computes `sin(self)` using a minimax eighth-order Taylor series approximation, where `self` is in radians. The error is bounded by 5.98045 ⋅ 10<sup>-8</sup>.
-    #[must_use]
-    pub const fn sin_8(self) -> I32F<-30> {
-        self.wrapping_mul(I32F::FRAC_1_TAU).sintau_8()
-    }
-
-    /// Computes `sin(self)` using a minimax tenth-order Taylor series approximation, where `self` is in radians. The error is bounded by 2.70068 ⋅ 10<sup>-10</sup>.
-    #[must_use]
-    pub const fn sin_10(self) -> I32F<-30> {
-        self.wrapping_mul(I32F::FRAC_1_TAU).sintau_10()
-    }
-
-    /// Computes `cos(self)` using a minimax second-order Taylor series approximation, where `self` is in full turns. The error is bounded by 5.60096 ⋅ 10<sup>-2</sup>.
-    #[must_use]
-    pub const fn costau_2(self) -> I32F<-30> {
-        let theta = self.wrapping_rescale::<-32>().to_bits();
-        let x = crate::algorithm::costau_2(theta);
-
-        I32F(x)
-    }
-
-    /// Computes `cos(self)` using a minimax fourth-order Taylor series approximation, where `self` is in full turns. The error is bounded by 9.18799 ⋅ 10<sup>-4</sup>.
-    #[must_use]
-    pub const fn costau_4(self) -> I32F<-30> {
-        let theta = self.wrapping_rescale::<-32>().to_bits();
-        let x = crate::algorithm::costau_4(theta);
-
-        I32F(x)
-    }
-
-    /// Computes `cos(self)` using a minimax sixth-order Taylor series approximation, where `self` is in full turns. The error is bounded by 9.20285 ⋅ 10<sup>-6</sup>.
-    #[must_use]
-    pub const fn costau_6(self) -> I32F<-30> {
-        let theta = self.wrapping_rescale::<-32>().to_bits();
-        let x = crate::algorithm::costau_6(theta);
-
-        I32F(x)
-    }
-
-    /// Computes `cos(self)` using a minimax eighth-order Taylor series approximation, where `self` is in full turns. The error is bounded by 5.98045 ⋅ 10<sup>-8</sup>.
-    #[must_use]
-    pub const fn costau_8(self) -> I32F<-30> {
-        let theta = self.wrapping_rescale::<-32>().to_bits();
-        let x = crate::algorithm::costau_8(theta);
-
-        I32F(x)
-    }
-
-    /// Computes `cos(self)` using a minimax tenth-order Taylor series approximation, where `self` is in full turns. The error is bounded by 2.70068 ⋅ 10<sup>-10</sup>.
-    #[must_use]
-    pub const fn costau_10(self) -> I32F<-30> {
-        let theta = self.wrapping_rescale::<-32>().to_bits();
-        let x = crate::algorithm::costau_10(theta);
-
-        I32F(x)
-    }
-
-    /// Computes `sin(self)` using a minimax second-order Taylor series approximation, where `self` is in full turns. The error is bounded by 5.60096 ⋅ 10<sup>-2</sup>.
-    #[must_use]
-    pub const fn sintau_2(self) -> I32F<-30> {
-        let mut theta = self.wrapping_rescale::<-32>().to_bits();
-        theta = theta.wrapping_add(const { 0xC0000000 });
-        let x = crate::algorithm::costau_2(theta);
-
-        I32F(x)
-    }
-
-    /// Computes `sin(self)` using a minimax fourth-order Taylor series approximation, where `self` is in full turns. The error is bounded by 9.18799 ⋅ 10<sup>-4</sup>.
-    #[must_use]
-    pub const fn sintau_4(self) -> I32F<-30> {
-        let mut theta = self.wrapping_rescale::<-32>().to_bits();
-        theta = theta.wrapping_add(const { 0xC0000000 });
-        let x = crate::algorithm::costau_4(theta);
-
-        I32F(x)
-    }
-
-    /// Computes `sin(self)` using a minimax sixth-order Taylor series approximation, where `self` is in full turns. The error is bounded by 9.20285 ⋅ 10<sup>-6</sup>.
-    #[must_use]
-    pub const fn sintau_6(self) -> I32F<-30> {
-        let mut theta = self.wrapping_rescale::<-32>().to_bits();
-        theta = theta.wrapping_add(const { 0xC0000000 });
-        let x = crate::algorithm::costau_6(theta);
-
-        I32F(x)
-    }
-
-    /// Computes `sin(self)` using a minimax eighth-order Taylor series approximation, where `self` is in full turns. The error is bounded by 5.98045 ⋅ 10<sup>-8</sup>.
-    #[must_use]
-    pub const fn sintau_8(self) -> I32F<-30> {
-        let mut theta = self.wrapping_rescale::<-32>().to_bits();
-        theta = theta.wrapping_add(const { 0xC0000000 });
-        let x = crate::algorithm::costau_8(theta);
-
-        I32F(x)
-    }
-
-    /// Computes `sin(self)` using a minimax tenth-order Taylor series approximation, where `self` is in full turns. The error is bounded by 2.70068 ⋅ 10<sup>-10</sup>.
-    #[must_use]
-    pub const fn sintau_10(self) -> I32F<-30> {
-        let mut theta = self.wrapping_rescale::<-32>().to_bits();
-        theta = theta.wrapping_add(const { 0xC0000000 });
-        let x = crate::algorithm::costau_10(theta);
-
-        I32F(x)
+    pub const fn sinpi_10(self) -> I32F<-30> {
+        I32F(crate::algorithm::cospi_i32_10(
+            self.0.wrapping_add_unsigned(0xC0000000),
+        ))
     }
 }
 
@@ -2699,86 +2592,86 @@ mod tests {
     }
 
     #[test]
-    fn costau_2_exact_right_angles() {
-        assert_eq!(I32F::<-32>::from_bits(0x0).costau_2(), I32F::<0>::new(1));
+    fn cospi_2_exact_right_angles() {
+        assert_eq!(I32F::<-31>::from_bits(0x0).cospi_2(), I32F::<0>::new(1));
         assert_eq!(
-            I32F::<-32>::from_bits(0x40000000).costau_2(),
+            I32F::<-31>::from_bits(0x40000000).cospi_2(),
             I32F::<0>::new(0)
         );
         assert_eq!(
-            I32F::<-32>::from_bits(0x80000000).costau_2(),
+            I32F::<-31>::from_bits(0x80000000).cospi_2(),
             I32F::<0>::new(-1)
         );
         assert_eq!(
-            I32F::<-32>::from_bits(0xC0000000).costau_2(),
+            I32F::<-31>::from_bits(0xC0000000).cospi_2(),
             I32F::<0>::new(0)
         );
     }
 
     #[test]
-    fn costau_4_exact_right_angles() {
-        assert_eq!(I32F::<-32>::from_bits(0x0).costau_4(), I32F::<0>::new(1));
+    fn cospi_4_exact_right_angles() {
+        assert_eq!(I32F::<-31>::from_bits(0x0).cospi_4(), I32F::<0>::new(1));
         assert_eq!(
-            I32F::<-32>::from_bits(0x40000000).costau_4(),
+            I32F::<-31>::from_bits(0x40000000).cospi_4(),
             I32F::<0>::new(0)
         );
         assert_eq!(
-            I32F::<-32>::from_bits(0x80000000).costau_4(),
+            I32F::<-31>::from_bits(0x80000000).cospi_4(),
             I32F::<0>::new(-1)
         );
         assert_eq!(
-            I32F::<-32>::from_bits(0xC0000000).costau_4(),
+            I32F::<-31>::from_bits(0xC0000000).cospi_4(),
             I32F::<0>::new(0)
         );
     }
 
     #[test]
-    fn costau_6_exact_right_angles() {
-        assert_eq!(I32F::<-32>::from_bits(0x0).costau_6(), I32F::<0>::new(1));
+    fn cospi_6_exact_right_angles() {
+        assert_eq!(I32F::<-31>::from_bits(0x0).cospi_6(), I32F::<0>::new(1));
         assert_eq!(
-            I32F::<-32>::from_bits(0x40000000).costau_6(),
+            I32F::<-31>::from_bits(0x40000000).cospi_6(),
             I32F::<0>::new(0)
         );
         assert_eq!(
-            I32F::<-32>::from_bits(0x80000000).costau_6(),
+            I32F::<-31>::from_bits(0x80000000).cospi_6(),
             I32F::<0>::new(-1)
         );
         assert_eq!(
-            I32F::<-32>::from_bits(0xC0000000).costau_6(),
+            I32F::<-31>::from_bits(0xC0000000).cospi_6(),
             I32F::<0>::new(0)
         );
     }
 
     #[test]
-    fn costau_8_exact_right_angles() {
-        assert_eq!(I32F::<-32>::from_bits(0x0).costau_8(), I32F::<0>::new(1));
+    fn cospi_8_exact_right_angles() {
+        assert_eq!(I32F::<-31>::from_bits(0x0).cospi_8(), I32F::<0>::new(1));
         assert_eq!(
-            I32F::<-32>::from_bits(0x40000000).costau_8(),
+            I32F::<-31>::from_bits(0x40000000).cospi_8(),
             I32F::<0>::new(0)
         );
         assert_eq!(
-            I32F::<-32>::from_bits(0x80000000).costau_8(),
+            I32F::<-31>::from_bits(0x80000000).cospi_8(),
             I32F::<0>::new(-1)
         );
         assert_eq!(
-            I32F::<-32>::from_bits(0xC0000000).costau_8(),
+            I32F::<-31>::from_bits(0xC0000000).cospi_8(),
             I32F::<0>::new(0)
         );
     }
 
     #[test]
-    fn costau_10_exact_right_angles() {
-        assert_eq!(I32F::<-32>::from_bits(0x0).costau_10(), I32F::<0>::new(1));
+    fn cospi_10_exact_right_angles() {
+        assert_eq!(I32F::<-31>::from_bits(0x0).cospi_10(), I32F::<0>::new(1));
         assert_eq!(
-            I32F::<-32>::from_bits(0x40000000).costau_10(),
+            I32F::<-31>::from_bits(0x40000000).cospi_10(),
             I32F::<0>::new(0)
         );
         assert_eq!(
-            I32F::<-32>::from_bits(0x80000000).costau_10(),
+            I32F::<-31>::from_bits(0x80000000).cospi_10(),
             I32F::<0>::new(-1)
         );
         assert_eq!(
-            I32F::<-32>::from_bits(0xC0000000).costau_10(),
+            I32F::<-31>::from_bits(0xC0000000).cospi_10(),
             I32F::<0>::new(0)
         );
     }
@@ -2858,86 +2751,86 @@ mod tests {
     }
 
     #[test]
-    fn sintau_2_exact_right_angles() {
-        assert_eq!(I32F::<-32>::from_bits(0x0).sintau_2(), I32F::<0>::new(0));
+    fn sinpi_2_exact_right_angles() {
+        assert_eq!(I32F::<-31>::from_bits(0x0).sinpi_2(), I32F::<0>::new(0));
         assert_eq!(
-            I32F::<-32>::from_bits(0x40000000).sintau_2(),
+            I32F::<-31>::from_bits(0x40000000).sinpi_2(),
             I32F::<0>::new(1)
         );
         assert_eq!(
-            I32F::<-32>::from_bits(0x80000000).sintau_2(),
+            I32F::<-31>::from_bits(0x80000000).sinpi_2(),
             I32F::<0>::new(0)
         );
         assert_eq!(
-            I32F::<-32>::from_bits(0xC0000000).sintau_2(),
+            I32F::<-31>::from_bits(0xC0000000).sinpi_2(),
             I32F::<0>::new(-1)
         );
     }
 
     #[test]
-    fn sintau_4_exact_right_angles() {
-        assert_eq!(I32F::<-32>::from_bits(0x0).sintau_4(), I32F::<0>::new(0));
+    fn sinpi_4_exact_right_angles() {
+        assert_eq!(I32F::<-31>::from_bits(0x0).sinpi_4(), I32F::<0>::new(0));
         assert_eq!(
-            I32F::<-32>::from_bits(0x40000000).sintau_4(),
+            I32F::<-31>::from_bits(0x40000000).sinpi_4(),
             I32F::<0>::new(1)
         );
         assert_eq!(
-            I32F::<-32>::from_bits(0x80000000).sintau_4(),
+            I32F::<-31>::from_bits(0x80000000).sinpi_4(),
             I32F::<0>::new(0)
         );
         assert_eq!(
-            I32F::<-32>::from_bits(0xC0000000).sintau_4(),
+            I32F::<-31>::from_bits(0xC0000000).sinpi_4(),
             I32F::<0>::new(-1)
         );
     }
 
     #[test]
-    fn sintau_6_exact_right_angles() {
-        assert_eq!(I32F::<-32>::from_bits(0x0).sintau_6(), I32F::<0>::new(0));
+    fn sinpi_6_exact_right_angles() {
+        assert_eq!(I32F::<-31>::from_bits(0x0).sinpi_6(), I32F::<0>::new(0));
         assert_eq!(
-            I32F::<-32>::from_bits(0x40000000).sintau_6(),
+            I32F::<-31>::from_bits(0x40000000).sinpi_6(),
             I32F::<0>::new(1)
         );
         assert_eq!(
-            I32F::<-32>::from_bits(0x80000000).sintau_6(),
+            I32F::<-31>::from_bits(0x80000000).sinpi_6(),
             I32F::<0>::new(0)
         );
         assert_eq!(
-            I32F::<-32>::from_bits(0xC0000000).sintau_6(),
+            I32F::<-31>::from_bits(0xC0000000).sinpi_6(),
             I32F::<0>::new(-1)
         );
     }
 
     #[test]
-    fn sintau_8_exact_right_angles() {
-        assert_eq!(I32F::<-32>::from_bits(0x0).sintau_8(), I32F::<0>::new(0));
+    fn sinpi_8_exact_right_angles() {
+        assert_eq!(I32F::<-31>::from_bits(0x0).sinpi_8(), I32F::<0>::new(0));
         assert_eq!(
-            I32F::<-32>::from_bits(0x40000000).sintau_8(),
+            I32F::<-31>::from_bits(0x40000000).sinpi_8(),
             I32F::<0>::new(1)
         );
         assert_eq!(
-            I32F::<-32>::from_bits(0x80000000).sintau_8(),
+            I32F::<-31>::from_bits(0x80000000).sinpi_8(),
             I32F::<0>::new(0)
         );
         assert_eq!(
-            I32F::<-32>::from_bits(0xC0000000).sintau_8(),
+            I32F::<-31>::from_bits(0xC0000000).sinpi_8(),
             I32F::<0>::new(-1)
         );
     }
 
     #[test]
-    fn sintau_10_exact_right_angles() {
-        assert_eq!(I32F::<-32>::from_bits(0x0).sintau_10(), I32F::<0>::new(0));
+    fn sinpi_10_exact_right_angles() {
+        assert_eq!(I32F::<-31>::from_bits(0x0).sinpi_10(), I32F::<0>::new(0));
         assert_eq!(
-            I32F::<-32>::from_bits(0x40000000).sintau_10(),
+            I32F::<-31>::from_bits(0x40000000).sinpi_10(),
             I32F::<0>::new(1)
         );
         assert_eq!(
-            I32F::<-32>::from_bits(0x80000000).sintau_10(),
+            I32F::<-31>::from_bits(0x80000000).sinpi_10(),
             I32F::<0>::new(0)
         );
         assert_eq!(
-            I32F::<-32>::from_bits(0xC0000000).sintau_10(),
+            I32F::<-31>::from_bits(0xC0000000).sinpi_10(),
             I32F::<0>::new(-1)
         );
     }

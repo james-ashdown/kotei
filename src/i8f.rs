@@ -2224,6 +2224,36 @@ impl<const E: i32> I8F<E> {
     }
 }
 
+impl I8F<-7> {
+    /// Computes `cos(π * self)` using a minimax second-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 5.60096 ⋅ 10<sup>-2</sup>.
+    #[must_use]
+    pub const fn cospi_2(self) -> I8F<-6> {
+        I8F(crate::algorithm::cospi_i8_2(self.0))
+    }
+
+    /// Computes `cos(π * self)` using a minimax fourth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 9.18799 ⋅ 10<sup>-4</sup>.
+    #[must_use]
+    pub const fn cospi_4(self) -> I8F<-6> {
+        I8F(crate::algorithm::cospi_i8_4(self.0))
+    }
+
+    /// Computes `sin(π * self)` using a minimax second-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 5.60096 ⋅ 10<sup>-2</sup>.
+    #[must_use]
+    pub const fn sinpi_2(self) -> I8F<-6> {
+        I8F(crate::algorithm::cospi_i8_2(
+            self.0.wrapping_add_unsigned(0xC0),
+        ))
+    }
+
+    /// Computes `sin(π * self)` using a minimax fourth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 9.18799 ⋅ 10<sup>-4</sup>.
+    #[must_use]
+    pub const fn sinpi_4(self) -> I8F<-6> {
+        I8F(crate::algorithm::cospi_i8_4(
+            self.0.wrapping_add_unsigned(0xC0),
+        ))
+    }
+}
+
 impl From<I8F<0>> for i8 {
     fn from(value: I8F<0>) -> Self {
         value.0

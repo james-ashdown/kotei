@@ -2254,6 +2254,134 @@ impl<const E: i32> I64F<E> {
     }
 }
 
+impl I64F<-63> {
+    /// Computes `cos(π * self)` using a minimax second-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 5.60096 ⋅ 10<sup>-2</sup>.
+    #[must_use]
+    pub const fn cospi_2(self) -> I64F<-62> {
+        I64F(crate::algorithm::cospi_i64_2(self.0))
+    }
+
+    /// Computes `cos(π * self)` using a minimax fourth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 9.18799 ⋅ 10<sup>-4</sup>.
+    #[must_use]
+    pub const fn cospi_4(self) -> I64F<-62> {
+        I64F(crate::algorithm::cospi_i64_4(self.0))
+    }
+
+    /// Computes `cos(π * self)` using a minimax sixth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 9.20285 ⋅ 10<sup>-6</sup>.
+    #[must_use]
+    pub const fn cospi_6(self) -> I64F<-62> {
+        I64F(crate::algorithm::cospi_i64_6(self.0))
+    }
+
+    /// Computes `cos(π * self)` using a minimax eighth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 5.98045 ⋅ 10<sup>-8</sup>.
+    #[must_use]
+    pub const fn cospi_8(self) -> I64F<-62> {
+        I64F(crate::algorithm::cospi_i64_8(self.0))
+    }
+
+    /// Computes `cos(π * self)` using a minimax tenth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 2.70068 ⋅ 10<sup>-10</sup>.
+    #[must_use]
+    pub const fn cospi_10(self) -> I64F<-62> {
+        I64F(crate::algorithm::cospi_i64_10(self.0))
+    }
+
+    /// Computes `cos(π * self)` using a minimax twelfth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 8.93703 ⋅ 10<sup>-13</sup>.
+    #[must_use]
+    pub const fn cospi_12(self) -> I64F<-62> {
+        I64F(crate::algorithm::cospi_i64_12(self.0))
+    }
+
+    /// Computes `cos(π * self)` using a minimax fourteenth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 2.25676 ⋅ 10<sup>-15</sup>.
+    #[must_use]
+    pub const fn cospi_14(self) -> I64F<-62> {
+        I64F(crate::algorithm::cospi_i64_14(self.0))
+    }
+
+    /// Computes `cos(π * self)` using a minimax sixteenth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 4.48780 ⋅ 10<sup>-18</sup>.
+    #[must_use]
+    pub const fn cospi_16(self) -> I64F<-62> {
+        I64F(crate::algorithm::cospi_i64_16(self.0))
+    }
+
+    /// Computes `cos(π * self)` using a minimax eighteenth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 7.20675 ⋅ 10<sup>-21</sup>.
+    #[must_use]
+    pub const fn cospi_18(self) -> I64F<-62> {
+        I64F(crate::algorithm::cospi_i64_18(self.0))
+    }
+
+    /// Computes `sin(π * self)` using a minimax second-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 5.60096 ⋅ 10<sup>-2</sup>.
+    #[must_use]
+    pub const fn sinpi_2(self) -> I64F<-62> {
+        I64F(crate::algorithm::cospi_i64_2(
+            self.0.wrapping_add_unsigned(0xC000000000000000),
+        ))
+    }
+
+    /// Computes `sin(π * self)` using a minimax fourth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 9.18799 ⋅ 10<sup>-4</sup>.
+    #[must_use]
+    pub const fn sinpi_4(self) -> I64F<-62> {
+        I64F(crate::algorithm::cospi_i64_4(
+            self.0.wrapping_add_unsigned(0xC000000000000000),
+        ))
+    }
+
+    /// Computes `sin(π * self)` using a minimax sixth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 9.20285 ⋅ 10<sup>-6</sup>.
+    #[must_use]
+    pub const fn sinpi_6(self) -> I64F<-62> {
+        I64F(crate::algorithm::cospi_i64_6(
+            self.0.wrapping_add_unsigned(0xC000000000000000),
+        ))
+    }
+
+    /// Computes `sin(π * self)` using a minimax eighth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 5.98045 ⋅ 10<sup>-8</sup>.
+    #[must_use]
+    pub const fn sinpi_8(self) -> I64F<-62> {
+        I64F(crate::algorithm::cospi_i64_8(
+            self.0.wrapping_add_unsigned(0xC000000000000000),
+        ))
+    }
+
+    /// Computes `sin(π * self)` using a minimax tenth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 2.70068 ⋅ 10<sup>-10</sup>.
+    #[must_use]
+    pub const fn sinpi_10(self) -> I64F<-62> {
+        I64F(crate::algorithm::cospi_i64_10(
+            self.0.wrapping_add_unsigned(0xC000000000000000),
+        ))
+    }
+
+    /// Computes `sin(π * self)` using a minimax twelfth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 8.93703 ⋅ 10<sup>-13</sup>.
+    #[must_use]
+    pub const fn sinpi_12(self) -> I64F<-62> {
+        I64F(crate::algorithm::cospi_i64_12(
+            self.0.wrapping_add_unsigned(0xC000000000000000),
+        ))
+    }
+
+    /// Computes `sin(π * self)` using a minimax fourteenth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 2.25676 ⋅ 10<sup>-15</sup>.
+    #[must_use]
+    pub const fn sinpi_14(self) -> I64F<-62> {
+        I64F(crate::algorithm::cospi_i64_14(
+            self.0.wrapping_add_unsigned(0xC000000000000000),
+        ))
+    }
+
+    /// Computes `sin(π * self)` using a minimax sixteenth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 4.48780 ⋅ 10<sup>-18</sup>.
+    #[must_use]
+    pub const fn sinpi_16(self) -> I64F<-62> {
+        I64F(crate::algorithm::cospi_i64_16(
+            self.0.wrapping_add_unsigned(0xC000000000000000),
+        ))
+    }
+
+    /// Computes `sin(π * self)` using a minimax eighteenth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 7.20675 ⋅ 10<sup>-21</sup>.
+    #[must_use]
+    pub const fn sinpi_18(self) -> I64F<-62> {
+        I64F(crate::algorithm::cospi_i64_18(
+            self.0.wrapping_add_unsigned(0xC000000000000000),
+        ))
+    }
+}
+
 impl From<I64F<0>> for i64 {
     fn from(value: I64F<0>) -> Self {
         value.0

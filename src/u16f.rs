@@ -2311,6 +2311,50 @@ impl<const E: i32> U16F<E> {
     }
 }
 
+impl U16F<-15> {
+    /// Computes `cos(π * self)` using a minimax second-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 5.60096 ⋅ 10<sup>-2</sup>.
+    #[must_use]
+    pub const fn cospi_2(self) -> I16F<-14> {
+        I16F(crate::algorithm::cospi_i16_2(self.0 as i16))
+    }
+
+    /// Computes `cos(π * self)` using a minimax fourth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 9.18799 ⋅ 10<sup>-4</sup>.
+    #[must_use]
+    pub const fn cospi_4(self) -> I16F<-14> {
+        I16F(crate::algorithm::cospi_i16_4(self.0 as i16))
+    }
+
+    /// Computes `cos(π * self)` using a minimax sixth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 9.20285 ⋅ 10<sup>-6</sup>.
+    #[must_use]
+    pub const fn cospi_6(self) -> I16F<-14> {
+        I16F(crate::algorithm::cospi_i16_6(self.0 as i16))
+    }
+
+    /// Computes `sin(π * self)` using a minimax second-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 5.60096 ⋅ 10<sup>-2</sup>.
+    #[must_use]
+    pub const fn sinpi_2(self) -> I16F<-14> {
+        I16F(crate::algorithm::cospi_i16_2(
+            self.0.wrapping_add(0xC000) as i16
+        ))
+    }
+
+    /// Computes `sin(π * self)` using a minimax fourth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 9.18799 ⋅ 10<sup>-4</sup>.
+    #[must_use]
+    pub const fn sinpi_4(self) -> I16F<-14> {
+        I16F(crate::algorithm::cospi_i16_4(
+            self.0.wrapping_add(0xC000) as i16
+        ))
+    }
+
+    /// Computes `sin(π * self)` using a minimax sixth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 9.20285 ⋅ 10<sup>-6</sup>.
+    #[must_use]
+    pub const fn sinpi_6(self) -> I16F<-14> {
+        I16F(crate::algorithm::cospi_i16_6(
+            self.0.wrapping_add(0xC000) as i16
+        ))
+    }
+}
+
 impl From<U16F<0>> for u16 {
     fn from(value: U16F<0>) -> Self {
         value.0
