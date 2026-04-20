@@ -474,9 +474,9 @@ impl<const E: i32> U32F<E> {
                     !(!0u32).unbounded_shl(shift)
                 };
                 let round = const {
-                    let shift = E2.wrapping_sub(E).wrapping_sub(1).cast_unsigned();
+                    let shift = E2.wrapping_sub(E).cast_unsigned();
 
-                    !(!0u32).unbounded_shl(shift)
+                    !(!0u32).unbounded_shl(shift.wrapping_sub(1))
                 };
 
                 let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
@@ -528,9 +528,9 @@ impl<const E: i32> U32F<E> {
                     !(!0u32).unbounded_shl(shift)
                 };
                 let round = const {
-                    let shift = E2.wrapping_sub(E).wrapping_sub(1).cast_unsigned();
+                    let shift = E2.wrapping_sub(E).cast_unsigned();
 
-                    !(!0u32).unbounded_shl(shift)
+                    !(!0u32).unbounded_shl(shift.wrapping_sub(1))
                 };
 
                 let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
@@ -573,9 +573,9 @@ impl<const E: i32> U32F<E> {
                     !(!0u32).unbounded_shl(shift)
                 };
                 let round = const {
-                    let shift = E2.wrapping_sub(E).wrapping_sub(1).cast_unsigned();
+                    let shift = E2.wrapping_sub(E).cast_unsigned();
 
-                    !(!0u32).unbounded_shl(shift)
+                    !(!0u32).unbounded_shl(shift.wrapping_sub(1))
                 };
 
                 let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
@@ -622,9 +622,9 @@ impl<const E: i32> U32F<E> {
                     !(!0u32).unbounded_shl(shift)
                 };
                 let round = const {
-                    let shift = E2.wrapping_sub(E).wrapping_sub(1).cast_unsigned();
+                    let shift = E2.wrapping_sub(E).cast_unsigned();
 
-                    !(!0u32).unbounded_shl(shift)
+                    !(!0u32).unbounded_shl(shift.wrapping_sub(1))
                 };
 
                 let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
@@ -670,9 +670,9 @@ impl<const E: i32> U32F<E> {
                     !(!0u32).unbounded_shl(shift)
                 };
                 let round = const {
-                    let shift = E2.wrapping_sub(E).wrapping_sub(1).cast_unsigned();
+                    let shift = E2.wrapping_sub(E).cast_unsigned();
 
-                    !(!0u32).unbounded_shl(shift)
+                    !(!0u32).unbounded_shl(shift.wrapping_sub(1))
                 };
 
                 let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
@@ -719,9 +719,9 @@ impl<const E: i32> U32F<E> {
                     !(!0u32).unbounded_shl(shift)
                 };
                 let round = const {
-                    let shift = E2.wrapping_sub(E).wrapping_sub(1).cast_unsigned();
+                    let shift = E2.wrapping_sub(E).cast_unsigned();
 
-                    !(!0u32).unbounded_shl(shift)
+                    !(!0u32).unbounded_shl(shift.wrapping_sub(1))
                 };
 
                 let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
@@ -1017,9 +1017,9 @@ impl<const E: i32> U32F<E> {
                     !(!0u64).unbounded_shl(shift)
                 };
                 let round = const {
-                    let shift = R.wrapping_neg().wrapping_sub(1).cast_unsigned();
+                    let shift = R.wrapping_neg().cast_unsigned();
 
-                    !(!0u64).unbounded_shl(shift)
+                    !(!0u64).unbounded_shl(shift.wrapping_sub(1))
                 };
 
                 let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
@@ -1075,9 +1075,9 @@ impl<const E: i32> U32F<E> {
                     !(!0u64).unbounded_shl(shift)
                 };
                 let round = const {
-                    let shift = R.wrapping_neg().wrapping_sub(1).cast_unsigned();
+                    let shift = R.wrapping_neg().cast_unsigned();
 
-                    !(!0u64).unbounded_shl(shift)
+                    !(!0u64).unbounded_shl(shift.wrapping_sub(1))
                 };
 
                 let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
@@ -1124,9 +1124,9 @@ impl<const E: i32> U32F<E> {
                     !(!0u64).unbounded_shl(shift)
                 };
                 let round = const {
-                    let shift = R.wrapping_neg().wrapping_sub(1).cast_unsigned();
+                    let shift = R.wrapping_neg().cast_unsigned();
 
-                    !(!0u64).unbounded_shl(shift)
+                    !(!0u64).unbounded_shl(shift.wrapping_sub(1))
                 };
 
                 let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
@@ -1173,9 +1173,9 @@ impl<const E: i32> U32F<E> {
                     !(!0u64).unbounded_shl(shift)
                 };
                 let round = const {
-                    let shift = R.wrapping_neg().wrapping_sub(1).cast_unsigned();
+                    let shift = R.wrapping_neg().cast_unsigned();
 
-                    !(!0u64).unbounded_shl(shift)
+                    !(!0u64).unbounded_shl(shift.wrapping_sub(1))
                 };
 
                 let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
@@ -1225,9 +1225,9 @@ impl<const E: i32> U32F<E> {
                     !(!0u64).unbounded_shl(shift)
                 };
                 let round = const {
-                    let shift = R.wrapping_neg().wrapping_sub(1).cast_unsigned();
+                    let shift = R.wrapping_neg().cast_unsigned();
 
-                    !(!0u64).unbounded_shl(shift)
+                    !(!0u64).unbounded_shl(shift.wrapping_sub(1))
                 };
 
                 let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
@@ -1276,9 +1276,9 @@ impl<const E: i32> U32F<E> {
                     !(!0u64).unbounded_shl(shift)
                 };
                 let round = const {
-                    let shift = R.wrapping_neg().wrapping_sub(1).cast_unsigned();
+                    let shift = R.wrapping_neg().cast_unsigned();
 
-                    !(!0u64).unbounded_shl(shift)
+                    !(!0u64).unbounded_shl(shift.wrapping_sub(1))
                 };
 
                 let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
@@ -1330,9 +1330,9 @@ impl<const E: i32> U32F<E> {
                     !(!0u64).unbounded_shl(shift)
                 };
                 let round = const {
-                    let shift = R.wrapping_neg().wrapping_sub(1).cast_unsigned();
+                    let shift = R.wrapping_neg().cast_unsigned();
 
-                    !(!0u64).unbounded_shl(shift)
+                    !(!0u64).unbounded_shl(shift.wrapping_sub(1))
                 };
 
                 let mut temp = x as u64;
@@ -1385,9 +1385,9 @@ impl<const E: i32> U32F<E> {
                     !(!0u64).unbounded_shl(shift)
                 };
                 let round = const {
-                    let shift = R.wrapping_neg().wrapping_sub(1).cast_unsigned();
+                    let shift = R.wrapping_neg().cast_unsigned();
 
-                    !(!0u64).unbounded_shl(shift)
+                    !(!0u64).unbounded_shl(shift.wrapping_sub(1))
                 };
 
                 let mut temp = x as u64;
@@ -1431,9 +1431,9 @@ impl<const E: i32> U32F<E> {
                     !(!0u64).unbounded_shl(shift)
                 };
                 let round = const {
-                    let shift = R.wrapping_neg().wrapping_sub(1).cast_unsigned();
+                    let shift = R.wrapping_neg().cast_unsigned();
 
-                    !(!0u64).unbounded_shl(shift)
+                    !(!0u64).unbounded_shl(shift.wrapping_sub(1))
                 };
 
                 let mut temp = x as u64;
@@ -1481,9 +1481,9 @@ impl<const E: i32> U32F<E> {
                     !(!0u64).unbounded_shl(shift)
                 };
                 let round = const {
-                    let shift = R.wrapping_neg().wrapping_sub(1).cast_unsigned();
+                    let shift = R.wrapping_neg().cast_unsigned();
 
-                    !(!0u64).unbounded_shl(shift)
+                    !(!0u64).unbounded_shl(shift.wrapping_sub(1))
                 };
 
                 let mut temp = x as u64;
@@ -1532,9 +1532,9 @@ impl<const E: i32> U32F<E> {
                     !(!0u64).unbounded_shl(shift)
                 };
                 let round = const {
-                    let shift = R.wrapping_neg().wrapping_sub(1).cast_unsigned();
+                    let shift = R.wrapping_neg().cast_unsigned();
 
-                    !(!0u64).unbounded_shl(shift)
+                    !(!0u64).unbounded_shl(shift.wrapping_sub(1))
                 };
 
                 let mut temp = x as u64;
@@ -1580,9 +1580,9 @@ impl<const E: i32> U32F<E> {
                     !(!0u64).unbounded_shl(shift)
                 };
                 let round = const {
-                    let shift = R.wrapping_neg().wrapping_sub(1).cast_unsigned();
+                    let shift = R.wrapping_neg().cast_unsigned();
 
-                    !(!0u64).unbounded_shl(shift)
+                    !(!0u64).unbounded_shl(shift.wrapping_sub(1))
                 };
 
                 let mut temp = x as u64;
@@ -1633,9 +1633,9 @@ impl<const E: i32> U32F<E> {
                     !(!0u64).unbounded_shl(shift)
                 };
                 let round = const {
-                    let shift = R.wrapping_sub(OFFSET).wrapping_sub(1).cast_unsigned();
+                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
 
-                    !(!0u64).unbounded_shl(shift)
+                    !(!0u64).unbounded_shl(shift.wrapping_sub(1))
                 };
 
                 let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
@@ -1693,9 +1693,9 @@ impl<const E: i32> U32F<E> {
                     !(!0u64).unbounded_shl(shift)
                 };
                 let round = const {
-                    let shift = R.wrapping_sub(OFFSET).wrapping_sub(1).cast_unsigned();
+                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
 
-                    !(!0u64).unbounded_shl(shift)
+                    !(!0u64).unbounded_shl(shift.wrapping_sub(1))
                 };
 
                 let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
@@ -1745,9 +1745,9 @@ impl<const E: i32> U32F<E> {
                     !(!0u64).unbounded_shl(shift)
                 };
                 let round = const {
-                    let shift = R.wrapping_sub(OFFSET).wrapping_sub(1).cast_unsigned();
+                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
 
-                    !(!0u64).unbounded_shl(shift)
+                    !(!0u64).unbounded_shl(shift.wrapping_sub(1))
                 };
 
                 let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
@@ -1797,9 +1797,9 @@ impl<const E: i32> U32F<E> {
                     !(!0u64).unbounded_shl(shift)
                 };
                 let round = const {
-                    let shift = R.wrapping_sub(OFFSET).wrapping_sub(1).cast_unsigned();
+                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
 
-                    !(!0u64).unbounded_shl(shift)
+                    !(!0u64).unbounded_shl(shift.wrapping_sub(1))
                 };
 
                 let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
@@ -1852,9 +1852,9 @@ impl<const E: i32> U32F<E> {
                     !(!0u64).unbounded_shl(shift)
                 };
                 let round = const {
-                    let shift = R.wrapping_sub(OFFSET).wrapping_sub(1).cast_unsigned();
+                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
 
-                    !(!0u64).unbounded_shl(shift)
+                    !(!0u64).unbounded_shl(shift.wrapping_sub(1))
                 };
 
                 let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
@@ -1905,9 +1905,9 @@ impl<const E: i32> U32F<E> {
                     !(!0u64).unbounded_shl(shift)
                 };
                 let round = const {
-                    let shift = R.wrapping_sub(OFFSET).wrapping_sub(1).cast_unsigned();
+                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
 
-                    !(!0u64).unbounded_shl(shift)
+                    !(!0u64).unbounded_shl(shift.wrapping_sub(1))
                 };
 
                 let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
@@ -1972,9 +1972,9 @@ impl<const E: i32> U32F<E> {
                     !(!0u64).unbounded_shl(shift)
                 };
                 let round = const {
-                    let shift = R.wrapping_sub(OFFSET).wrapping_sub(1).cast_unsigned();
+                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
 
-                    !(!0u64).unbounded_shl(shift)
+                    !(!0u64).unbounded_shl(shift.wrapping_sub(1))
                 };
 
                 let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
@@ -2045,9 +2045,9 @@ impl<const E: i32> U32F<E> {
                     !(!0u64).unbounded_shl(shift)
                 };
                 let round = const {
-                    let shift = R.wrapping_sub(OFFSET).wrapping_sub(1).cast_unsigned();
+                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
 
-                    !(!0u64).unbounded_shl(shift)
+                    !(!0u64).unbounded_shl(shift.wrapping_sub(1))
                 };
 
                 let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
@@ -2104,9 +2104,9 @@ impl<const E: i32> U32F<E> {
                     !(!0u64).unbounded_shl(shift)
                 };
                 let round = const {
-                    let shift = R.wrapping_sub(OFFSET).wrapping_sub(1).cast_unsigned();
+                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
 
-                    !(!0u64).unbounded_shl(shift)
+                    !(!0u64).unbounded_shl(shift.wrapping_sub(1))
                 };
 
                 let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
@@ -2171,9 +2171,9 @@ impl<const E: i32> U32F<E> {
                     !(!0u64).unbounded_shl(shift)
                 };
                 let round = const {
-                    let shift = R.wrapping_sub(OFFSET).wrapping_sub(1).cast_unsigned();
+                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
 
-                    !(!0u64).unbounded_shl(shift)
+                    !(!0u64).unbounded_shl(shift.wrapping_sub(1))
                 };
 
                 let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
@@ -2235,9 +2235,9 @@ impl<const E: i32> U32F<E> {
                     !(!0u64).unbounded_shl(shift)
                 };
                 let round = const {
-                    let shift = R.wrapping_sub(OFFSET).wrapping_sub(1).cast_unsigned();
+                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
 
-                    !(!0u64).unbounded_shl(shift)
+                    !(!0u64).unbounded_shl(shift.wrapping_sub(1))
                 };
 
                 let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
@@ -2295,9 +2295,9 @@ impl<const E: i32> U32F<E> {
                     !(!0u64).unbounded_shl(shift)
                 };
                 let round = const {
-                    let shift = R.wrapping_sub(OFFSET).wrapping_sub(1).cast_unsigned();
+                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
 
-                    !(!0u64).unbounded_shl(shift)
+                    !(!0u64).unbounded_shl(shift.wrapping_sub(1))
                 };
 
                 let mut temp = (x & mask).wrapping_add(x >> shift & 0x1);
