@@ -137,6 +137,7 @@ impl<const E: i32> I32F<E> {
     pub const BITS: u32 = i32::BITS;
 
     /// Creates a new fixed-point number from an integer significand, equal to `significand` ⋅ 2<sup>E</sup>.
+    #[inline(always)]
     #[must_use]
     pub const fn new(significand: i32) -> Self {
         Self { significand }
@@ -305,6 +306,7 @@ impl<const E: i32> I32F<E> {
     }
 
     /// Raw transutation from [`u32`].
+    #[inline(always)]
     #[must_use]
     pub const fn from_bits(bits: u32) -> Self {
         Self {
@@ -473,6 +475,7 @@ impl<const E: i32> I32F<E> {
     }
 
     /// Raw transmutation to [`u32`].
+    #[inline(always)]
     #[must_use]
     pub const fn to_bits(self) -> u32 {
         self.significand.cast_unsigned()
@@ -497,12 +500,14 @@ impl<const E: i32> I32F<E> {
     }
 
     /// Returns the fixed-point significand, equal to `self` ⋅ 2<sup>-E</sup>.
+    #[inline(always)]
     #[must_use]
     pub const fn significand(self) -> i32 {
         self.significand
     }
 
     /// Returns the fixed-point exponent.
+    #[inline(always)]
     #[must_use]
     pub const fn exponent(self) -> i32 {
         E
