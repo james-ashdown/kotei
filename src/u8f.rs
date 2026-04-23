@@ -7,76 +7,82 @@ use crate::error::TryFromFloatError;
 
 /// The 32-bit unsigned fixed-point type.
 #[derive(Clone, Copy, Eq, Hash, Ord)]
-pub struct U8F<const E: i32>(pub(crate) u8);
+pub struct U8F<const E: i32> {
+    pub(crate) significand: u8,
+}
 
 impl U8F<-10> {
     /// 1/τ
-    pub const FRAC_1_TAU: Self = Self::from_bits(0xA3);
+    pub const FRAC_1_TAU: Self = Self { significand: 0xA3 };
 }
 
 impl U8F<-9> {
     /// 1/π
-    pub const FRAC_1_PI: Self = Self::from_bits(0xA3);
+    pub const FRAC_1_PI: Self = Self { significand: 0xA3 };
     /// π/8
-    pub const FRAC_PI_8: Self = Self::from_bits(0xC9);
+    pub const FRAC_PI_8: Self = Self { significand: 0xC9 };
     /// log<sub>10</sub>(2)
-    pub const LOG10_2: Self = Self::from_bits(0x9A);
+    pub const LOG10_2: Self = Self { significand: 0x9A };
     /// log<sub>10</sub>(e)
-    pub const LOG10_E: Self = Self::from_bits(0xDE);
+    pub const LOG10_E: Self = Self { significand: 0xDE };
 }
 
 impl U8F<-8> {
     /// The Euler-Mascheroni constant (γ)
-    pub const EULER_GAMMA: Self = Self::from_bits(0x94);
+    pub const EULER_GAMMA: Self = Self { significand: 0x94 };
     /// 1/sqrt(2)
-    pub const FRAC_1_SQRT_2: Self = Self::from_bits(0xB5);
+    pub const FRAC_1_SQRT_2: Self = Self { significand: 0xB5 };
     /// 2/π
-    pub const FRAC_2_PI: Self = Self::from_bits(0xA3);
+    pub const FRAC_2_PI: Self = Self { significand: 0xA3 };
     /// π/4
-    pub const FRAC_PI_4: Self = Self::from_bits(0xC9);
+    pub const FRAC_PI_4: Self = Self { significand: 0xC9 };
     /// π/6
-    pub const FRAC_PI_6: Self = Self::from_bits(0x86);
+    pub const FRAC_PI_6: Self = Self { significand: 0x86 };
     /// ln(2)
-    pub const LN_2: Self = Self::from_bits(0xB1);
+    pub const LN_2: Self = Self { significand: 0xB1 };
 }
 
 impl U8F<-7> {
     /// 2/sqrt(π)
-    pub const FRAC_2_SQRT_PI: Self = Self::from_bits(0x90);
+    pub const FRAC_2_SQRT_PI: Self = Self { significand: 0x90 };
     /// π/2
-    pub const FRAC_PI_2: Self = Self::from_bits(0xC9);
+    pub const FRAC_PI_2: Self = Self { significand: 0xC9 };
     /// π/3
-    pub const FRAC_PI_3: Self = Self::from_bits(0x86);
+    pub const FRAC_PI_3: Self = Self { significand: 0x86 };
     /// The golden ratio (φ)
-    pub const GOLDEN_RATIO: Self = Self::from_bits(0xCF);
+    pub const GOLDEN_RATIO: Self = Self { significand: 0xCF };
     /// log<sub>2</sub>(e)
-    pub const LOG2_E: Self = Self::from_bits(0xB9);
+    pub const LOG2_E: Self = Self { significand: 0xB9 };
     /// sqrt(2)
-    pub const SQRT_2: Self = Self::from_bits(0xB5);
+    pub const SQRT_2: Self = Self { significand: 0xB5 };
 }
 
 impl U8F<-6> {
     /// Euler's number (e)
-    pub const E: Self = Self::from_bits(0xAE);
+    pub const E: Self = Self { significand: 0xAE };
     /// ln(10)
-    pub const LN_10: Self = Self::from_bits(0x93);
+    pub const LN_10: Self = Self { significand: 0x93 };
     /// log<sub>2</sub>(10)
-    pub const LOG2_10: Self = Self::from_bits(0xD5);
+    pub const LOG2_10: Self = Self { significand: 0xD5 };
     /// Archimedes’ constant (π)
-    pub const PI: Self = Self::from_bits(0xC9);
+    pub const PI: Self = Self { significand: 0xC9 };
 }
 
 impl U8F<-5> {
     /// The full circle constant (τ)
-    pub const TAU: Self = Self::from_bits(0xC9);
+    pub const TAU: Self = Self { significand: 0xC9 };
 }
 
 impl<const E: i32> U8F<E> {
     /// The smallest value that can be represented by this fixed-point type, equal to 0.
-    pub const MIN: Self = Self(u8::MIN);
+    pub const MIN: Self = Self {
+        significand: u8::MIN,
+    };
 
     /// The largest value that can be represented by this fixed-point type, equal to (2<sup>8</sup> - 1) ⋅ 2<sup>E</sup>.
-    pub const MAX: Self = Self(u8::MAX);
+    pub const MAX: Self = Self {
+        significand: u8::MAX,
+    };
 
     /// The size of this type in bits.
     pub const BITS: u32 = u8::BITS;
@@ -84,7 +90,7 @@ impl<const E: i32> U8F<E> {
     /// Creates a new fixed-point number from an integer significand, equal to `significand` ⋅ 2<sup>E</sup>.
     #[must_use]
     pub const fn new(significand: u8) -> Self {
-        Self(significand)
+        Self { significand }
     }
 
     /// Tries to create a new fixed-point number from [`f32`]. Returns the nearest multiple of 2<sup>E</sup> to `value`, rounded to the number with even least significant digits if `value` is halfway between two multiples of 2<sup>E</sup>. Returns an error if `value` is not a number, less than [`Self::MIN`], or greater than [`Self::MAX`].
@@ -92,7 +98,7 @@ impl<const E: i32> U8F<E> {
         let bits = value.to_bits();
 
         if bits & 0x7FFFFFFF == 0 {
-            return Ok(Self(0));
+            return Ok(Self { significand: 0 });
         }
 
         let mut significand = bits & 0x7FFFFF;
@@ -145,7 +151,9 @@ impl<const E: i32> U8F<E> {
             return Err(TryFromFloatError::Overflow);
         }
 
-        Ok(Self(significand as u8))
+        Ok(Self {
+            significand: significand as u8,
+        })
     }
 
     /// Tries to create a new fixed-point number from [`f64`]. Returns the nearest multiple of 2<sup>E</sup> to `value`, rounded to the number with even least significant digits if `value` is halfway between two multiples of 2<sup>E</sup>. Returns an error if `value` is not a number, less than [`Self::MIN`], or greater than [`Self::MAX`].
@@ -153,7 +161,7 @@ impl<const E: i32> U8F<E> {
         let bits = value.to_bits();
 
         if bits & 0x7FFFFFFFFFFFFFFF == 0 {
-            return Ok(Self(0));
+            return Ok(Self { significand: 0 });
         }
 
         let mut significand = bits & 0xFFFFFFFFFFFFF;
@@ -206,13 +214,15 @@ impl<const E: i32> U8F<E> {
             return Err(TryFromFloatError::Overflow);
         }
 
-        Ok(Self(significand as u8))
+        Ok(Self {
+            significand: significand as u8,
+        })
     }
 
     /// Raw transutation from [`u8`].
     #[must_use]
     pub const fn from_bits(bits: u8) -> Self {
-        Self(bits)
+        Self { significand: bits }
     }
 
     /// Creates a native endian fixed-point number from its memory representation as a byte array in native endian byte order.
@@ -220,19 +230,25 @@ impl<const E: i32> U8F<E> {
     /// As the target platform's native endianness is used, portable code likely wants to use [`from_be_bytes`](Self::from_be_bytes) or [`from_le_bytes`](Self::from_le_bytes), as appropriate, instead.
     #[must_use]
     pub const fn from_ne_bytes(bytes: [u8; 1]) -> Self {
-        Self(u8::from_ne_bytes(bytes))
+        Self {
+            significand: u8::from_ne_bytes(bytes),
+        }
     }
 
     /// Creates a fixed-point number from its memory representation as a byte array in big endian byte order.
     #[must_use]
     pub const fn from_be_bytes(bytes: [u8; 1]) -> Self {
-        Self(u8::from_be_bytes(bytes))
+        Self {
+            significand: u8::from_be_bytes(bytes),
+        }
     }
 
     /// Creates a fixed-point number from its memory representation as a byte array in little endian byte order.
     #[must_use]
     pub const fn from_le_bytes(bytes: [u8; 1]) -> Self {
-        Self(u8::from_le_bytes(bytes))
+        Self {
+            significand: u8::from_le_bytes(bytes),
+        }
     }
 
     /// Returns the nearest [`f32`] to `self`, rounded to the number with even least significant digits if `self` is halfway between two representable [`f32`] numbers, saturating at [`f32::INFINITY`] or [`f32::NEG_INFINITY`] if `self` rounds to a value greater than [`f32::MAX`] or less than [`f32::MIN`], respectively.
@@ -253,14 +269,14 @@ impl<const E: i32> U8F<E> {
                 f32::from_bits(bits)
             };
 
-            if scaling_factor == f32::INFINITY && self.0 == 0 {
+            if scaling_factor == f32::INFINITY && self.significand == 0 {
                 0.0
             } else {
-                self.0 as f32 * scaling_factor
+                self.significand as f32 * scaling_factor
             }
         } else {
             let mut bits = 0;
-            let mut significand = self.0 as u32;
+            let mut significand = self.significand as u32;
 
             let leading_zeros = significand.leading_zeros();
             let mut exponent = const { BIAS + u32::BITS - 1 }.wrapping_sub(leading_zeros);
@@ -315,14 +331,14 @@ impl<const E: i32> U8F<E> {
                 f64::from_bits(bits)
             };
 
-            if scaling_factor == f64::INFINITY && self.0 == 0 {
+            if scaling_factor == f64::INFINITY && self.significand == 0 {
                 0.0
             } else {
-                self.0 as f64 * scaling_factor
+                self.significand as f64 * scaling_factor
             }
         } else {
             let mut bits = 0;
-            let mut significand = self.0 as u64;
+            let mut significand = self.significand as u64;
 
             let leading_zeros = significand.leading_zeros();
             let mut exponent = const { BIAS + u64::BITS - 1 }.wrapping_sub(leading_zeros);
@@ -362,31 +378,31 @@ impl<const E: i32> U8F<E> {
     /// Raw transmutation to [`u8`].
     #[must_use]
     pub const fn to_bits(self) -> u8 {
-        self.0
+        self.significand
     }
 
     /// Returns the memory representation of this fixed-point number as a byte array in native byte order.
     #[must_use]
     pub const fn to_ne_bytes(self) -> [u8; 1] {
-        self.0.to_ne_bytes()
+        self.significand.to_ne_bytes()
     }
 
     /// Returns the memory representation of this fixed-point number as a byte array in big-endian (network) byte order.
     #[must_use]
     pub const fn to_be_bytes(self) -> [u8; 1] {
-        self.0.to_be_bytes()
+        self.significand.to_be_bytes()
     }
 
     /// Returns the memory representation of this fixed-point number as a byte array in little-endian byte order.
     #[must_use]
     pub const fn to_le_bytes(self) -> [u8; 1] {
-        self.0.to_le_bytes()
+        self.significand.to_le_bytes()
     }
 
     /// Returns the fixed-point significand, equal to `self` ⋅ 2<sup>-E</sup>.
     #[must_use]
     pub const fn significand(self) -> u8 {
-        self.0
+        self.significand
     }
 
     /// Returns the fixed-point exponent.
@@ -403,7 +419,7 @@ impl<const E: i32> U8F<E> {
     #[must_use]
     #[track_caller]
     pub const fn ilog2(self) -> i32 {
-        let x = self.0.ilog2();
+        let x = self.significand.ilog2();
         let Some(x) = E.checked_add_unsigned(x) else {
             crate::panic::ilog2();
         };
@@ -414,7 +430,7 @@ impl<const E: i32> U8F<E> {
     /// Computes the base 2 logarithm of `self`, rounded down. Returns `None` if `self` is zero, or if overflow occurred.
     #[must_use]
     pub const fn checked_ilog2(self) -> Option<i32> {
-        let Some(x) = self.0.checked_ilog2() else {
+        let Some(x) = self.significand.checked_ilog2() else {
             return None;
         };
         let Some(x) = E.checked_add_unsigned(x) else {
@@ -432,7 +448,7 @@ impl<const E: i32> U8F<E> {
     #[must_use]
     #[track_caller]
     pub const fn rescale<const E2: i32>(self) -> U8F<E2> {
-        let mut x = self.0;
+        let mut x = self.significand;
 
         if const { E > E2 } {
             let shift = const { E.wrapping_sub(E2).cast_unsigned() };
@@ -475,7 +491,7 @@ impl<const E: i32> U8F<E> {
             }
         }
 
-        U8F(x)
+        U8F { significand: x }
     }
 
     /// Returns the nearest multiple of 2<sup>E2</sup> to `self`, rounded to the number with even least significant digits if `self` is halfway between two multiples of 2<sup>E2</sup>.
@@ -486,7 +502,7 @@ impl<const E: i32> U8F<E> {
     #[must_use]
     #[track_caller]
     pub const fn strict_rescale<const E2: i32>(self) -> U8F<E2> {
-        let mut x = self.0;
+        let mut x = self.significand;
 
         if const { E > E2 } {
             let shift = const { E.wrapping_sub(E2).cast_unsigned() };
@@ -529,13 +545,13 @@ impl<const E: i32> U8F<E> {
             }
         }
 
-        U8F(x)
+        U8F { significand: x }
     }
 
     /// Returns the nearest multiple of 2<sup>E2</sup> to `self`, rounded to the number with even least significant digits if `self` is halfway between two multiples of 2<sup>E2</sup>, wrapping around at the numeric bounds of the type.
     #[must_use]
     pub const fn wrapping_rescale<const E2: i32>(self) -> U8F<E2> {
-        let mut x = self.0;
+        let mut x = self.significand;
 
         if const { E > E2 } {
             let shift = const { E.wrapping_sub(E2).cast_unsigned() };
@@ -574,13 +590,13 @@ impl<const E: i32> U8F<E> {
             }
         }
 
-        U8F(x)
+        U8F { significand: x }
     }
 
     /// Returns the nearest multiple of 2<sup>E2</sup> to `self`, rounded to the number with even least significant digits if `self` is halfway between two multiples of 2<sup>E2</sup>, saturating at the numeric bounds of the type instead of overflowing.
     #[must_use]
     pub const fn saturating_rescale<const E2: i32>(self) -> U8F<E2> {
-        let mut x = self.0;
+        let mut x = self.significand;
 
         if const { E > E2 } {
             let shift = const { E.wrapping_sub(E2).cast_unsigned() };
@@ -623,13 +639,13 @@ impl<const E: i32> U8F<E> {
             }
         }
 
-        U8F(x)
+        U8F { significand: x }
     }
 
     /// Returns the nearest multiple of 2<sup>E2</sup> to `self`, rounded to the number with even least significant digits if `self` is halfway between two multiples of 2<sup>E2</sup>. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
     #[must_use]
     pub const fn overflowing_rescale<const E2: i32>(self) -> (U8F<E2>, bool) {
-        let mut x = self.0;
+        let mut x = self.significand;
         let mut overflowed = false;
 
         if const { E > E2 } {
@@ -671,13 +687,13 @@ impl<const E: i32> U8F<E> {
             }
         }
 
-        (U8F(x), overflowed)
+        (U8F { significand: x }, overflowed)
     }
 
     /// Returns the nearest multiple of 2<sup>E2</sup> to `self`, rounded to the number with even least significant digits if `self` is halfway between two multiples of 2<sup>E2</sup>, returning `None` if overflow occurred.
     #[must_use]
     pub const fn checked_rescale<const E2: i32>(self) -> Option<U8F<E2>> {
-        let mut x = self.0;
+        let mut x = self.significand;
 
         if const { E > E2 } {
             let shift = const { E.wrapping_sub(E2).cast_unsigned() };
@@ -720,14 +736,16 @@ impl<const E: i32> U8F<E> {
             }
         }
 
-        Some(U8F(x))
+        Some(U8F { significand: x })
     }
 
     #[doc(hidden)]
     #[must_use]
     #[track_caller]
     pub const fn add(self, rhs: Self) -> Self {
-        Self(self.0 + rhs.0)
+        Self {
+            significand: self.significand + rhs.significand,
+        }
     }
 
     /// Computes `self + rhs`, panicking if overflow occurred.
@@ -738,37 +756,43 @@ impl<const E: i32> U8F<E> {
     #[must_use]
     #[track_caller]
     pub const fn strict_add(self, rhs: Self) -> Self {
-        Self(self.0.strict_add(rhs.0))
+        Self {
+            significand: self.significand.strict_add(rhs.significand),
+        }
     }
 
     /// Computes `self + rhs`, wrapping around at the numeric bounds of the type.
     #[must_use]
     pub const fn wrapping_add(self, rhs: Self) -> Self {
-        Self(self.0.wrapping_add(rhs.0))
+        Self {
+            significand: self.significand.wrapping_add(rhs.significand),
+        }
     }
 
     /// Computes `self + rhs`, saturating at the numeric bounds of the type instead of overflowing.
     #[must_use]
     pub const fn saturating_add(self, rhs: Self) -> Self {
-        Self(self.0.saturating_add(rhs.0))
+        Self {
+            significand: self.significand.saturating_add(rhs.significand),
+        }
     }
 
     /// Computes `self + rhs`. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
     #[must_use]
     pub const fn overflowing_add(self, rhs: Self) -> (Self, bool) {
-        let (x, overflowed) = self.0.overflowing_add(rhs.0);
+        let (x, overflowed) = self.significand.overflowing_add(rhs.significand);
 
-        (Self(x), overflowed)
+        (Self { significand: x }, overflowed)
     }
 
     /// Computes `self + rhs`, returning `None` if overflow occurred.
     #[must_use]
     pub const fn checked_add(self, rhs: Self) -> Option<Self> {
-        let Some(x) = self.0.checked_add(rhs.0) else {
+        let Some(x) = self.significand.checked_add(rhs.significand) else {
             return None;
         };
 
-        Some(Self(x))
+        Some(Self { significand: x })
     }
 
     /// Computes `self + rhs`, panicking if overflow occurred.
@@ -779,13 +803,13 @@ impl<const E: i32> U8F<E> {
     #[must_use]
     #[track_caller]
     pub const fn add_signed(self, rhs: I8F<E>) -> Self {
-        let x = self.0.wrapping_add(rhs.0 as u8);
+        let x = self.significand.wrapping_add(rhs.significand as u8);
 
-        if cfg!(debug_assertions) && (rhs.0 < 0) != (x < self.0) {
+        if cfg!(debug_assertions) && (rhs.significand < 0) != (x < self.significand) {
             crate::panic::add();
         }
 
-        Self(x)
+        Self { significand: x }
     }
 
     /// Computes `self + rhs`, panicking if overflow occurred.
@@ -796,62 +820,69 @@ impl<const E: i32> U8F<E> {
     #[must_use]
     #[track_caller]
     pub const fn strict_add_signed(self, rhs: I8F<E>) -> Self {
-        let x = self.0.wrapping_add(rhs.0 as u8);
+        let x = self.significand.wrapping_add(rhs.significand as u8);
 
-        if (rhs.0 < 0) != (x < self.0) {
+        if (rhs.significand < 0) != (x < self.significand) {
             crate::panic::add();
         }
 
-        Self(x)
+        Self { significand: x }
     }
 
     /// Computes `self + rhs`, wrapping around at the numeric bounds of the type.
     #[must_use]
     pub const fn wrapping_add_signed(self, rhs: I8F<E>) -> Self {
-        Self(self.0.wrapping_add(rhs.0 as u8))
+        Self {
+            significand: self.significand.wrapping_add(rhs.significand as u8),
+        }
     }
 
     /// Computes `self + rhs`, saturating at the numeric bounds of the type instead of overflowing.
     #[must_use]
     pub const fn saturating_add_signed(self, rhs: I8F<E>) -> Self {
-        let x = self.0.wrapping_add(rhs.0 as u8);
+        let x = self.significand.wrapping_add(rhs.significand as u8);
 
-        if (rhs.0 < 0) != (x > self.0) {
-            if rhs.0 < 0 {
+        if (rhs.significand < 0) != (x > self.significand) {
+            if rhs.significand < 0 {
                 return Self::MIN;
             } else {
                 return Self::MAX;
             }
         }
 
-        Self(x)
+        Self { significand: x }
     }
 
     /// Computes `self + rhs`. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
     #[must_use]
     pub const fn overflowing_add_signed(self, rhs: I8F<E>) -> (Self, bool) {
-        let x = self.0.wrapping_add(rhs.0 as u8);
+        let x = self.significand.wrapping_add(rhs.significand as u8);
 
-        (Self(x), (rhs.0 < 0) != (x < self.0))
+        (
+            Self { significand: x },
+            (rhs.significand < 0) != (x < self.significand),
+        )
     }
 
     /// Computes `self + rhs`, returning `None` if overflow occurred.
     #[must_use]
     pub const fn checked_add_signed(self, rhs: I8F<E>) -> Option<Self> {
-        let x = self.0.wrapping_add(rhs.0 as u8);
+        let x = self.significand.wrapping_add(rhs.significand as u8);
 
-        if x < self.0 {
+        if x < self.significand {
             return None;
         }
 
-        Some(Self(x))
+        Some(Self { significand: x })
     }
 
     #[doc(hidden)]
     #[must_use]
     #[track_caller]
     pub const fn sub(self, rhs: Self) -> Self {
-        Self(self.0 - rhs.0)
+        Self {
+            significand: self.significand - rhs.significand,
+        }
     }
 
     /// Computes `self - rhs`, panicking if overflow occurred.
@@ -862,37 +893,43 @@ impl<const E: i32> U8F<E> {
     #[must_use]
     #[track_caller]
     pub const fn strict_sub(self, rhs: Self) -> Self {
-        Self(self.0.strict_sub(rhs.0))
+        Self {
+            significand: self.significand.strict_sub(rhs.significand),
+        }
     }
 
     /// Computes `self - rhs`, wrapping around at the numeric bounds of the type.
     #[must_use]
     pub const fn wrapping_sub(self, rhs: Self) -> Self {
-        Self(self.0.wrapping_sub(rhs.0))
+        Self {
+            significand: self.significand.wrapping_sub(rhs.significand),
+        }
     }
 
     /// Computes `self - rhs`, saturating at the numeric bounds of the type instead of overflowing.
     #[must_use]
     pub const fn saturating_sub(self, rhs: Self) -> Self {
-        Self(self.0.saturating_sub(rhs.0))
+        Self {
+            significand: self.significand.saturating_sub(rhs.significand),
+        }
     }
 
     /// Computes `self - rhs`. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
     #[must_use]
     pub const fn overflowing_sub(self, rhs: Self) -> (Self, bool) {
-        let (x, overflowed) = self.0.overflowing_sub(rhs.0);
+        let (x, overflowed) = self.significand.overflowing_sub(rhs.significand);
 
-        (Self(x), overflowed)
+        (Self { significand: x }, overflowed)
     }
 
     /// Computes `self - rhs`, returning `None` if overflow occurred.
     #[must_use]
     pub const fn checked_sub(self, rhs: Self) -> Option<Self> {
-        let Some(x) = self.0.checked_sub(rhs.0) else {
+        let Some(x) = self.significand.checked_sub(rhs.significand) else {
             return None;
         };
 
-        Some(Self(x))
+        Some(Self { significand: x })
     }
 
     /// Computes `self - rhs`, panicking if overflow occurred.
@@ -903,13 +940,13 @@ impl<const E: i32> U8F<E> {
     #[must_use]
     #[track_caller]
     pub const fn sub_signed(self, rhs: I8F<E>) -> Self {
-        let x = self.0.wrapping_sub(rhs.0 as u8);
+        let x = self.significand.wrapping_sub(rhs.significand as u8);
 
-        if cfg!(debug_assertions) && (rhs.0 < 0) != (x > self.0) {
+        if cfg!(debug_assertions) && (rhs.significand < 0) != (x > self.significand) {
             crate::panic::sub();
         }
 
-        Self(x)
+        Self { significand: x }
     }
 
     /// Computes `self - rhs`, panicking if overflow occurred.
@@ -920,62 +957,67 @@ impl<const E: i32> U8F<E> {
     #[must_use]
     #[track_caller]
     pub const fn strict_sub_signed(self, rhs: I8F<E>) -> Self {
-        let x = self.0.wrapping_sub(rhs.0 as u8);
+        let x = self.significand.wrapping_sub(rhs.significand as u8);
 
-        if (rhs.0 < 0) != (x > self.0) {
+        if (rhs.significand < 0) != (x > self.significand) {
             crate::panic::sub();
         }
 
-        Self(x)
+        Self { significand: x }
     }
 
     /// Computes `self - rhs`, wrapping around at the numeric bounds of the type.
     #[must_use]
     pub const fn wrapping_sub_signed(self, rhs: I8F<E>) -> Self {
-        Self(self.0.wrapping_sub(rhs.0 as u8))
+        Self {
+            significand: self.significand.wrapping_sub(rhs.significand as u8),
+        }
     }
 
     /// Computes `self - rhs`, saturating at the numeric bounds of the type instead of overflowing.
     #[must_use]
     pub const fn saturating_sub_signed(self, rhs: I8F<E>) -> Self {
-        let x = self.0.wrapping_sub(rhs.0 as u8);
+        let x = self.significand.wrapping_sub(rhs.significand as u8);
 
-        if (rhs.0 < 0) != (x > self.0) {
-            if rhs.0 < 0 {
+        if (rhs.significand < 0) != (x > self.significand) {
+            if rhs.significand < 0 {
                 return Self::MAX;
             } else {
                 return Self::MIN;
             }
         }
 
-        Self(x)
+        Self { significand: x }
     }
 
     /// Computes `self - rhs`. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
     #[must_use]
     pub const fn overflowing_sub_signed(self, rhs: I8F<E>) -> (Self, bool) {
-        let x = self.0.wrapping_sub(rhs.0 as u8);
+        let x = self.significand.wrapping_sub(rhs.significand as u8);
 
-        (Self(x), (rhs.0 < 0) != (x > self.0))
+        (
+            Self { significand: x },
+            (rhs.significand < 0) != (x > self.significand),
+        )
     }
 
     /// Computes `self - rhs`, returning `None` if overflow occurred.
     #[must_use]
     pub const fn checked_sub_signed(self, rhs: I8F<E>) -> Option<Self> {
-        let x = self.0.wrapping_sub(rhs.0 as u8);
+        let x = self.significand.wrapping_sub(rhs.significand as u8);
 
-        if (rhs.0 < 0) != (x > self.0) {
+        if (rhs.significand < 0) != (x > self.significand) {
             return None;
         }
 
-        Some(Self(x))
+        Some(Self { significand: x })
     }
 
     #[doc(hidden)]
     #[must_use]
     #[track_caller]
     pub const fn mul<const R: i32>(self, rhs: U8F<R>) -> Self {
-        let mut x = (self.0 as u16).wrapping_mul(rhs.0 as u16);
+        let mut x = (self.significand as u16).wrapping_mul(rhs.significand as u16);
 
         if const { R > 0 } {
             let shift = const { R.cast_unsigned() };
@@ -1022,7 +1064,9 @@ impl<const E: i32> U8F<E> {
             crate::panic::mul();
         }
 
-        Self(x as u8)
+        Self {
+            significand: x as u8,
+        }
     }
 
     /// Computes `self * rhs`, panicking if overflow occurred.
@@ -1033,7 +1077,7 @@ impl<const E: i32> U8F<E> {
     #[must_use]
     #[track_caller]
     pub const fn strict_mul<const R: i32>(self, rhs: U8F<R>) -> Self {
-        let mut x = (self.0 as u16).wrapping_mul(rhs.0 as u16);
+        let mut x = (self.significand as u16).wrapping_mul(rhs.significand as u16);
 
         if const { R > 0 } {
             let shift = const { R.cast_unsigned() };
@@ -1080,13 +1124,15 @@ impl<const E: i32> U8F<E> {
             crate::panic::mul();
         }
 
-        Self(x as u8)
+        Self {
+            significand: x as u8,
+        }
     }
 
     /// Computes `self * rhs`, wrapping around at the numeric bounds of the type.
     #[must_use]
     pub const fn wrapping_mul<const R: i32>(self, rhs: U8F<R>) -> Self {
-        let mut x = (self.0 as u16).wrapping_mul(rhs.0 as u16);
+        let mut x = (self.significand as u16).wrapping_mul(rhs.significand as u16);
 
         if const { R > 0 } {
             let shift = const { R.cast_unsigned() };
@@ -1125,13 +1171,15 @@ impl<const E: i32> U8F<E> {
             }
         }
 
-        Self(x as u8)
+        Self {
+            significand: x as u8,
+        }
     }
 
     /// Computes `self * rhs`, saturating at the numeric bounds of the type instead of overflowing.
     #[must_use]
     pub const fn saturating_mul<const R: i32>(self, rhs: U8F<R>) -> Self {
-        let mut x = (self.0 as u16).wrapping_mul(rhs.0 as u16);
+        let mut x = (self.significand as u16).wrapping_mul(rhs.significand as u16);
 
         if const { R > 0 } {
             let shift = const { R.cast_unsigned() };
@@ -1178,13 +1226,15 @@ impl<const E: i32> U8F<E> {
             return Self::MAX;
         }
 
-        Self(x as u8)
+        Self {
+            significand: x as u8,
+        }
     }
 
     /// Computes `self * rhs`. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
     #[must_use]
     pub const fn overflowing_mul<const R: i32>(self, rhs: U8F<R>) -> (Self, bool) {
-        let mut x = (self.0 as u16).wrapping_mul(rhs.0 as u16);
+        let mut x = (self.significand as u16).wrapping_mul(rhs.significand as u16);
         let mut overflowed = false;
 
         if const { R > 0 } {
@@ -1228,13 +1278,18 @@ impl<const E: i32> U8F<E> {
 
         overflowed |= x > u8::MAX as u16;
 
-        (Self(x as u8), overflowed)
+        (
+            Self {
+                significand: x as u8,
+            },
+            overflowed,
+        )
     }
 
     /// Computes `self * rhs`, returning `None` if overflow occurred.
     #[must_use]
     pub const fn checked_mul<const R: i32>(self, rhs: U8F<R>) -> Option<Self> {
-        let mut x = (self.0 as u16).wrapping_mul(rhs.0 as u16);
+        let mut x = (self.significand as u16).wrapping_mul(rhs.significand as u16);
 
         if const { R > 0 } {
             let shift = const { R.cast_unsigned() };
@@ -1281,7 +1336,9 @@ impl<const E: i32> U8F<E> {
             return None;
         }
 
-        Some(Self(x as u8))
+        Some(Self {
+            significand: x as u8,
+        })
     }
 
     /// Computes `self * rhs`, panicking if overflow occurred.
@@ -1292,7 +1349,7 @@ impl<const E: i32> U8F<E> {
     #[must_use]
     #[track_caller]
     pub const fn mul_signed<const R: i32>(self, rhs: I8F<R>) -> Self {
-        let mut x = (self.0 as i16).wrapping_mul(rhs.0 as i16);
+        let mut x = (self.significand as i16).wrapping_mul(rhs.significand as i16);
 
         if const { R > 0 } {
             let shift = const { R.cast_unsigned() };
@@ -1336,7 +1393,9 @@ impl<const E: i32> U8F<E> {
             crate::panic::mul();
         }
 
-        Self(x as u8)
+        Self {
+            significand: x as u8,
+        }
     }
 
     /// Computes `self * rhs`, panicking if overflow occurred.
@@ -1347,7 +1406,7 @@ impl<const E: i32> U8F<E> {
     #[must_use]
     #[track_caller]
     pub const fn strict_mul_signed<const R: i32>(self, rhs: I8F<R>) -> Self {
-        let mut x = (self.0 as i16).wrapping_mul(rhs.0 as i16);
+        let mut x = (self.significand as i16).wrapping_mul(rhs.significand as i16);
 
         if const { R > 0 } {
             let shift = const { R.cast_unsigned() };
@@ -1391,13 +1450,15 @@ impl<const E: i32> U8F<E> {
             crate::panic::mul();
         }
 
-        Self(x as u8)
+        Self {
+            significand: x as u8,
+        }
     }
 
     /// Computes `self * rhs`, wrapping around at the numeric bounds of the type.
     #[must_use]
     pub const fn wrapping_mul_signed<const R: i32>(self, rhs: I8F<R>) -> Self {
-        let mut x = (self.0 as i16).wrapping_mul(rhs.0 as i16);
+        let mut x = (self.significand as i16).wrapping_mul(rhs.significand as i16);
 
         if const { R > 0 } {
             let shift = const { R.cast_unsigned() };
@@ -1433,13 +1494,15 @@ impl<const E: i32> U8F<E> {
             }
         }
 
-        Self(x as u8)
+        Self {
+            significand: x as u8,
+        }
     }
 
     /// Computes `self * rhs`, saturating at the numeric bounds of the type instead of overflowing.
     #[must_use]
     pub const fn saturating_mul_signed<const R: i32>(self, rhs: I8F<R>) -> Self {
-        let mut x = (self.0 as i16).wrapping_mul(rhs.0 as i16);
+        let mut x = (self.significand as i16).wrapping_mul(rhs.significand as i16);
 
         if const { R > 0 } {
             let shift = const { R.cast_unsigned() };
@@ -1489,13 +1552,15 @@ impl<const E: i32> U8F<E> {
             return Self::MAX;
         }
 
-        Self(x as u8)
+        Self {
+            significand: x as u8,
+        }
     }
 
     /// Computes `self * rhs`. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
     #[must_use]
     pub const fn overflowing_mul_signed<const R: i32>(self, rhs: I8F<R>) -> (Self, bool) {
-        let mut x = (self.0 as i16).wrapping_mul(rhs.0 as i16);
+        let mut x = (self.significand as i16).wrapping_mul(rhs.significand as i16);
         let mut overflowed = false;
 
         if const { R > 0 } {
@@ -1536,13 +1601,18 @@ impl<const E: i32> U8F<E> {
 
         overflowed |= x < u8::MIN as i16 || x > u8::MAX as i16;
 
-        (Self(x as u8), overflowed)
+        (
+            Self {
+                significand: x as u8,
+            },
+            overflowed,
+        )
     }
 
     /// Computes `self * rhs`, returning `None` if overflow occurred.
     #[must_use]
     pub const fn checked_mul_signed<const R: i32>(self, rhs: I8F<R>) -> Option<Self> {
-        let mut x = (self.0 as i16).wrapping_mul(rhs.0 as i16);
+        let mut x = (self.significand as i16).wrapping_mul(rhs.significand as i16);
 
         if const { R > 0 } {
             let shift = const { R.cast_unsigned() };
@@ -1586,7 +1656,9 @@ impl<const E: i32> U8F<E> {
             return None;
         }
 
-        Some(Self(x as u8))
+        Some(Self {
+            significand: x as u8,
+        })
     }
 
     #[doc(hidden)]
@@ -1595,7 +1667,7 @@ impl<const E: i32> U8F<E> {
     pub const fn div<const R: i32>(self, rhs: U8F<R>) -> Self {
         const OFFSET: i32 = u8::BITS.cast_signed() - u16::BITS.cast_signed();
 
-        let mut x = ((self.0 as u16) << -OFFSET) / rhs.0 as u16;
+        let mut x = ((self.significand as u16) << -OFFSET) / rhs.significand as u16;
 
         if const { R < OFFSET } {
             let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
@@ -1638,7 +1710,9 @@ impl<const E: i32> U8F<E> {
             crate::panic::div();
         }
 
-        Self(x as u8)
+        Self {
+            significand: x as u8,
+        }
     }
 
     /// Computes `self / rhs`, panicking if overflow occurred.
@@ -1655,7 +1729,7 @@ impl<const E: i32> U8F<E> {
     pub const fn strict_div<const R: i32>(self, rhs: U8F<R>) -> Self {
         const OFFSET: i32 = u8::BITS.cast_signed() - u16::BITS.cast_signed();
 
-        let mut x = ((self.0 as u16) << -OFFSET) / rhs.0 as u16;
+        let mut x = ((self.significand as u16) << -OFFSET) / rhs.significand as u16;
 
         if const { R < OFFSET } {
             let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
@@ -1698,7 +1772,9 @@ impl<const E: i32> U8F<E> {
             crate::panic::div();
         }
 
-        Self(x as u8)
+        Self {
+            significand: x as u8,
+        }
     }
 
     /// Computes `self / rhs`, wrapping around at the numeric bounds of the type.
@@ -1711,7 +1787,7 @@ impl<const E: i32> U8F<E> {
     pub const fn wrapping_div<const R: i32>(self, rhs: U8F<R>) -> Self {
         const OFFSET: i32 = u8::BITS.cast_signed() - u16::BITS.cast_signed();
 
-        let mut x = ((self.0 as u16) << -OFFSET) / rhs.0 as u16;
+        let mut x = ((self.significand as u16) << -OFFSET) / rhs.significand as u16;
 
         if const { R < OFFSET } {
             let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
@@ -1746,7 +1822,9 @@ impl<const E: i32> U8F<E> {
             }
         }
 
-        Self(x as u8)
+        Self {
+            significand: x as u8,
+        }
     }
 
     /// Computes `self / rhs`, saturating at the numeric bounds of the type instead of overflowing.
@@ -1759,7 +1837,7 @@ impl<const E: i32> U8F<E> {
     pub const fn saturating_div<const R: i32>(self, rhs: U8F<R>) -> Self {
         const OFFSET: i32 = u8::BITS.cast_signed() - u16::BITS.cast_signed();
 
-        let mut x = ((self.0 as u16) << -OFFSET) / rhs.0 as u16;
+        let mut x = ((self.significand as u16) << -OFFSET) / rhs.significand as u16;
 
         if const { R < OFFSET } {
             let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
@@ -1802,7 +1880,9 @@ impl<const E: i32> U8F<E> {
             return Self::MAX;
         }
 
-        Self(x as u8)
+        Self {
+            significand: x as u8,
+        }
     }
 
     /// Computes `self / rhs`. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
@@ -1815,7 +1895,7 @@ impl<const E: i32> U8F<E> {
     pub const fn overflowing_div<const R: i32>(self, rhs: U8F<R>) -> (Self, bool) {
         const OFFSET: i32 = u8::BITS.cast_signed() - u16::BITS.cast_signed();
 
-        let mut x = ((self.0 as u16) << -OFFSET) / rhs.0 as u16;
+        let mut x = ((self.significand as u16) << -OFFSET) / rhs.significand as u16;
         let mut overflowed = false;
 
         if const { R < OFFSET } {
@@ -1855,7 +1935,12 @@ impl<const E: i32> U8F<E> {
 
         overflowed |= x > u8::MAX as u16;
 
-        (Self(x as u8), overflowed)
+        (
+            Self {
+                significand: x as u8,
+            },
+            overflowed,
+        )
     }
 
     /// Computes `self / rhs`, returning `None` if `rhs == 0` or overflow occurred.
@@ -1863,11 +1948,11 @@ impl<const E: i32> U8F<E> {
     pub const fn checked_div<const R: i32>(self, rhs: U8F<R>) -> Option<Self> {
         const OFFSET: i32 = u8::BITS.cast_signed() - u16::BITS.cast_signed();
 
-        if rhs.0 == 0 {
+        if rhs.significand == 0 {
             return None;
         }
 
-        let mut x = ((self.0 as u16) << -OFFSET) / rhs.0 as u16;
+        let mut x = ((self.significand as u16) << -OFFSET) / rhs.significand as u16;
 
         if const { R < OFFSET } {
             let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
@@ -1910,7 +1995,9 @@ impl<const E: i32> U8F<E> {
             return None;
         }
 
-        Some(Self(x as u8))
+        Some(Self {
+            significand: x as u8,
+        })
     }
 
     /// Computes `self / rhs`, panicking if overflow occurred.
@@ -1927,14 +2014,14 @@ impl<const E: i32> U8F<E> {
     pub const fn div_signed<const R: i32>(self, rhs: I8F<R>) -> Self {
         const OFFSET: i32 = u8::BITS.cast_signed() - u16::BITS.cast_signed();
 
-        let negative = rhs.0 < 0;
-        let mut rhs = rhs.0 as u8;
+        let negative = rhs.significand < 0;
+        let mut rhs = rhs.significand as u8;
 
         if negative {
             rhs = rhs.wrapping_neg();
         }
 
-        let mut x = ((self.0 as u16) << -OFFSET) / rhs as u16;
+        let mut x = ((self.significand as u16) << -OFFSET) / rhs as u16;
 
         if const { R < OFFSET } {
             let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
@@ -1983,7 +2070,9 @@ impl<const E: i32> U8F<E> {
             }
         }
 
-        Self(x as u8)
+        Self {
+            significand: x as u8,
+        }
     }
 
     /// Computes `self / rhs`, panicking if overflow occurred.
@@ -2000,14 +2089,14 @@ impl<const E: i32> U8F<E> {
     pub const fn strict_div_signed<const R: i32>(self, rhs: I8F<R>) -> Self {
         const OFFSET: i32 = u8::BITS.cast_signed() - u16::BITS.cast_signed();
 
-        let negative = rhs.0 < 0;
-        let mut rhs = rhs.0 as u8;
+        let negative = rhs.significand < 0;
+        let mut rhs = rhs.significand as u8;
 
         if negative {
             rhs = rhs.wrapping_neg();
         }
 
-        let mut x = ((self.0 as u16) << -OFFSET) / rhs as u16;
+        let mut x = ((self.significand as u16) << -OFFSET) / rhs as u16;
 
         if const { R < OFFSET } {
             let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
@@ -2050,7 +2139,9 @@ impl<const E: i32> U8F<E> {
             crate::panic::div();
         }
 
-        Self(x as u8)
+        Self {
+            significand: x as u8,
+        }
     }
 
     /// Computes `self / rhs`, wrapping around at the numeric bounds of the type.
@@ -2063,14 +2154,14 @@ impl<const E: i32> U8F<E> {
     pub const fn wrapping_div_signed<const R: i32>(self, rhs: I8F<R>) -> Self {
         const OFFSET: i32 = u8::BITS.cast_signed() - u16::BITS.cast_signed();
 
-        let negative = rhs.0 < 0;
-        let mut rhs = rhs.0 as u8;
+        let negative = rhs.significand < 0;
+        let mut rhs = rhs.significand as u8;
 
         if negative {
             rhs = rhs.wrapping_neg();
         }
 
-        let mut x = ((self.0 as u16) << -OFFSET) / rhs as u16;
+        let mut x = ((self.significand as u16) << -OFFSET) / rhs as u16;
 
         if const { R < OFFSET } {
             let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
@@ -2109,7 +2200,9 @@ impl<const E: i32> U8F<E> {
             x = x.wrapping_neg();
         }
 
-        Self(x as u8)
+        Self {
+            significand: x as u8,
+        }
     }
 
     /// Computes `self / rhs`, saturating at the numeric bounds of the type instead of overflowing.
@@ -2122,14 +2215,14 @@ impl<const E: i32> U8F<E> {
     pub const fn saturating_div_signed<const R: i32>(self, rhs: I8F<R>) -> Self {
         const OFFSET: i32 = u8::BITS.cast_signed() - u16::BITS.cast_signed();
 
-        let negative = rhs.0 < 0;
-        let mut rhs = rhs.0 as u8;
+        let negative = rhs.significand < 0;
+        let mut rhs = rhs.significand as u8;
 
         if negative {
             rhs = rhs.wrapping_neg();
         }
 
-        let mut x = ((self.0 as u16) << -OFFSET) / rhs as u16;
+        let mut x = ((self.significand as u16) << -OFFSET) / rhs as u16;
 
         if const { R < OFFSET } {
             let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
@@ -2178,7 +2271,9 @@ impl<const E: i32> U8F<E> {
             return Self::MAX;
         }
 
-        Self(x as u8)
+        Self {
+            significand: x as u8,
+        }
     }
 
     /// Computes `self / rhs`. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
@@ -2191,14 +2286,14 @@ impl<const E: i32> U8F<E> {
     pub const fn overflowing_div_signed<const R: i32>(self, rhs: I8F<R>) -> (Self, bool) {
         const OFFSET: i32 = u8::BITS.cast_signed() - u16::BITS.cast_signed();
 
-        let negative = rhs.0 < 0;
-        let mut rhs = rhs.0 as u8;
+        let negative = rhs.significand < 0;
+        let mut rhs = rhs.significand as u8;
 
         if negative {
             rhs = rhs.wrapping_neg();
         }
 
-        let mut x = ((self.0 as u16) << -OFFSET) / rhs as u16;
+        let mut x = ((self.significand as u16) << -OFFSET) / rhs as u16;
         let mut overflowed = false;
 
         if const { R < OFFSET } {
@@ -2238,7 +2333,12 @@ impl<const E: i32> U8F<E> {
 
         overflowed |= (negative && x != 0) || x > u8::MAX as u16;
 
-        (Self(x as u8), overflowed)
+        (
+            Self {
+                significand: x as u8,
+            },
+            overflowed,
+        )
     }
 
     /// Computes `self / rhs`, returning `None` if `rhs == 0` or overflow occurred.
@@ -2246,18 +2346,18 @@ impl<const E: i32> U8F<E> {
     pub const fn checked_div_signed<const R: i32>(self, rhs: I8F<R>) -> Option<Self> {
         const OFFSET: i32 = u8::BITS.cast_signed() - u16::BITS.cast_signed();
 
-        if rhs.0 == 0 {
+        if rhs.significand == 0 {
             return None;
         }
 
-        let negative = rhs.0 < 0;
-        let mut rhs = rhs.0 as u8;
+        let negative = rhs.significand < 0;
+        let mut rhs = rhs.significand as u8;
 
         if negative {
             rhs = rhs.wrapping_neg();
         }
 
-        let mut x = ((self.0 as u16) << -OFFSET) / rhs as u16;
+        let mut x = ((self.significand as u16) << -OFFSET) / rhs as u16;
 
         if const { R < OFFSET } {
             let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
@@ -2300,7 +2400,9 @@ impl<const E: i32> U8F<E> {
             return None;
         }
 
-        Some(Self(x as u8))
+        Some(Self {
+            significand: x as u8,
+        })
     }
 }
 
@@ -2308,44 +2410,52 @@ impl U8F<-7> {
     /// Computes `cos(π * self)` using a minimax second-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 5.60096 ⋅ 10<sup>-2</sup>.
     #[must_use]
     pub const fn cospi_2(self) -> I8F<-6> {
-        I8F(crate::algorithm::cospi_i8_2(self.0 as i8))
+        I8F {
+            significand: crate::algorithm::cospi_i8_2(self.significand as i8),
+        }
     }
 
     /// Computes `cos(π * self)` using a minimax fourth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 9.18799 ⋅ 10<sup>-4</sup>.
     #[must_use]
     pub const fn cospi_4(self) -> I8F<-6> {
-        I8F(crate::algorithm::cospi_i8_4(self.0 as i8))
+        I8F {
+            significand: crate::algorithm::cospi_i8_4(self.significand as i8),
+        }
     }
 
     /// Computes `sin(π * self)` using a minimax second-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 5.60096 ⋅ 10<sup>-2</sup>.
     #[must_use]
     pub const fn sinpi_2(self) -> I8F<-6> {
-        I8F(crate::algorithm::cospi_i8_2(self.0.wrapping_add(0xC0) as i8))
+        I8F {
+            significand: crate::algorithm::cospi_i8_2(self.significand.wrapping_add(0xC0) as i8),
+        }
     }
 
     /// Computes `sin(π * self)` using a minimax fourth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 9.18799 ⋅ 10<sup>-4</sup>.
     #[must_use]
     pub const fn sinpi_4(self) -> I8F<-6> {
-        I8F(crate::algorithm::cospi_i8_4(self.0.wrapping_add(0xC0) as i8))
+        I8F {
+            significand: crate::algorithm::cospi_i8_4(self.significand.wrapping_add(0xC0) as i8),
+        }
     }
 }
 
 impl From<U8F<0>> for u8 {
     fn from(value: U8F<0>) -> Self {
-        value.0
+        value.significand
     }
 }
 
 impl From<u8> for U8F<0> {
     fn from(value: u8) -> Self {
-        Self(value)
+        Self { significand: value }
     }
 }
 
 impl<const E1: i32, const E2: i32> PartialEq<U8F<E2>> for U8F<E1> {
     fn eq(&self, other: &U8F<E2>) -> bool {
-        let mut lhs = self.0;
-        let mut rhs = other.0;
+        let mut lhs = self.significand;
+        let mut rhs = other.significand;
 
         if const { E1 > E2 } && lhs != 0 {
             let shift = const { E1.wrapping_sub(E2).cast_unsigned() };
@@ -2373,8 +2483,8 @@ impl<const E1: i32, const E2: i32> PartialEq<U8F<E2>> for U8F<E1> {
 
 impl<const E1: i32, const E2: i32> PartialOrd<U8F<E2>> for U8F<E1> {
     fn partial_cmp(&self, other: &U8F<E2>) -> Option<cmp::Ordering> {
-        let mut lhs = self.0;
-        let mut rhs = other.0;
+        let mut lhs = self.significand;
+        let mut rhs = other.significand;
 
         if const { E1 > E2 } && lhs != 0 {
             let shift = const { E1.wrapping_sub(E2).cast_unsigned() };
@@ -2404,7 +2514,7 @@ impl<const E: i32> fmt::Debug for U8F<E> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "U8F<{E}")?;
 
-        f.debug_tuple(">").field(&self.0).finish()
+        f.debug_tuple(">").field(&self.significand).finish()
     }
 }
 
