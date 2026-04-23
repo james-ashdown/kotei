@@ -4,7 +4,7 @@
 pub(crate) const fn cospi_i8_2(theta: i8) -> i8 {
     const A: u16 = COEFFICIENT + ROUND;
     const BITS: i32 = i8::BITS.cast_signed();
-    const COEFFICIENT: u16 = 1 << (BITS - 2) * 2;
+    const COEFFICIENT: u16 = 1 << ((BITS - 2) * 2);
     const E_OUT: i32 = -(BITS - 2);
     const E_XX: i32 = -(BITS - 2) * 2;
     const MSB: i8 = 1 << (BITS - 1);
@@ -90,7 +90,7 @@ pub(crate) const fn cospi_i8_4(theta: i8) -> i8 {
 pub(crate) const fn cospi_i16_2(theta: i16) -> i16 {
     const A: u32 = COEFFICIENT + ROUND;
     const BITS: i32 = i16::BITS.cast_signed();
-    const COEFFICIENT: u32 = 1 << (BITS - 2) * 2;
+    const COEFFICIENT: u32 = 1 << ((BITS - 2) * 2);
     const E_OUT: i32 = -(BITS - 2);
     const E_XX: i32 = -(BITS - 2) * 2;
     const MSB: i16 = 1 << (BITS - 1);
@@ -242,7 +242,7 @@ pub(crate) const fn cospi_i16_6(theta: i16) -> i16 {
 pub(crate) const fn cospi_i32_2(theta: i32) -> i32 {
     const A: u64 = COEFFICIENT + ROUND;
     const BITS: i32 = i32::BITS.cast_signed();
-    const COEFFICIENT: u64 = 1 << (BITS - 2) * 2;
+    const COEFFICIENT: u64 = 1 << ((BITS - 2) * 2);
     const E_OUT: i32 = -(BITS - 2);
     const E_XX: i32 = -(BITS - 2) * 2;
     const MSB: i32 = 1 << (BITS - 1);
@@ -536,7 +536,7 @@ pub(crate) const fn cospi_i32_10(theta: i32) -> i32 {
 pub(crate) const fn cospi_i64_2(theta: i64) -> i64 {
     const A: u128 = COEFFICIENT + ROUND;
     const BITS: i32 = i64::BITS.cast_signed();
-    const COEFFICIENT: u128 = 1 << (BITS - 2) * 2;
+    const COEFFICIENT: u128 = 1 << ((BITS - 2) * 2);
     const E_OUT: i32 = -(BITS - 2);
     const E_XX: i32 = -(BITS - 2) * 2;
     const MSB: i64 = 1 << (BITS - 1);
