@@ -337,7 +337,7 @@ impl<const E: i32> I128F<E> {
     #[must_use]
     pub const fn from_bits(bits: u128) -> Self {
         Self {
-            significand: bits.cast_signed(),
+            significand: bits as i128,
         }
     }
 
@@ -505,7 +505,7 @@ impl<const E: i32> I128F<E> {
     #[inline(always)]
     #[must_use]
     pub const fn to_bits(self) -> u128 {
-        self.significand.cast_unsigned()
+        self.significand as u128
     }
 
     /// Returns the memory representation of this fixed-point number as a byte array in native byte order.

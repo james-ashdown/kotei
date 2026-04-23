@@ -237,7 +237,7 @@ impl<const E: i32> I8F<E> {
     #[must_use]
     pub const fn from_bits(bits: u8) -> Self {
         Self {
-            significand: bits.cast_signed(),
+            significand: bits as i8,
         }
     }
 
@@ -405,7 +405,7 @@ impl<const E: i32> I8F<E> {
     #[inline(always)]
     #[must_use]
     pub const fn to_bits(self) -> u8 {
-        self.significand.cast_unsigned()
+        self.significand as u8
     }
 
     /// Returns the memory representation of this fixed-point number as a byte array in native byte order.
