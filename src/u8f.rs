@@ -2415,33 +2415,41 @@ impl U8F<-7> {
     /// Computes `cos(π * self)` using a minimax second-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 5.60096 ⋅ 10<sup>-2</sup>.
     #[must_use]
     pub const fn cospi_2(self) -> I8F<-6> {
-        I8F {
-            significand: crate::algorithm::cospi_i8_2(self.significand as i8),
-        }
+        let theta = self.significand as i8;
+        let significand = crate::algorithm::cospi_i8_2(theta);
+
+        I8F { significand }
     }
 
     /// Computes `cos(π * self)` using a minimax fourth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 9.18799 ⋅ 10<sup>-4</sup>.
     #[must_use]
     pub const fn cospi_4(self) -> I8F<-6> {
-        I8F {
-            significand: crate::algorithm::cospi_i8_4(self.significand as i8),
-        }
+        let theta = self.significand as i8;
+        let significand = crate::algorithm::cospi_i8_4(theta);
+
+        I8F { significand }
     }
 
     /// Computes `sin(π * self)` using a minimax second-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 5.60096 ⋅ 10<sup>-2</sup>.
     #[must_use]
     pub const fn sinpi_2(self) -> I8F<-6> {
-        I8F {
-            significand: crate::algorithm::cospi_i8_2(self.significand.wrapping_add(0xC0) as i8),
-        }
+        const PHASE_SHIFT: i8 = 0x3 << (i8::BITS - 2);
+
+        let theta = (self.significand as i8).wrapping_add(PHASE_SHIFT);
+        let significand = crate::algorithm::cospi_i8_2(theta);
+
+        I8F { significand }
     }
 
     /// Computes `sin(π * self)` using a minimax fourth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 9.18799 ⋅ 10<sup>-4</sup>.
     #[must_use]
     pub const fn sinpi_4(self) -> I8F<-6> {
-        I8F {
-            significand: crate::algorithm::cospi_i8_4(self.significand.wrapping_add(0xC0) as i8),
-        }
+        const PHASE_SHIFT: i8 = 0x3 << (i8::BITS - 2);
+
+        let theta = (self.significand as i8).wrapping_add(PHASE_SHIFT);
+        let significand = crate::algorithm::cospi_i8_4(theta);
+
+        I8F { significand }
     }
 }
 

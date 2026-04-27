@@ -2427,163 +2427,181 @@ impl I64F<-63> {
     /// Computes `cos(π * self)` using a minimax second-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 5.60096 ⋅ 10<sup>-2</sup>.
     #[must_use]
     pub const fn cospi_2(self) -> I64F<-62> {
-        I64F {
-            significand: crate::algorithm::cospi_i64_2(self.significand),
-        }
+        let theta = self.significand;
+        let significand = crate::algorithm::cospi_i64_2(theta);
+
+        I64F { significand }
     }
 
     /// Computes `cos(π * self)` using a minimax fourth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 9.18799 ⋅ 10<sup>-4</sup>.
     #[must_use]
     pub const fn cospi_4(self) -> I64F<-62> {
-        I64F {
-            significand: crate::algorithm::cospi_i64_4(self.significand),
-        }
+        let theta = self.significand;
+        let significand = crate::algorithm::cospi_i64_4(theta);
+
+        I64F { significand }
     }
 
     /// Computes `cos(π * self)` using a minimax sixth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 9.20285 ⋅ 10<sup>-6</sup>.
     #[must_use]
     pub const fn cospi_6(self) -> I64F<-62> {
-        I64F {
-            significand: crate::algorithm::cospi_i64_6(self.significand),
-        }
+        let theta = self.significand;
+        let significand = crate::algorithm::cospi_i64_6(theta);
+
+        I64F { significand }
     }
 
     /// Computes `cos(π * self)` using a minimax eighth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 5.98045 ⋅ 10<sup>-8</sup>.
     #[must_use]
     pub const fn cospi_8(self) -> I64F<-62> {
-        I64F {
-            significand: crate::algorithm::cospi_i64_8(self.significand),
-        }
+        let theta = self.significand;
+        let significand = crate::algorithm::cospi_i64_8(theta);
+
+        I64F { significand }
     }
 
     /// Computes `cos(π * self)` using a minimax tenth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 2.70068 ⋅ 10<sup>-10</sup>.
     #[must_use]
     pub const fn cospi_10(self) -> I64F<-62> {
-        I64F {
-            significand: crate::algorithm::cospi_i64_10(self.significand),
-        }
+        let theta = self.significand;
+        let significand = crate::algorithm::cospi_i64_10(theta);
+
+        I64F { significand }
     }
 
     /// Computes `cos(π * self)` using a minimax twelfth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 8.93703 ⋅ 10<sup>-13</sup>.
     #[must_use]
     pub const fn cospi_12(self) -> I64F<-62> {
-        I64F {
-            significand: crate::algorithm::cospi_i64_12(self.significand),
-        }
+        let theta = self.significand;
+        let significand = crate::algorithm::cospi_i64_12(theta);
+
+        I64F { significand }
     }
 
     /// Computes `cos(π * self)` using a minimax fourteenth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 2.25676 ⋅ 10<sup>-15</sup>.
     #[must_use]
     pub const fn cospi_14(self) -> I64F<-62> {
-        I64F {
-            significand: crate::algorithm::cospi_i64_14(self.significand),
-        }
+        let theta = self.significand;
+        let significand = crate::algorithm::cospi_i64_14(theta);
+
+        I64F { significand }
     }
 
     /// Computes `cos(π * self)` using a minimax sixteenth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 4.48780 ⋅ 10<sup>-18</sup>.
     #[must_use]
     pub const fn cospi_16(self) -> I64F<-62> {
-        I64F {
-            significand: crate::algorithm::cospi_i64_16(self.significand),
-        }
+        let theta = self.significand;
+        let significand = crate::algorithm::cospi_i64_16(theta);
+
+        I64F { significand }
     }
 
     /// Computes `cos(π * self)` using a minimax eighteenth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 7.20675 ⋅ 10<sup>-21</sup>.
     #[must_use]
     pub const fn cospi_18(self) -> I64F<-62> {
-        I64F {
-            significand: crate::algorithm::cospi_i64_18(self.significand),
-        }
+        let theta = self.significand;
+        let significand = crate::algorithm::cospi_i64_18(theta);
+
+        I64F { significand }
     }
 
     /// Computes `sin(π * self)` using a minimax second-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 5.60096 ⋅ 10<sup>-2</sup>.
     #[must_use]
     pub const fn sinpi_2(self) -> I64F<-62> {
-        I64F {
-            significand: crate::algorithm::cospi_i64_2(
-                self.significand.wrapping_add_unsigned(0xC000000000000000),
-            ),
-        }
+        const PHASE_SHIFT: i64 = 0x3 << (i64::BITS - 2);
+
+        let theta = self.significand.wrapping_add(PHASE_SHIFT);
+        let significand = crate::algorithm::cospi_i64_2(theta);
+
+        I64F { significand }
     }
 
     /// Computes `sin(π * self)` using a minimax fourth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 9.18799 ⋅ 10<sup>-4</sup>.
     #[must_use]
     pub const fn sinpi_4(self) -> I64F<-62> {
-        I64F {
-            significand: crate::algorithm::cospi_i64_4(
-                self.significand.wrapping_add_unsigned(0xC000000000000000),
-            ),
-        }
+        const PHASE_SHIFT: i64 = 0x3 << (i64::BITS - 2);
+
+        let theta = self.significand.wrapping_add(PHASE_SHIFT);
+        let significand = crate::algorithm::cospi_i64_4(theta);
+
+        I64F { significand }
     }
 
     /// Computes `sin(π * self)` using a minimax sixth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 9.20285 ⋅ 10<sup>-6</sup>.
     #[must_use]
     pub const fn sinpi_6(self) -> I64F<-62> {
-        I64F {
-            significand: crate::algorithm::cospi_i64_6(
-                self.significand.wrapping_add_unsigned(0xC000000000000000),
-            ),
-        }
+        const PHASE_SHIFT: i64 = 0x3 << (i64::BITS - 2);
+
+        let theta = self.significand.wrapping_add(PHASE_SHIFT);
+        let significand = crate::algorithm::cospi_i64_6(theta);
+
+        I64F { significand }
     }
 
     /// Computes `sin(π * self)` using a minimax eighth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 5.98045 ⋅ 10<sup>-8</sup>.
     #[must_use]
     pub const fn sinpi_8(self) -> I64F<-62> {
-        I64F {
-            significand: crate::algorithm::cospi_i64_8(
-                self.significand.wrapping_add_unsigned(0xC000000000000000),
-            ),
-        }
+        const PHASE_SHIFT: i64 = 0x3 << (i64::BITS - 2);
+
+        let theta = self.significand.wrapping_add(PHASE_SHIFT);
+        let significand = crate::algorithm::cospi_i64_8(theta);
+
+        I64F { significand }
     }
 
     /// Computes `sin(π * self)` using a minimax tenth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 2.70068 ⋅ 10<sup>-10</sup>.
     #[must_use]
     pub const fn sinpi_10(self) -> I64F<-62> {
-        I64F {
-            significand: crate::algorithm::cospi_i64_10(
-                self.significand.wrapping_add_unsigned(0xC000000000000000),
-            ),
-        }
+        const PHASE_SHIFT: i64 = 0x3 << (i64::BITS - 2);
+
+        let theta = self.significand.wrapping_add(PHASE_SHIFT);
+        let significand = crate::algorithm::cospi_i64_10(theta);
+
+        I64F { significand }
     }
 
     /// Computes `sin(π * self)` using a minimax twelfth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 8.93703 ⋅ 10<sup>-13</sup>.
     #[must_use]
     pub const fn sinpi_12(self) -> I64F<-62> {
-        I64F {
-            significand: crate::algorithm::cospi_i64_12(
-                self.significand.wrapping_add_unsigned(0xC000000000000000),
-            ),
-        }
+        const PHASE_SHIFT: i64 = 0x3 << (i64::BITS - 2);
+
+        let theta = self.significand.wrapping_add(PHASE_SHIFT);
+        let significand = crate::algorithm::cospi_i64_12(theta);
+
+        I64F { significand }
     }
 
     /// Computes `sin(π * self)` using a minimax fourteenth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 2.25676 ⋅ 10<sup>-15</sup>.
     #[must_use]
     pub const fn sinpi_14(self) -> I64F<-62> {
-        I64F {
-            significand: crate::algorithm::cospi_i64_14(
-                self.significand.wrapping_add_unsigned(0xC000000000000000),
-            ),
-        }
+        const PHASE_SHIFT: i64 = 0x3 << (i64::BITS - 2);
+
+        let theta = self.significand.wrapping_add(PHASE_SHIFT);
+        let significand = crate::algorithm::cospi_i64_14(theta);
+
+        I64F { significand }
     }
 
     /// Computes `sin(π * self)` using a minimax sixteenth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 4.48780 ⋅ 10<sup>-18</sup>.
     #[must_use]
     pub const fn sinpi_16(self) -> I64F<-62> {
-        I64F {
-            significand: crate::algorithm::cospi_i64_16(
-                self.significand.wrapping_add_unsigned(0xC000000000000000),
-            ),
-        }
+        const PHASE_SHIFT: i64 = 0x3 << (i64::BITS - 2);
+
+        let theta = self.significand.wrapping_add(PHASE_SHIFT);
+        let significand = crate::algorithm::cospi_i64_16(theta);
+
+        I64F { significand }
     }
 
     /// Computes `sin(π * self)` using a minimax eighteenth-order Taylor series approximation, where `self` is in half-turns. The error is bounded by 7.20675 ⋅ 10<sup>-21</sup>.
     #[must_use]
     pub const fn sinpi_18(self) -> I64F<-62> {
-        I64F {
-            significand: crate::algorithm::cospi_i64_18(
-                self.significand.wrapping_add_unsigned(0xC000000000000000),
-            ),
-        }
+        const PHASE_SHIFT: i64 = 0x3 << (i64::BITS - 2);
+
+        let theta = self.significand.wrapping_add(PHASE_SHIFT);
+        let significand = crate::algorithm::cospi_i64_18(theta);
+
+        I64F { significand }
     }
 }
 
