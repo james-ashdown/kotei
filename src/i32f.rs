@@ -966,14 +966,14 @@ impl<const E: i32> I32F<E> {
         I16F::checked_from_i32f(self)
     }
 
-    /// Converts to [`I64F`] losslessly.
+    /// Converts into [`I64F`] losslessly.
     #[inline(always)]
     #[must_use]
     pub const fn into_i64f(self) -> I64F<E> {
         I64F::from_i32f(self)
     }
 
-    /// Converts to [`I128F`] losslessly.
+    /// Converts into [`I128F`] losslessly.
     #[inline(always)]
     #[must_use]
     pub const fn into_i128f(self) -> I128F<E> {
