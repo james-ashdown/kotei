@@ -2,9 +2,15 @@ use ::core::cmp;
 use ::core::fmt;
 use ::core::ops;
 
+use crate::I8F;
+use crate::I16F;
 use crate::I32F;
+use crate::I64F;
+use crate::I128F;
 use crate::U8F;
 use crate::U16F;
+use crate::U64F;
+use crate::U128F;
 use crate::error::TryFromFloatError;
 
 /// The 32-bit unsigned fixed-point type.
@@ -262,20 +268,554 @@ impl<const E: i32> U32F<E> {
         })
     }
 
+    /// Converts from [`I8F`], panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic on overflow for debug builds, or return a wrapping result for release builds.
+    #[must_use]
+    #[track_caller]
+    pub const fn from_i8f(value: I8F<E>) -> Self {
+        if cfg!(debug_assertions) && value.significand < u32::MIN as i8 {
+            crate::panic::from();
+        }
+
+        let significand = value.significand as u32;
+
+        Self { significand }
+    }
+
+    /// Converts from [`I8F`], panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will always panic on overflow, even if overflow checks are disabled.
+    #[must_use]
+    #[track_caller]
+    pub const fn strict_from_i8f(value: I8F<E>) -> Self {
+        if value.significand < u32::MIN as i8 {
+            crate::panic::from();
+        }
+
+        let significand = value.significand as u32;
+
+        Self { significand }
+    }
+
+    /// Converts from [`I8F`], wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn wrapping_from_i8f(value: I8F<E>) -> Self {
+        let significand = value.significand as u32;
+
+        Self { significand }
+    }
+
+    /// Converts from [`I8F`], wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn saturating_from_i8f(value: I8F<E>) -> Self {
+        if value.significand < u32::MIN as i8 {
+            return Self::MIN;
+        }
+
+        let significand = value.significand as u32;
+
+        Self { significand }
+    }
+
+    /// Converts from [`I8F`], wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn overflowing_from_i8f(value: I8F<E>) -> (Self, bool) {
+        let overflowed = value.significand < u32::MIN as i8;
+        let significand = value.significand as u32;
+
+        (Self { significand }, overflowed)
+    }
+
+    /// Converts from [`I8F`], returning `None` if overflow occurred.
+    #[must_use]
+    pub const fn checked_from_i8f(value: I8F<E>) -> Option<Self> {
+        if value.significand < u32::MIN as i8 {
+            return None;
+        }
+
+        let significand = value.significand as u32;
+
+        Some(Self { significand })
+    }
+
+    /// Converts from [`I16F`], panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic on overflow for debug builds, or return a wrapping result for release builds.
+    #[must_use]
+    #[track_caller]
+    pub const fn from_i16f(value: I16F<E>) -> Self {
+        if cfg!(debug_assertions) && value.significand < u32::MIN as i16 {
+            crate::panic::from();
+        }
+
+        let significand = value.significand as u32;
+
+        Self { significand }
+    }
+
+    /// Converts from [`I16F`], panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will always panic on overflow, even if overflow checks are disabled.
+    #[must_use]
+    #[track_caller]
+    pub const fn strict_from_i16f(value: I16F<E>) -> Self {
+        if value.significand < u32::MIN as i16 {
+            crate::panic::from();
+        }
+
+        let significand = value.significand as u32;
+
+        Self { significand }
+    }
+
+    /// Converts from [`I16F`], wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn wrapping_from_i16f(value: I16F<E>) -> Self {
+        let significand = value.significand as u32;
+
+        Self { significand }
+    }
+
+    /// Converts from [`I16F`], wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn saturating_from_i16f(value: I16F<E>) -> Self {
+        if value.significand < u32::MIN as i16 {
+            return Self::MIN;
+        }
+
+        let significand = value.significand as u32;
+
+        Self { significand }
+    }
+
+    /// Converts from [`I16F`], wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn overflowing_from_i16f(value: I16F<E>) -> (Self, bool) {
+        let overflowed = value.significand < u32::MIN as i16;
+        let significand = value.significand as u32;
+
+        (Self { significand }, overflowed)
+    }
+
+    /// Converts from [`I16F`], returning `None` if overflow occurred.
+    #[must_use]
+    pub const fn checked_from_i16f(value: I16F<E>) -> Option<Self> {
+        if value.significand < u32::MIN as i16 {
+            return None;
+        }
+
+        let significand = value.significand as u32;
+
+        Some(Self { significand })
+    }
+
+    /// Converts from [`I32F`], panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic on overflow for debug builds, or return a wrapping result for release builds.
+    #[must_use]
+    #[track_caller]
+    pub const fn from_i32f(value: I32F<E>) -> Self {
+        if cfg!(debug_assertions) && value.significand < u32::MIN as i32 {
+            crate::panic::from();
+        }
+
+        let significand = value.significand as u32;
+
+        Self { significand }
+    }
+
+    /// Converts from [`I32F`], panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will always panic on overflow, even if overflow checks are disabled.
+    #[must_use]
+    #[track_caller]
+    pub const fn strict_from_i32f(value: I32F<E>) -> Self {
+        if value.significand < u32::MIN as i32 {
+            crate::panic::from();
+        }
+
+        let significand = value.significand as u32;
+
+        Self { significand }
+    }
+
+    /// Converts from [`I32F`], wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn wrapping_from_i32f(value: I32F<E>) -> Self {
+        let significand = value.significand as u32;
+
+        Self { significand }
+    }
+
+    /// Converts from [`I32F`], wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn saturating_from_i32f(value: I32F<E>) -> Self {
+        if value.significand < u32::MIN as i32 {
+            return Self::MIN;
+        }
+
+        let significand = value.significand as u32;
+
+        Self { significand }
+    }
+
+    /// Converts from [`I32F`], wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn overflowing_from_i32f(value: I32F<E>) -> (Self, bool) {
+        let overflowed = value.significand < u32::MIN as i32;
+        let significand = value.significand as u32;
+
+        (Self { significand }, overflowed)
+    }
+
+    /// Converts from [`I32F`], returning `None` if overflow occurred.
+    #[must_use]
+    pub const fn checked_from_i32f(value: I32F<E>) -> Option<Self> {
+        if value.significand < u32::MIN as i32 {
+            return None;
+        }
+
+        let significand = value.significand as u32;
+
+        Some(Self { significand })
+    }
+
+    /// Converts from [`I64F`], panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic on overflow for debug builds, or return a wrapping result for release builds.
+    #[must_use]
+    #[track_caller]
+    pub const fn from_i64f(value: I64F<E>) -> Self {
+        if cfg!(debug_assertions)
+            && (value.significand < u32::MIN as i64 || value.significand > u32::MAX as i64)
+        {
+            crate::panic::from();
+        }
+
+        let significand = value.significand as u32;
+
+        Self { significand }
+    }
+
+    /// Converts from [`I64F`], panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will always panic on overflow, even if overflow checks are disabled.
+    #[must_use]
+    #[track_caller]
+    pub const fn strict_from_i64f(value: I64F<E>) -> Self {
+        if value.significand < u32::MIN as i64 || value.significand > u32::MAX as i64 {
+            crate::panic::from();
+        }
+
+        let significand = value.significand as u32;
+
+        Self { significand }
+    }
+
+    /// Converts from [`I64F`], wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn wrapping_from_i64f(value: I64F<E>) -> Self {
+        let significand = value.significand as u32;
+
+        Self { significand }
+    }
+
+    /// Converts from [`I64F`], wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn saturating_from_i64f(value: I64F<E>) -> Self {
+        if value.significand < u32::MIN as i64 {
+            return Self::MIN;
+        } else if value.significand > u32::MAX as i64 {
+            return Self::MAX;
+        }
+
+        let significand = value.significand as u32;
+
+        Self { significand }
+    }
+
+    /// Converts from [`I64F`], wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn overflowing_from_i64f(value: I64F<E>) -> (Self, bool) {
+        let overflowed = value.significand < u32::MIN as i64 || value.significand > u32::MAX as i64;
+        let significand = value.significand as u32;
+
+        (Self { significand }, overflowed)
+    }
+
+    /// Converts from [`I64F`], returning `None` if overflow occurred.
+    #[must_use]
+    pub const fn checked_from_i64f(value: I64F<E>) -> Option<Self> {
+        if value.significand < u32::MIN as i64 || value.significand > u32::MAX as i64 {
+            return None;
+        }
+
+        let significand = value.significand as u32;
+
+        Some(Self { significand })
+    }
+
+    /// Converts from [`I128F`], panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic on overflow for debug builds, or return a wrapping result for release builds.
+    #[must_use]
+    #[track_caller]
+    pub const fn from_i128f(value: I128F<E>) -> Self {
+        if cfg!(debug_assertions)
+            && (value.significand < u32::MIN as i128 || value.significand > u32::MAX as i128)
+        {
+            crate::panic::from();
+        }
+
+        let significand = value.significand as u32;
+
+        Self { significand }
+    }
+
+    /// Converts from [`I128F`], panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will always panic on overflow, even if overflow checks are disabled.
+    #[must_use]
+    #[track_caller]
+    pub const fn strict_from_i128f(value: I128F<E>) -> Self {
+        if value.significand < u32::MIN as i128 || value.significand > u32::MAX as i128 {
+            crate::panic::from();
+        }
+
+        let significand = value.significand as u32;
+
+        Self { significand }
+    }
+
+    /// Converts from [`I128F`], wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn wrapping_from_i128f(value: I128F<E>) -> Self {
+        let significand = value.significand as u32;
+
+        Self { significand }
+    }
+
+    /// Converts from [`I128F`], wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn saturating_from_i128f(value: I128F<E>) -> Self {
+        if value.significand < u32::MIN as i128 {
+            return Self::MIN;
+        } else if value.significand > u32::MAX as i128 {
+            return Self::MAX;
+        }
+
+        let significand = value.significand as u32;
+
+        Self { significand }
+    }
+
+    /// Converts from [`I128F`], wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn overflowing_from_i128f(value: I128F<E>) -> (Self, bool) {
+        let overflowed =
+            value.significand < u32::MIN as i128 || value.significand > u32::MAX as i128;
+        let significand = value.significand as u32;
+
+        (Self { significand }, overflowed)
+    }
+
+    /// Converts from [`I128F`], returning `None` if overflow occurred.
+    #[must_use]
+    pub const fn checked_from_i128f(value: I128F<E>) -> Option<Self> {
+        if value.significand < u32::MIN as i128 || value.significand > u32::MAX as i128 {
+            return None;
+        }
+
+        let significand = value.significand as u32;
+
+        Some(Self { significand })
+    }
+
     /// Converts from [`U8F<E>`] losslessly.
     #[must_use]
     pub const fn from_u8f(value: U8F<E>) -> Self {
-        Self {
-            significand: value.significand as u32,
-        }
+        let significand = value.significand as u32;
+
+        Self { significand }
     }
 
     /// Converts from [`U16F<E>`] losslessly.
     #[must_use]
     pub const fn from_u16f(value: U16F<E>) -> Self {
-        Self {
-            significand: value.significand as u32,
+        let significand = value.significand as u32;
+
+        Self { significand }
+    }
+
+    /// Converts from [`U64F`], panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic on overflow for debug builds, or return a wrapping result for release builds.
+    #[must_use]
+    #[track_caller]
+    pub const fn from_u64f(value: U64F<E>) -> Self {
+        if cfg!(debug_assertions) && value.significand > u32::MAX as u64 {
+            crate::panic::from();
         }
+
+        let significand = value.significand as u32;
+
+        Self { significand }
+    }
+
+    /// Converts from [`U64F`], panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will always panic on overflow, even if overflow checks are disabled.
+    #[must_use]
+    #[track_caller]
+    pub const fn strict_from_u64f(value: U64F<E>) -> Self {
+        if value.significand > u32::MAX as u64 {
+            crate::panic::from();
+        }
+
+        let significand = value.significand as u32;
+
+        Self { significand }
+    }
+
+    /// Converts from [`U64F`], wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn wrapping_from_u64f(value: U64F<E>) -> Self {
+        let significand = value.significand as u32;
+
+        Self { significand }
+    }
+
+    /// Converts from [`U64F`], saturating at the numeric bounds of the type instead of overflowing.
+    #[must_use]
+    pub const fn saturating_from_u64f(value: U64F<E>) -> Self {
+        if value.significand > u32::MAX as u64 {
+            return Self::MAX;
+        }
+
+        let significand = value.significand as u32;
+
+        Self { significand }
+    }
+
+    /// Converts from [`U64F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
+    #[must_use]
+    pub const fn overflowing_from_u64f(value: U64F<E>) -> (Self, bool) {
+        let overflowed = value.significand > u32::MAX as u64;
+        let significand = value.significand as u32;
+
+        (Self { significand }, overflowed)
+    }
+
+    /// Converts from [`U64F`], returning `None` if overflow occurred.
+    #[must_use]
+    pub const fn checked_from_u64f(value: U64F<E>) -> Option<Self> {
+        if value.significand > u32::MAX as u64 {
+            return None;
+        }
+
+        let significand = value.significand as u32;
+
+        Some(Self { significand })
+    }
+
+    /// Converts from [`U128F`], panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic on overflow for debug builds, or return a wrapping result for release builds.
+    #[must_use]
+    #[track_caller]
+    pub const fn from_u128f(value: U128F<E>) -> Self {
+        if cfg!(debug_assertions) && value.significand > u32::MAX as u128 {
+            crate::panic::from();
+        }
+
+        let significand = value.significand as u32;
+
+        Self { significand }
+    }
+
+    /// Converts from [`U128F`], panicking if overflow occurred.
+    ///
+    /// # Panics
+    ///
+    /// This function will always panic on overflow, even if overflow checks are disabled.
+    #[must_use]
+    #[track_caller]
+    pub const fn strict_from_u128f(value: U128F<E>) -> Self {
+        if value.significand > u32::MAX as u128 {
+            crate::panic::from();
+        }
+
+        let significand = value.significand as u32;
+
+        Self { significand }
+    }
+
+    /// Converts from [`U128F`], wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn wrapping_from_u128f(value: U128F<E>) -> Self {
+        let significand = value.significand as u32;
+
+        Self { significand }
+    }
+
+    /// Converts from [`U128F`], saturating at the numeric bounds of the type instead of overflowing.
+    #[must_use]
+    pub const fn saturating_from_u128f(value: U128F<E>) -> Self {
+        if value.significand > u32::MAX as u128 {
+            return Self::MAX;
+        }
+
+        let significand = value.significand as u32;
+
+        Self { significand }
+    }
+
+    /// Converts from [`U128F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
+    #[must_use]
+    pub const fn overflowing_from_u128f(value: U128F<E>) -> (Self, bool) {
+        let overflowed = value.significand > u32::MAX as u128;
+        let significand = value.significand as u32;
+
+        (Self { significand }, overflowed)
+    }
+
+    /// Converts from [`U128F`], returning `None` if overflow occurred.
+    #[must_use]
+    pub const fn checked_from_u128f(value: U128F<E>) -> Option<Self> {
+        if value.significand > u32::MAX as u128 {
+            return None;
+        }
+
+        let significand = value.significand as u32;
+
+        Some(Self { significand })
     }
 
     /// Raw transutation from [`u32`].

@@ -12,6 +12,12 @@ pub(crate) const fn div() -> ! {
 
 #[cold]
 #[track_caller]
+pub(crate) const fn from() -> ! {
+    panic!("attempt to convert with overflow")
+}
+
+#[cold]
+#[track_caller]
 pub(crate) const fn ilog2() -> ! {
     panic!("attempt to compute integer binary logarithm with overflow")
 }
