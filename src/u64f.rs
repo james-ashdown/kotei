@@ -3512,24 +3512,24 @@ impl<const E1: i32, const E2: i32> PartialOrd<U64F<E2>> for U64F<E1> {
         let mut lhs = self.significand;
         let mut rhs = other.significand;
 
-        if const { E1 > E2 } && lhs != 0 {
-            let shift = const { E1.wrapping_sub(E2).cast_unsigned() };
+        if E1 > E2 {
+            let shift = E1.wrapping_sub(E2).cast_unsigned();
+            let temp = lhs.unbounded_shl(shift);
 
-            if shift > lhs.leading_zeros() {
+            if temp.unbounded_shr(shift) != lhs {
                 return Some(cmp::Ordering::Greater);
             }
 
-            lhs <<= shift;
-        }
+            lhs = temp;
+        } else if E2 > E1 {
+            let shift = E2.wrapping_sub(E1).cast_unsigned();
+            let temp = rhs.unbounded_shl(shift);
 
-        if const { E2 > E1 } && rhs != 0 {
-            let shift = const { E2.wrapping_sub(E1).cast_unsigned() };
-
-            if shift > rhs.leading_zeros() {
+            if temp.unbounded_shr(shift) != rhs {
                 return Some(cmp::Ordering::Less);
             }
 
-            rhs <<= shift;
+            rhs = temp;
         }
 
         PartialOrd::partial_cmp(&lhs, &rhs)
