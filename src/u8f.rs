@@ -3282,30 +3282,7 @@ impl From<u8> for U8F<0> {
 
 impl<const E1: i32, const E2: i32> PartialEq<U8F<E2>> for U8F<E1> {
     fn eq(&self, other: &U8F<E2>) -> bool {
-        let mut lhs = self.significand;
-        let mut rhs = other.significand;
-
-        if const { E1 > E2 } && lhs != 0 {
-            let shift = const { E1.wrapping_sub(E2).cast_unsigned() };
-
-            if shift > lhs.leading_zeros() {
-                return false;
-            }
-
-            lhs <<= shift;
-        }
-
-        if const { E2 > E1 } && rhs != 0 {
-            let shift = const { E2.wrapping_sub(E1).cast_unsigned() };
-
-            if shift > rhs.leading_zeros() {
-                return false;
-            }
-
-            rhs <<= shift;
-        }
-
-        lhs == rhs
+        self.partial_cmp(other) == Some(cmp::Ordering::Equal)
     }
 }
 

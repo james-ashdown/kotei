@@ -3320,26 +3320,7 @@ impl<const E: i32> From<U16F<E>> for I32F<E> {
 
 impl<const E1: i32, const E2: i32> PartialEq<I32F<E2>> for I32F<E1> {
     fn eq(&self, other: &I32F<E2>) -> bool {
-        let mut lhs = self.significand;
-        let mut rhs = other.significand;
-
-        if const { E1 > E2 } && lhs != 0 {
-            if const { E1.abs_diff(E2) } >= lhs.leading_zeros() | lhs.leading_ones() {
-                return false;
-            }
-
-            lhs <<= const { E1.abs_diff(E2) };
-        }
-
-        if const { E2 > E1 } && rhs != 0 {
-            if const { E2.abs_diff(E1) } >= rhs.leading_zeros() | rhs.leading_ones() {
-                return false;
-            }
-
-            rhs <<= const { E2.abs_diff(E1) };
-        }
-
-        lhs == rhs
+        self.partial_cmp(other) == Some(cmp::Ordering::Equal)
     }
 }
 
