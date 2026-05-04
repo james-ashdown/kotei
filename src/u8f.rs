@@ -273,8 +273,8 @@ impl<const E: i32> U8F<E> {
     /// Converts from [`I8F`], wrapping around at the numeric bounds of the type.
     #[must_use]
     pub const fn overflowing_from_i8f(value: I8F<E>) -> (Self, bool) {
-        let significand = value.significand as u8;
         let overflowed = value.significand.is_negative();
+        let significand = value.significand as u8;
 
         (Self { significand }, overflowed)
     }
@@ -334,8 +334,8 @@ impl<const E: i32> U8F<E> {
     /// Converts from [`I16F`], wrapping around at the numeric bounds of the type.
     #[must_use]
     pub const fn overflowing_from_i16f(value: I16F<E>) -> (Self, bool) {
-        let significand = value.significand as u8;
         let overflowed = value.significand.is_negative() || value.significand > u8::MAX as i16;
+        let significand = value.significand as u8;
 
         (Self { significand }, overflowed)
     }
@@ -401,8 +401,8 @@ impl<const E: i32> U8F<E> {
     /// Converts from [`I32F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
     #[must_use]
     pub const fn overflowing_from_i32f(value: I32F<E>) -> (Self, bool) {
-        let significand = value.significand as u8;
         let overflowed = value.significand.is_negative() || value.significand > u8::MAX as i32;
+        let significand = value.significand as u8;
 
         (Self { significand }, overflowed)
     }
@@ -468,8 +468,8 @@ impl<const E: i32> U8F<E> {
     /// Converts from [`I64F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
     #[must_use]
     pub const fn overflowing_from_i64f(value: I64F<E>) -> (Self, bool) {
-        let significand = value.significand as u8;
         let overflowed = value.significand.is_negative() || value.significand > u8::MAX as i64;
+        let significand = value.significand as u8;
 
         (Self { significand }, overflowed)
     }
@@ -535,8 +535,8 @@ impl<const E: i32> U8F<E> {
     /// Converts from [`I128F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
     #[must_use]
     pub const fn overflowing_from_i128f(value: I128F<E>) -> (Self, bool) {
-        let significand = value.significand as u8;
         let overflowed = value.significand.is_negative() || value.significand > u8::MAX as i128;
+        let significand = value.significand as u8;
 
         (Self { significand }, overflowed)
     }
@@ -602,8 +602,8 @@ impl<const E: i32> U8F<E> {
     /// Converts from [`U16F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
     #[must_use]
     pub const fn overflowing_from_u16f(value: U16F<E>) -> (Self, bool) {
-        let significand = value.significand as u8;
         let overflowed = value.significand > u8::MAX as u16;
+        let significand = value.significand as u8;
 
         (Self { significand }, overflowed)
     }
@@ -663,8 +663,8 @@ impl<const E: i32> U8F<E> {
     /// Converts from [`U32F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
     #[must_use]
     pub const fn overflowing_from_u32f(value: U32F<E>) -> (Self, bool) {
-        let significand = value.significand as u8;
         let overflowed = value.significand > u8::MAX as u32;
+        let significand = value.significand as u8;
 
         (Self { significand }, overflowed)
     }
@@ -724,8 +724,8 @@ impl<const E: i32> U8F<E> {
     /// Converts from [`U64F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
     #[must_use]
     pub const fn overflowing_from_u64f(value: U64F<E>) -> (Self, bool) {
-        let significand = value.significand as u8;
         let overflowed = value.significand > u8::MAX as u64;
+        let significand = value.significand as u8;
 
         (Self { significand }, overflowed)
     }
@@ -785,8 +785,8 @@ impl<const E: i32> U8F<E> {
     /// Converts from [`U128F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
     #[must_use]
     pub const fn overflowing_from_u128f(value: U128F<E>) -> (Self, bool) {
-        let significand = value.significand as u8;
         let overflowed = value.significand > u8::MAX as u128;
+        let significand = value.significand as u8;
 
         (Self { significand }, overflowed)
     }

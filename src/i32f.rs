@@ -340,8 +340,8 @@ impl<const E: i32> I32F<E> {
     /// Converts from [`I64F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
     #[must_use]
     pub const fn overflowing_from_i64f(value: I64F<E>) -> (Self, bool) {
-        let significand = value.significand as i32;
         let overflowed = value.significand < i32::MIN as i64 || value.significand > i32::MAX as i64;
+        let significand = value.significand as i32;
 
         (Self { significand }, overflowed)
     }
@@ -407,9 +407,9 @@ impl<const E: i32> I32F<E> {
     /// Converts from [`I128F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
     #[must_use]
     pub const fn overflowing_from_i128f(value: I128F<E>) -> (Self, bool) {
-        let significand = value.significand as i32;
         let overflowed =
             value.significand < i32::MIN as i128 || value.significand > i32::MAX as i128;
+        let significand = value.significand as i32;
 
         (Self { significand }, overflowed)
     }
@@ -491,8 +491,8 @@ impl<const E: i32> I32F<E> {
     /// Converts from [`U32F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
     #[must_use]
     pub const fn overflowing_from_u32f(value: U32F<E>) -> (Self, bool) {
-        let significand = value.significand as i32;
         let overflowed = value.significand > i32::MAX as u32;
+        let significand = value.significand as i32;
 
         (Self { significand }, overflowed)
     }
@@ -552,8 +552,8 @@ impl<const E: i32> I32F<E> {
     /// Converts from [`U64F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
     #[must_use]
     pub const fn overflowing_from_u64f(value: U64F<E>) -> (Self, bool) {
-        let significand = value.significand as i32;
         let overflowed = value.significand > i32::MAX as u64;
+        let significand = value.significand as i32;
 
         (Self { significand }, overflowed)
     }
@@ -613,8 +613,8 @@ impl<const E: i32> I32F<E> {
     /// Converts from [`U128F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
     #[must_use]
     pub const fn overflowing_from_u128f(value: U128F<E>) -> (Self, bool) {
-        let significand = value.significand as i32;
         let overflowed = value.significand > i32::MAX as u128;
+        let significand = value.significand as i32;
 
         (Self { significand }, overflowed)
     }
