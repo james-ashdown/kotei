@@ -140,7 +140,6 @@ impl<const E: i32> U16F<E> {
     pub const BITS: u32 = u16::BITS;
 
     /// Creates a new fixed-point number from an integer significand, equal to `significand` ⋅ 2<sup>E</sup>.
-    #[inline(always)]
     #[must_use]
     pub const fn new(significand: u16) -> Self {
         Self { significand }
@@ -793,7 +792,6 @@ impl<const E: i32> U16F<E> {
     }
 
     /// Raw transutation from [`u16`].
-    #[inline(always)]
     #[must_use]
     pub const fn from_bits(bits: u16) -> Self {
         Self { significand: bits }
@@ -954,7 +952,6 @@ impl<const E: i32> U16F<E> {
     /// # Panics
     ///
     /// This function will panic on overflow for debug builds, or return a wrapping result for release builds.
-    #[inline(always)]
     #[must_use]
     #[track_caller]
     pub const fn into_i8f(self) -> I8F<E> {
@@ -966,7 +963,6 @@ impl<const E: i32> U16F<E> {
     /// # Panics
     ///
     /// This function will always panic on overflow, even if overflow checks are disabled.
-    #[inline(always)]
     #[must_use]
     #[track_caller]
     pub const fn strict_into_i8f(self) -> I8F<E> {
@@ -974,35 +970,30 @@ impl<const E: i32> U16F<E> {
     }
 
     /// Converts into [`I8F`], returning `None` if overflow occurred.
-    #[inline(always)]
     #[must_use]
     pub const fn checked_into_i8f(self) -> Option<I8F<E>> {
         I8F::checked_from_u16f(self)
     }
 
     /// Converts into [`I8F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
-    #[inline(always)]
     #[must_use]
     pub const fn overflowing_into_i8f(self) -> (I8F<E>, bool) {
         I8F::overflowing_from_u16f(self)
     }
 
     /// Converts into [`I8F`], wrapping around at the numeric bounds of the type.
-    #[inline(always)]
     #[must_use]
     pub const fn wrapping_into_i8f(self) -> I8F<E> {
         I8F::wrapping_from_u16f(self)
     }
 
     /// Converts into [`I8F`], saturating at the numeric bounds of the type instead of overflowing.
-    #[inline(always)]
     #[must_use]
     pub const fn saturating_into_i8f(self) -> I8F<E> {
         I8F::saturating_from_u16f(self)
     }
 
     /// Converts into [`I32F`] losslessly
-    #[inline(always)]
     #[must_use]
     #[track_caller]
     pub const fn into_i32f(self) -> I32F<E> {
@@ -1010,7 +1001,6 @@ impl<const E: i32> U16F<E> {
     }
 
     /// Converts into [`I64F`] losslessly.
-    #[inline(always)]
     #[must_use]
     #[track_caller]
     pub const fn into_i64f(self) -> I64F<E> {
@@ -1018,7 +1008,6 @@ impl<const E: i32> U16F<E> {
     }
 
     /// Converts into [`I128F`] losslessly.
-    #[inline(always)]
     #[must_use]
     #[track_caller]
     pub const fn into_i128f(self) -> I128F<E> {
@@ -1030,7 +1019,6 @@ impl<const E: i32> U16F<E> {
     /// # Panics
     ///
     /// This function will panic on overflow for debug builds, or return a wrapping result for release builds.
-    #[inline(always)]
     #[must_use]
     #[track_caller]
     pub const fn into_u8f(self) -> U8F<E> {
@@ -1042,7 +1030,6 @@ impl<const E: i32> U16F<E> {
     /// # Panics
     ///
     /// This function will always panic on overflow, even if overflow checks are disabled.
-    #[inline(always)]
     #[must_use]
     #[track_caller]
     pub const fn strict_into_u8f(self) -> U8F<E> {
@@ -1050,35 +1037,30 @@ impl<const E: i32> U16F<E> {
     }
 
     /// Converts into [`U8F`], returning `None` if overflow occurred.
-    #[inline(always)]
     #[must_use]
     pub const fn checked_into_u8f(self) -> Option<U8F<E>> {
         U8F::checked_from_u16f(self)
     }
 
     /// Converts into [`U8F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
-    #[inline(always)]
     #[must_use]
     pub const fn overflowing_into_u8f(self) -> (U8F<E>, bool) {
         U8F::overflowing_from_u16f(self)
     }
 
     /// Converts into [`U8F`], wrapping around at the numeric bounds of the type.
-    #[inline(always)]
     #[must_use]
     pub const fn wrapping_into_u8f(self) -> U8F<E> {
         U8F::wrapping_from_u16f(self)
     }
 
     /// Converts into [`U8F`], saturating at the numeric bounds of the type instead of overflowing.
-    #[inline(always)]
     #[must_use]
     pub const fn saturating_into_u8f(self) -> U8F<E> {
         U8F::saturating_from_u16f(self)
     }
 
     /// Converts into [`U32F`] losslessly
-    #[inline(always)]
     #[must_use]
     #[track_caller]
     pub const fn into_u32f(self) -> U32F<E> {
@@ -1086,7 +1068,6 @@ impl<const E: i32> U16F<E> {
     }
 
     /// Converts into [`U64F`] losslessly.
-    #[inline(always)]
     #[must_use]
     #[track_caller]
     pub const fn into_u64f(self) -> U64F<E> {
@@ -1094,7 +1075,6 @@ impl<const E: i32> U16F<E> {
     }
 
     /// Converts into [`U128F`] losslessly.
-    #[inline(always)]
     #[must_use]
     #[track_caller]
     pub const fn into_u128f(self) -> U128F<E> {
@@ -1102,7 +1082,6 @@ impl<const E: i32> U16F<E> {
     }
 
     /// Raw transmutation to [`u16`].
-    #[inline(always)]
     #[must_use]
     pub const fn to_bits(self) -> u16 {
         self.significand
@@ -1127,14 +1106,12 @@ impl<const E: i32> U16F<E> {
     }
 
     /// Returns the fixed-point significand, equal to `self` ⋅ 2<sup>-E</sup>.
-    #[inline(always)]
     #[must_use]
     pub const fn significand(self) -> u16 {
         self.significand
     }
 
     /// Returns the fixed-point exponent.
-    #[inline(always)]
     #[must_use]
     pub const fn exponent(self) -> i32 {
         E

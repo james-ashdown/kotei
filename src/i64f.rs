@@ -140,7 +140,6 @@ impl<const E: i32> I64F<E> {
     pub const BITS: u32 = i64::BITS;
 
     /// Creates a new fixed-point number from an integer significand, equal to `significand` ⋅ 2<sup>E</sup>.
-    #[inline(always)]
     #[must_use]
     pub const fn new(significand: i64) -> Self {
         Self { significand }
@@ -517,7 +516,6 @@ impl<const E: i32> I64F<E> {
     }
 
     /// Raw transutation from [`u64`].
-    #[inline(always)]
     #[must_use]
     pub const fn from_bits(bits: u64) -> Self {
         Self {
@@ -690,7 +688,6 @@ impl<const E: i32> I64F<E> {
     /// # Panics
     ///
     /// This function will panic on overflow for debug builds, or return a wrapping result for release builds.
-    #[inline(always)]
     #[must_use]
     #[track_caller]
     pub const fn into_i8f(self) -> I8F<E> {
@@ -702,7 +699,6 @@ impl<const E: i32> I64F<E> {
     /// # Panics
     ///
     /// This function will always panic on overflow, even if overflow checks are disabled.
-    #[inline(always)]
     #[must_use]
     #[track_caller]
     pub const fn strict_into_i8f(self) -> I8F<E> {
@@ -710,28 +706,24 @@ impl<const E: i32> I64F<E> {
     }
 
     /// Converts into [`I8F`], returning `None` if overflow occurred.
-    #[inline(always)]
     #[must_use]
     pub const fn checked_into_i8f(self) -> Option<I8F<E>> {
         I8F::checked_from_i64f(self)
     }
 
     /// Converts into [`I8F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
-    #[inline(always)]
     #[must_use]
     pub const fn overflowing_into_i8f(self) -> (I8F<E>, bool) {
         I8F::overflowing_from_i64f(self)
     }
 
     /// Converts into [`I8F`], wrapping around at the numeric bounds of the type.
-    #[inline(always)]
     #[must_use]
     pub const fn wrapping_into_i8f(self) -> I8F<E> {
         I8F::wrapping_from_i64f(self)
     }
 
     /// Converts into [`I8F`], saturating at the numeric bounds of the type instead of overflowing.
-    #[inline(always)]
     #[must_use]
     pub const fn saturating_into_i8f(self) -> I8F<E> {
         I8F::saturating_from_i64f(self)
@@ -742,7 +734,6 @@ impl<const E: i32> I64F<E> {
     /// # Panics
     ///
     /// This function will panic on overflow for debug builds, or return a wrapping result for release builds.
-    #[inline(always)]
     #[must_use]
     #[track_caller]
     pub const fn into_i16f(self) -> I16F<E> {
@@ -754,7 +745,6 @@ impl<const E: i32> I64F<E> {
     /// # Panics
     ///
     /// This function will always panic on overflow, even if overflow checks are disabled.
-    #[inline(always)]
     #[must_use]
     #[track_caller]
     pub const fn strict_into_i16f(self) -> I16F<E> {
@@ -762,28 +752,24 @@ impl<const E: i32> I64F<E> {
     }
 
     /// Converts into [`I16F`], returning `None` if overflow occurred.
-    #[inline(always)]
     #[must_use]
     pub const fn checked_into_i16f(self) -> Option<I16F<E>> {
         I16F::checked_from_i64f(self)
     }
 
     /// Converts into [`I16F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
-    #[inline(always)]
     #[must_use]
     pub const fn overflowing_into_i16f(self) -> (I16F<E>, bool) {
         I16F::overflowing_from_i64f(self)
     }
 
     /// Converts into [`I16F`], wrapping around at the numeric bounds of the type.
-    #[inline(always)]
     #[must_use]
     pub const fn wrapping_into_i16f(self) -> I16F<E> {
         I16F::wrapping_from_i64f(self)
     }
 
     /// Converts into [`I16F`], saturating at the numeric bounds of the type instead of overflowing.
-    #[inline(always)]
     #[must_use]
     pub const fn saturating_into_i16f(self) -> I16F<E> {
         I16F::saturating_from_i64f(self)
@@ -794,7 +780,6 @@ impl<const E: i32> I64F<E> {
     /// # Panics
     ///
     /// This function will panic on overflow for debug builds, or return a wrapping result for release builds.
-    #[inline(always)]
     #[must_use]
     #[track_caller]
     pub const fn into_i32f(self) -> I32F<E> {
@@ -806,7 +791,6 @@ impl<const E: i32> I64F<E> {
     /// # Panics
     ///
     /// This function will always panic on overflow, even if overflow checks are disabled.
-    #[inline(always)]
     #[must_use]
     #[track_caller]
     pub const fn strict_into_i32f(self) -> I32F<E> {
@@ -814,35 +798,30 @@ impl<const E: i32> I64F<E> {
     }
 
     /// Converts into [`I32F`], returning `None` if overflow occurred.
-    #[inline(always)]
     #[must_use]
     pub const fn checked_into_i32f(self) -> Option<I32F<E>> {
         I32F::checked_from_i64f(self)
     }
 
     /// Converts into [`I32F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
-    #[inline(always)]
     #[must_use]
     pub const fn overflowing_into_i32f(self) -> (I32F<E>, bool) {
         I32F::overflowing_from_i64f(self)
     }
 
     /// Converts into [`I32F`], wrapping around at the numeric bounds of the type.
-    #[inline(always)]
     #[must_use]
     pub const fn wrapping_into_i32f(self) -> I32F<E> {
         I32F::wrapping_from_i64f(self)
     }
 
     /// Converts into [`I32F`], saturating at the numeric bounds of the type instead of overflowing.
-    #[inline(always)]
     #[must_use]
     pub const fn saturating_into_i32f(self) -> I32F<E> {
         I32F::saturating_from_i64f(self)
     }
 
     /// Converts into [`I128F`] losslessly.
-    #[inline(always)]
     #[must_use]
     pub const fn into_i128f(self) -> I128F<E> {
         I128F::from_i64f(self)
@@ -853,7 +832,6 @@ impl<const E: i32> I64F<E> {
     /// # Panics
     ///
     /// This function will panic on overflow for debug builds, or return a wrapping result for release builds.
-    #[inline(always)]
     #[must_use]
     #[track_caller]
     pub const fn into_u8f(self) -> U8F<E> {
@@ -865,7 +843,6 @@ impl<const E: i32> I64F<E> {
     /// # Panics
     ///
     /// This function will always panic on overflow, even if overflow checks are disabled.
-    #[inline(always)]
     #[must_use]
     #[track_caller]
     pub const fn strict_into_u8f(self) -> U8F<E> {
@@ -873,28 +850,24 @@ impl<const E: i32> I64F<E> {
     }
 
     /// Converts into [`U8F`], returning `None` if overflow occurred.
-    #[inline(always)]
     #[must_use]
     pub const fn checked_into_u8f(self) -> Option<U8F<E>> {
         U8F::checked_from_i64f(self)
     }
 
     /// Converts into [`U8F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
-    #[inline(always)]
     #[must_use]
     pub const fn overflowing_into_u8f(self) -> (U8F<E>, bool) {
         U8F::overflowing_from_i64f(self)
     }
 
     /// Converts into [`U8F`], wrapping around at the numeric bounds of the type.
-    #[inline(always)]
     #[must_use]
     pub const fn wrapping_into_u8f(self) -> U8F<E> {
         U8F::wrapping_from_i64f(self)
     }
 
     /// Converts into [`U8F`], saturating at the numeric bounds of the type instead of overflowing.
-    #[inline(always)]
     #[must_use]
     pub const fn saturating_into_u8f(self) -> U8F<E> {
         U8F::saturating_from_i64f(self)
@@ -905,7 +878,6 @@ impl<const E: i32> I64F<E> {
     /// # Panics
     ///
     /// This function will panic on overflow for debug builds, or return a wrapping result for release builds.
-    #[inline(always)]
     #[must_use]
     #[track_caller]
     pub const fn into_u16f(self) -> U16F<E> {
@@ -917,7 +889,6 @@ impl<const E: i32> I64F<E> {
     /// # Panics
     ///
     /// This function will always panic on overflow, even if overflow checks are disabled.
-    #[inline(always)]
     #[must_use]
     #[track_caller]
     pub const fn strict_into_u16f(self) -> U16F<E> {
@@ -925,28 +896,24 @@ impl<const E: i32> I64F<E> {
     }
 
     /// Converts into [`U16F`], returning `None` if overflow occurred.
-    #[inline(always)]
     #[must_use]
     pub const fn checked_into_u16f(self) -> Option<U16F<E>> {
         U16F::checked_from_i64f(self)
     }
 
     /// Converts into [`U16F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
-    #[inline(always)]
     #[must_use]
     pub const fn overflowing_into_u16f(self) -> (U16F<E>, bool) {
         U16F::overflowing_from_i64f(self)
     }
 
     /// Converts into [`U16F`], wrapping around at the numeric bounds of the type.
-    #[inline(always)]
     #[must_use]
     pub const fn wrapping_into_u16f(self) -> U16F<E> {
         U16F::wrapping_from_i64f(self)
     }
 
     /// Converts into [`U16F`], saturating at the numeric bounds of the type instead of overflowing.
-    #[inline(always)]
     #[must_use]
     pub const fn saturating_into_u16f(self) -> U16F<E> {
         U16F::saturating_from_i64f(self)
@@ -957,7 +924,6 @@ impl<const E: i32> I64F<E> {
     /// # Panics
     ///
     /// This function will panic on overflow for debug builds, or return a wrapping result for release builds.
-    #[inline(always)]
     #[must_use]
     #[track_caller]
     pub const fn into_u32f(self) -> U32F<E> {
@@ -969,7 +935,6 @@ impl<const E: i32> I64F<E> {
     /// # Panics
     ///
     /// This function will always panic on overflow, even if overflow checks are disabled.
-    #[inline(always)]
     #[must_use]
     #[track_caller]
     pub const fn strict_into_u32f(self) -> U32F<E> {
@@ -977,28 +942,24 @@ impl<const E: i32> I64F<E> {
     }
 
     /// Converts into [`U32F`], returning `None` if overflow occurred.
-    #[inline(always)]
     #[must_use]
     pub const fn checked_into_u32f(self) -> Option<U32F<E>> {
         U32F::checked_from_i64f(self)
     }
 
     /// Converts into [`U32F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
-    #[inline(always)]
     #[must_use]
     pub const fn overflowing_into_u32f(self) -> (U32F<E>, bool) {
         U32F::overflowing_from_i64f(self)
     }
 
     /// Converts into [`U32F`], wrapping around at the numeric bounds of the type.
-    #[inline(always)]
     #[must_use]
     pub const fn wrapping_into_u32f(self) -> U32F<E> {
         U32F::wrapping_from_i64f(self)
     }
 
     /// Converts into [`U32F`], saturating at the numeric bounds of the type instead of overflowing.
-    #[inline(always)]
     #[must_use]
     pub const fn saturating_into_u32f(self) -> U32F<E> {
         U32F::saturating_from_i64f(self)
@@ -1009,7 +970,6 @@ impl<const E: i32> I64F<E> {
     /// # Panics
     ///
     /// This function will panic on overflow for debug builds, or return a wrapping result for release builds.
-    #[inline(always)]
     #[must_use]
     #[track_caller]
     pub const fn into_u64f(self) -> U64F<E> {
@@ -1021,7 +981,6 @@ impl<const E: i32> I64F<E> {
     /// # Panics
     ///
     /// This function will always panic on overflow, even if overflow checks are disabled.
-    #[inline(always)]
     #[must_use]
     #[track_caller]
     pub const fn strict_into_u64f(self) -> U64F<E> {
@@ -1029,28 +988,24 @@ impl<const E: i32> I64F<E> {
     }
 
     /// Converts into [`U64F`], returning `None` if overflow occurred.
-    #[inline(always)]
     #[must_use]
     pub const fn checked_into_u64f(self) -> Option<U64F<E>> {
         U64F::checked_from_i64f(self)
     }
 
     /// Converts into [`U64F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
-    #[inline(always)]
     #[must_use]
     pub const fn overflowing_into_u64f(self) -> (U64F<E>, bool) {
         U64F::overflowing_from_i64f(self)
     }
 
     /// Converts into [`U64F`], wrapping around at the numeric bounds of the type.
-    #[inline(always)]
     #[must_use]
     pub const fn wrapping_into_u64f(self) -> U64F<E> {
         U64F::wrapping_from_i64f(self)
     }
 
     /// Converts into [`U64F`], saturating at the numeric bounds of the type instead of overflowing.
-    #[inline(always)]
     #[must_use]
     pub const fn saturating_into_u64f(self) -> U64F<E> {
         U64F::saturating_from_i64f(self)
@@ -1061,7 +1016,6 @@ impl<const E: i32> I64F<E> {
     /// # Panics
     ///
     /// This function will panic on overflow for debug builds, or return a wrapping result for release builds.
-    #[inline(always)]
     #[must_use]
     #[track_caller]
     pub const fn into_u128f(self) -> U128F<E> {
@@ -1073,7 +1027,6 @@ impl<const E: i32> I64F<E> {
     /// # Panics
     ///
     /// This function will always panic on overflow, even if overflow checks are disabled.
-    #[inline(always)]
     #[must_use]
     #[track_caller]
     pub const fn strict_into_u128f(self) -> U128F<E> {
@@ -1081,35 +1034,30 @@ impl<const E: i32> I64F<E> {
     }
 
     /// Converts into [`U128F`], returning `None` if overflow occurred.
-    #[inline(always)]
     #[must_use]
     pub const fn checked_into_u128f(self) -> Option<U128F<E>> {
         U128F::checked_from_i64f(self)
     }
 
     /// Converts into [`U128F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
-    #[inline(always)]
     #[must_use]
     pub const fn overflowing_into_u128f(self) -> (U128F<E>, bool) {
         U128F::overflowing_from_i64f(self)
     }
 
     /// Converts into [`U128F`], wrapping around at the numeric bounds of the type.
-    #[inline(always)]
     #[must_use]
     pub const fn wrapping_into_u128f(self) -> U128F<E> {
         U128F::wrapping_from_i64f(self)
     }
 
     /// Converts into [`U128F`], saturating at the numeric bounds of the type instead of overflowing.
-    #[inline(always)]
     #[must_use]
     pub const fn saturating_into_u128f(self) -> U128F<E> {
         U128F::saturating_from_i64f(self)
     }
 
     /// Raw transmutation to [`u64`].
-    #[inline(always)]
     #[must_use]
     pub const fn to_bits(self) -> u64 {
         self.significand as u64
@@ -1134,14 +1082,12 @@ impl<const E: i32> I64F<E> {
     }
 
     /// Returns the fixed-point significand, equal to `self` ⋅ 2<sup>-E</sup>.
-    #[inline(always)]
     #[must_use]
     pub const fn significand(self) -> i64 {
         self.significand
     }
 
     /// Returns the fixed-point exponent.
-    #[inline(always)]
     #[must_use]
     pub const fn exponent(self) -> i32 {
         E
