@@ -146,8 +146,8 @@ impl<const E: i32> I64F<E> {
         Self { significand }
     }
 
-    /// Tries to create a new fixed-point number from [`f32`]. Returns the nearest multiple of 2<sup>E</sup> to `value`, rounded to the number with even least significant digits if `value` is halfway between two multiples of 2<sup>E</sup>. Returns an error if `value` is not a number, less than [`Self::MIN`], or greater than [`Self::MAX`].
-    pub const fn try_new_from_f32(value: f32) -> Result<Self, TryFromFloatError> {
+    /// Tries to convert from [`f32`]. Returns the nearest multiple of 2<sup>E</sup> to `value`, rounded to the number with even least significant digits if `value` is halfway between two multiples of 2<sup>E</sup>. Returns an error if `value` is not a number, less than [`Self::MIN`], or greater than [`Self::MAX`].
+    pub const fn try_from_f32(value: f32) -> Result<Self, TryFromFloatError> {
         const EXPONENT_BIAS: i32 = !(!0 << (EXPONENT_BITS - 1));
         const EXPONENT_BITS: u32 = 8;
         const EXPONENT_MASK: u32 = !(!0 << EXPONENT_BITS);
@@ -212,8 +212,8 @@ impl<const E: i32> I64F<E> {
         Ok(Self { significand })
     }
 
-    /// Tries to create a new fixed-point number from [`f64`]. Returns the nearest multiple of 2<sup>E</sup> to `value`, rounded to the number with even least significant digits if `value` is halfway between two multiples of 2<sup>E</sup>. Returns an error if `value` is not a number, less than [`Self::MIN`], or greater than [`Self::MAX`].
-    pub const fn try_new_from_f64(value: f64) -> Result<Self, TryFromFloatError> {
+    /// Tries to convert from [`f64`]. Returns the nearest multiple of 2<sup>E</sup> to `value`, rounded to the number with even least significant digits if `value` is halfway between two multiples of 2<sup>E</sup>. Returns an error if `value` is not a number, less than [`Self::MIN`], or greater than [`Self::MAX`].
+    pub const fn try_from_f64(value: f64) -> Result<Self, TryFromFloatError> {
         const EXPONENT_BIAS: i32 = !(!0 << (EXPONENT_BITS - 1));
         const EXPONENT_BITS: u32 = 11;
         const EXPONENT_MASK: u64 = !(!0 << EXPONENT_BITS);
