@@ -15,7 +15,7 @@ use crate::U128F;
 use crate::error::TryFromFloatError;
 
 /// The 32-bit signed fixed-point type.
-#[derive(Clone, Copy, Eq, Hash, Ord)]
+#[derive(Clone, Copy, Eq, Ord)]
 pub struct I32F<const E: i32> {
     pub(crate) significand: i32,
 }

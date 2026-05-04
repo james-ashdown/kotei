@@ -14,7 +14,7 @@ use crate::U64F;
 use crate::error::TryFromFloatError;
 
 /// The 32-bit unsigned fixed-point type.
-#[derive(Clone, Copy, Eq, Hash, Ord)]
+#[derive(Clone, Copy, Eq, Ord)]
 pub struct U128F<const E: i32> {
     pub(crate) significand: u128,
 }
