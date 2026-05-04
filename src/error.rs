@@ -8,9 +8,7 @@ use ::core::fmt;
 pub enum TryFromFloatError {
     /// Value was not a number.
     Nan,
-    /// Value was less than the minimum value for the target fixed-point type.
-    Underflow,
-    /// Value was greater than the maximum value for the target fixed-point type.
+    /// Value exceeded the maximum or minimum value for the target fixed-point type.
     Overflow,
 }
 
@@ -19,8 +17,7 @@ impl error::Error for TryFromFloatError {}
 impl fmt::Display for TryFromFloatError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let message = match self {
-            TryFromFloatError::Underflow => "value is less than target MIN",
-            TryFromFloatError::Overflow => "value is greater than target MAX",
+            TryFromFloatError::Overflow => "value exceeded target boundary",
             TryFromFloatError::Nan => "value is not a number",
         };
 

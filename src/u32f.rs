@@ -161,8 +161,6 @@ impl<const E: i32> U32F<E> {
         if exponent == 0xFF {
             if significand != 0 {
                 return Err(TryFromFloatError::Nan);
-            } else if negative {
-                return Err(TryFromFloatError::Underflow);
             } else {
                 return Err(TryFromFloatError::Overflow);
             }
@@ -178,11 +176,7 @@ impl<const E: i32> U32F<E> {
             let shift = exponent.wrapping_sub(E) as u32;
 
             if shift >= significand.leading_zeros() {
-                if negative {
-                    return Err(TryFromFloatError::Underflow);
-                } else {
-                    return Err(TryFromFloatError::Overflow);
-                }
+                return Err(TryFromFloatError::Overflow);
             } else {
                 significand <<= shift;
             }
@@ -199,7 +193,7 @@ impl<const E: i32> U32F<E> {
         }
 
         if negative && significand > 0 {
-            return Err(TryFromFloatError::Underflow);
+            return Err(TryFromFloatError::Overflow);
         }
 
         Ok(Self { significand })
@@ -220,8 +214,6 @@ impl<const E: i32> U32F<E> {
         if exponent == 0x7FF {
             if significand != 0 {
                 return Err(TryFromFloatError::Nan);
-            } else if negative {
-                return Err(TryFromFloatError::Underflow);
             } else {
                 return Err(TryFromFloatError::Overflow);
             }
@@ -237,11 +229,7 @@ impl<const E: i32> U32F<E> {
             let shift = exponent.wrapping_sub(E) as u32;
 
             if shift >= significand.leading_zeros() {
-                if negative {
-                    return Err(TryFromFloatError::Underflow);
-                } else {
-                    return Err(TryFromFloatError::Overflow);
-                }
+                return Err(TryFromFloatError::Overflow);
             } else {
                 significand <<= shift;
             }
@@ -257,9 +245,7 @@ impl<const E: i32> U32F<E> {
             }
         }
 
-        if negative && significand > 0 {
-            return Err(TryFromFloatError::Underflow);
-        } else if significand > u32::MAX as u64 {
+        if negative && significand > 0 || significand > u32::MAX as u64 {
             return Err(TryFromFloatError::Overflow);
         }
 

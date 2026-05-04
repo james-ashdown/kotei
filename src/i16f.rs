@@ -161,8 +161,6 @@ impl<const E: i32> I16F<E> {
         if exponent == 0xFF {
             if significand != 0 {
                 return Err(TryFromFloatError::Nan);
-            } else if negative {
-                return Err(TryFromFloatError::Underflow);
             } else {
                 return Err(TryFromFloatError::Overflow);
             }
@@ -184,11 +182,7 @@ impl<const E: i32> I16F<E> {
             let shift = exponent.wrapping_sub(E) as u32;
 
             if shift >= significand.leading_zeros() | significand.leading_ones() {
-                if negative {
-                    return Err(TryFromFloatError::Underflow);
-                } else {
-                    return Err(TryFromFloatError::Overflow);
-                }
+                return Err(TryFromFloatError::Overflow);
             } else {
                 significand <<= shift;
             }
@@ -204,9 +198,7 @@ impl<const E: i32> I16F<E> {
             }
         }
 
-        if significand < i16::MIN as i32 {
-            return Err(TryFromFloatError::Underflow);
-        } else if significand > i16::MAX as i32 {
+        if significand < i16::MIN as i32 || significand > i16::MAX as i32 {
             return Err(TryFromFloatError::Overflow);
         }
 
@@ -230,8 +222,6 @@ impl<const E: i32> I16F<E> {
         if exponent == 0x7FF {
             if significand != 0 {
                 return Err(TryFromFloatError::Nan);
-            } else if negative {
-                return Err(TryFromFloatError::Underflow);
             } else {
                 return Err(TryFromFloatError::Overflow);
             }
@@ -253,11 +243,7 @@ impl<const E: i32> I16F<E> {
             let shift = exponent.wrapping_sub(E) as u32;
 
             if shift >= significand.leading_zeros() | significand.leading_ones() {
-                if negative {
-                    return Err(TryFromFloatError::Underflow);
-                } else {
-                    return Err(TryFromFloatError::Overflow);
-                }
+                return Err(TryFromFloatError::Overflow);
             } else {
                 significand <<= shift;
             }
@@ -273,9 +259,7 @@ impl<const E: i32> I16F<E> {
             }
         }
 
-        if significand < i16::MIN as i64 {
-            return Err(TryFromFloatError::Underflow);
-        } else if significand > i16::MAX as i64 {
+        if significand < i16::MIN as i64 || significand > i16::MAX as i64 {
             return Err(TryFromFloatError::Overflow);
         }
 
