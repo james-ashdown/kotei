@@ -3348,28 +3348,32 @@ impl<const E1: i32, const E2: i32> PartialOrd<I32F<E2>> for I32F<E1> {
         let mut lhs = self.significand;
         let mut rhs = other.significand;
 
-        if const { E1 > E2 } && lhs != 0 {
-            if const { E1.abs_diff(E2) } >= lhs.leading_zeros() | lhs.leading_ones() {
-                if lhs > 0 {
-                    return Some(cmp::Ordering::Greater);
-                } else {
-                    return Some(cmp::Ordering::Less);
-                }
-            }
+        if E1 > E2 {
+            let shift = E1.wrapping_sub(E2).cast_unsigned();
+            let temp = lhs.unbounded_shl(shift);
 
-            lhs <<= const { E1.abs_diff(E2) };
-        }
-
-        if const { E2 > E1 } && rhs != 0 {
-            if const { E2.abs_diff(E1) } >= rhs.leading_zeros() | rhs.leading_ones() {
-                if rhs > 0 {
+            if temp.unbounded_shr(shift) != lhs {
+                if lhs.is_negative() {
                     return Some(cmp::Ordering::Less);
                 } else {
                     return Some(cmp::Ordering::Greater);
                 }
             }
 
-            rhs <<= const { E2.abs_diff(E1) };
+            lhs = temp;
+        } else if E2 > E1 {
+            let shift = E2.wrapping_sub(E1).cast_unsigned();
+            let temp = rhs.unbounded_shl(shift);
+
+            if temp.unbounded_shr(shift) != rhs {
+                if rhs.is_negative() {
+                    return Some(cmp::Ordering::Greater);
+                } else {
+                    return Some(cmp::Ordering::Less);
+                }
+            }
+
+            rhs = temp;
         }
 
         PartialOrd::partial_cmp(&lhs, &rhs)
