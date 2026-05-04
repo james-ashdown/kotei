@@ -306,15 +306,10 @@ impl<const E: i32> I16F<E> {
     #[must_use]
     #[track_caller]
     pub const fn from_i32f(value: I32F<E>) -> Self {
-        if cfg!(debug_assertions)
-            && (value.significand < i16::MIN as i32 || value.significand > i16::MAX as i32)
-        {
-            crate::panic::from();
+        match Self::overflowing_from_i32f(value) {
+            (_, true) if cfg!(debug_assertions) => crate::panic::from(),
+            (x, _) => x,
         }
-
-        let significand = value.significand as i16;
-
-        Self { significand }
     }
 
     /// Converts from [`I32F`], panicking if overflow occurred.
@@ -325,56 +320,49 @@ impl<const E: i32> I16F<E> {
     #[must_use]
     #[track_caller]
     pub const fn strict_from_i32f(value: I32F<E>) -> Self {
-        if value.significand < i16::MIN as i32 || value.significand > i16::MAX as i32 {
-            crate::panic::from();
+        match Self::overflowing_from_i32f(value) {
+            (_, true) => crate::panic::from(),
+            (x, _) => x,
         }
-
-        let significand = value.significand as i16;
-
-        Self { significand }
-    }
-
-    /// Converts from [`I32F`], wrapping around at the numeric bounds of the type.
-    #[must_use]
-    pub const fn wrapping_from_i32f(value: I32F<E>) -> Self {
-        let significand = value.significand as i16;
-
-        Self { significand }
-    }
-
-    /// Converts from [`I32F`], saturating at the numeric bounds of the type instead of overflowing.
-    #[must_use]
-    pub const fn saturating_from_i32f(value: I32F<E>) -> Self {
-        if value.significand < i16::MIN as i32 {
-            return Self::MIN;
-        } else if value.significand > i16::MAX as i32 {
-            return Self::MAX;
-        }
-
-        let significand = value.significand as i16;
-
-        Self { significand }
-    }
-
-    /// Converts from [`I32F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
-    #[must_use]
-    pub const fn overflowing_from_i32f(value: I32F<E>) -> (Self, bool) {
-        let overflowed = value.significand < i16::MIN as i32 || value.significand > i16::MAX as i32;
-        let significand = value.significand as i16;
-
-        (Self { significand }, overflowed)
     }
 
     /// Converts from [`I32F`], returning `None` if overflow occurred.
     #[must_use]
     pub const fn checked_from_i32f(value: I32F<E>) -> Option<Self> {
-        if value.significand < i16::MIN as i32 || value.significand > i16::MAX as i32 {
-            return None;
+        match Self::overflowing_from_i32f(value) {
+            (_, true) => None,
+            (x, _) => Some(x),
         }
+    }
 
+    /// Converts from [`I32F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
+    #[must_use]
+    pub const fn overflowing_from_i32f(value: I32F<E>) -> (Self, bool) {
         let significand = value.significand as i16;
+        let overflowed = value.significand < i16::MIN as i32 || value.significand > i16::MAX as i32;
 
-        Some(Self { significand })
+        (Self { significand }, overflowed)
+    }
+
+    /// Converts from [`I32F`], wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn wrapping_from_i32f(value: I32F<E>) -> Self {
+        Self::overflowing_from_i32f(value).0
+    }
+
+    /// Converts from [`I32F`], saturating at the numeric bounds of the type instead of overflowing.
+    #[must_use]
+    pub const fn saturating_from_i32f(value: I32F<E>) -> Self {
+        match Self::overflowing_from_i32f(value) {
+            (_, true) => {
+                if value.significand.is_negative() {
+                    Self::MIN
+                } else {
+                    Self::MAX
+                }
+            }
+            (x, _) => x,
+        }
     }
 
     /// Converts from [`I64F`], panicking if overflow occurred.
@@ -385,15 +373,10 @@ impl<const E: i32> I16F<E> {
     #[must_use]
     #[track_caller]
     pub const fn from_i64f(value: I64F<E>) -> Self {
-        if cfg!(debug_assertions)
-            && (value.significand < i16::MIN as i64 || value.significand > i16::MAX as i64)
-        {
-            crate::panic::from();
+        match Self::overflowing_from_i64f(value) {
+            (_, true) if cfg!(debug_assertions) => crate::panic::from(),
+            (x, _) => x,
         }
-
-        let significand = value.significand as i16;
-
-        Self { significand }
     }
 
     /// Converts from [`I64F`], panicking if overflow occurred.
@@ -404,56 +387,49 @@ impl<const E: i32> I16F<E> {
     #[must_use]
     #[track_caller]
     pub const fn strict_from_i64f(value: I64F<E>) -> Self {
-        if value.significand < i16::MIN as i64 || value.significand > i16::MAX as i64 {
-            crate::panic::from();
+        match Self::overflowing_from_i64f(value) {
+            (_, true) => crate::panic::from(),
+            (x, _) => x,
         }
-
-        let significand = value.significand as i16;
-
-        Self { significand }
-    }
-
-    /// Converts from [`I64F`], wrapping around at the numeric bounds of the type.
-    #[must_use]
-    pub const fn wrapping_from_i64f(value: I64F<E>) -> Self {
-        let significand = value.significand as i16;
-
-        Self { significand }
-    }
-
-    /// Converts from [`I64F`], saturating at the numeric bounds of the type instead of overflowing.
-    #[must_use]
-    pub const fn saturating_from_i64f(value: I64F<E>) -> Self {
-        if value.significand < i16::MIN as i64 {
-            return Self::MIN;
-        } else if value.significand > i16::MAX as i64 {
-            return Self::MAX;
-        }
-
-        let significand = value.significand as i16;
-
-        Self { significand }
-    }
-
-    /// Converts from [`I64F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
-    #[must_use]
-    pub const fn overflowing_from_i64f(value: I64F<E>) -> (Self, bool) {
-        let overflowed = value.significand < i16::MIN as i64 || value.significand > i16::MAX as i64;
-        let significand = value.significand as i16;
-
-        (Self { significand }, overflowed)
     }
 
     /// Converts from [`I64F`], returning `None` if overflow occurred.
     #[must_use]
     pub const fn checked_from_i64f(value: I64F<E>) -> Option<Self> {
-        if value.significand < i16::MIN as i64 || value.significand > i16::MAX as i64 {
-            return None;
+        match Self::overflowing_from_i64f(value) {
+            (_, true) => None,
+            (x, _) => Some(x),
         }
+    }
 
+    /// Converts from [`I64F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
+    #[must_use]
+    pub const fn overflowing_from_i64f(value: I64F<E>) -> (Self, bool) {
         let significand = value.significand as i16;
+        let overflowed = value.significand < i16::MIN as i64 || value.significand > i16::MAX as i64;
 
-        Some(Self { significand })
+        (Self { significand }, overflowed)
+    }
+
+    /// Converts from [`I64F`], wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn wrapping_from_i64f(value: I64F<E>) -> Self {
+        Self::overflowing_from_i64f(value).0
+    }
+
+    /// Converts from [`I64F`], saturating at the numeric bounds of the type instead of overflowing.
+    #[must_use]
+    pub const fn saturating_from_i64f(value: I64F<E>) -> Self {
+        match Self::overflowing_from_i64f(value) {
+            (_, true) => {
+                if value.significand.is_negative() {
+                    Self::MIN
+                } else {
+                    Self::MAX
+                }
+            }
+            (x, _) => x,
+        }
     }
 
     /// Converts from [`I128F`], panicking if overflow occurred.
@@ -464,15 +440,10 @@ impl<const E: i32> I16F<E> {
     #[must_use]
     #[track_caller]
     pub const fn from_i128f(value: I128F<E>) -> Self {
-        if cfg!(debug_assertions)
-            && (value.significand < i16::MIN as i128 || value.significand > i16::MAX as i128)
-        {
-            crate::panic::from();
+        match Self::overflowing_from_i128f(value) {
+            (_, true) if cfg!(debug_assertions) => crate::panic::from(),
+            (x, _) => x,
         }
-
-        let significand = value.significand as i16;
-
-        Self { significand }
     }
 
     /// Converts from [`I128F`], panicking if overflow occurred.
@@ -483,57 +454,50 @@ impl<const E: i32> I16F<E> {
     #[must_use]
     #[track_caller]
     pub const fn strict_from_i128f(value: I128F<E>) -> Self {
-        if value.significand < i16::MIN as i128 || value.significand > i16::MAX as i128 {
-            crate::panic::from();
+        match Self::overflowing_from_i128f(value) {
+            (_, true) => crate::panic::from(),
+            (x, _) => x,
         }
-
-        let significand = value.significand as i16;
-
-        Self { significand }
-    }
-
-    /// Converts from [`I128F`], wrapping around at the numeric bounds of the type.
-    #[must_use]
-    pub const fn wrapping_from_i128f(value: I128F<E>) -> Self {
-        let significand = value.significand as i16;
-
-        Self { significand }
-    }
-
-    /// Converts from [`I128F`], saturating at the numeric bounds of the type instead of overflowing.
-    #[must_use]
-    pub const fn saturating_from_i128f(value: I128F<E>) -> Self {
-        if value.significand < i16::MIN as i128 {
-            return Self::MIN;
-        } else if value.significand > i16::MAX as i128 {
-            return Self::MAX;
-        }
-
-        let significand = value.significand as i16;
-
-        Self { significand }
-    }
-
-    /// Converts from [`I128F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
-    #[must_use]
-    pub const fn overflowing_from_i128f(value: I128F<E>) -> (Self, bool) {
-        let overflowed =
-            value.significand < i16::MIN as i128 || value.significand > i16::MAX as i128;
-        let significand = value.significand as i16;
-
-        (Self { significand }, overflowed)
     }
 
     /// Converts from [`I128F`], returning `None` if overflow occurred.
     #[must_use]
     pub const fn checked_from_i128f(value: I128F<E>) -> Option<Self> {
-        if value.significand < i16::MIN as i128 || value.significand > i16::MAX as i128 {
-            return None;
+        match Self::overflowing_from_i128f(value) {
+            (_, true) => None,
+            (x, _) => Some(x),
         }
+    }
 
+    /// Converts from [`I128F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
+    #[must_use]
+    pub const fn overflowing_from_i128f(value: I128F<E>) -> (Self, bool) {
         let significand = value.significand as i16;
+        let overflowed =
+            value.significand < i16::MIN as i128 || value.significand > i16::MAX as i128;
 
-        Some(Self { significand })
+        (Self { significand }, overflowed)
+    }
+
+    /// Converts from [`I128F`], wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn wrapping_from_i128f(value: I128F<E>) -> Self {
+        Self::overflowing_from_i128f(value).0
+    }
+
+    /// Converts from [`I128F`], saturating at the numeric bounds of the type instead of overflowing.
+    #[must_use]
+    pub const fn saturating_from_i128f(value: I128F<E>) -> Self {
+        match Self::overflowing_from_i128f(value) {
+            (_, true) => {
+                if value.significand.is_negative() {
+                    Self::MIN
+                } else {
+                    Self::MAX
+                }
+            }
+            (x, _) => x,
+        }
     }
 
     /// Converts from [`U8F<E>`] losslessly.
@@ -552,13 +516,10 @@ impl<const E: i32> I16F<E> {
     #[must_use]
     #[track_caller]
     pub const fn from_u16f(value: U16F<E>) -> Self {
-        if cfg!(debug_assertions) && value.significand > i16::MAX as u16 {
-            crate::panic::from();
+        match Self::overflowing_from_u16f(value) {
+            (_, true) if cfg!(debug_assertions) => crate::panic::from(),
+            (x, _) => x,
         }
-
-        let significand = value.significand as i16;
-
-        Self { significand }
     }
 
     /// Converts from [`U16F`], panicking if overflow occurred.
@@ -569,54 +530,43 @@ impl<const E: i32> I16F<E> {
     #[must_use]
     #[track_caller]
     pub const fn strict_from_u16f(value: U16F<E>) -> Self {
-        if value.significand > i16::MAX as u16 {
-            crate::panic::from();
+        match Self::overflowing_from_u16f(value) {
+            (_, true) => crate::panic::from(),
+            (x, _) => x,
         }
-
-        let significand = value.significand as i16;
-
-        Self { significand }
-    }
-
-    /// Converts from [`U16F`], wrapping around at the numeric bounds of the type.
-    #[must_use]
-    pub const fn wrapping_from_u16f(value: U16F<E>) -> Self {
-        let significand = value.significand as i16;
-
-        Self { significand }
-    }
-
-    /// Converts from [`U16F`], saturating at the numeric bounds of the type instead of overflowing.
-    #[must_use]
-    pub const fn saturating_from_u16f(value: U16F<E>) -> Self {
-        if value.significand > i16::MAX as u16 {
-            return Self::MAX;
-        }
-
-        let significand = value.significand as i16;
-
-        Self { significand }
-    }
-
-    /// Converts from [`U16F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
-    #[must_use]
-    pub const fn overflowing_from_u16f(value: U16F<E>) -> (Self, bool) {
-        let overflowed = value.significand > i16::MAX as u16;
-        let significand = value.significand as i16;
-
-        (Self { significand }, overflowed)
     }
 
     /// Converts from [`U16F`], returning `None` if overflow occurred.
     #[must_use]
     pub const fn checked_from_u16f(value: U16F<E>) -> Option<Self> {
-        if value.significand > i16::MAX as u16 {
-            return None;
+        match Self::overflowing_from_u16f(value) {
+            (_, true) => None,
+            (x, _) => Some(x),
         }
+    }
 
+    /// Converts from [`U16F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
+    #[must_use]
+    pub const fn overflowing_from_u16f(value: U16F<E>) -> (Self, bool) {
         let significand = value.significand as i16;
+        let overflowed = value.significand > i16::MAX as u16;
 
-        Some(Self { significand })
+        (Self { significand }, overflowed)
+    }
+
+    /// Converts from [`U16F`], wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn wrapping_from_u16f(value: U16F<E>) -> Self {
+        Self::overflowing_from_u16f(value).0
+    }
+
+    /// Converts from [`U16F`], saturating at the numeric bounds of the type instead of overflowing.
+    #[must_use]
+    pub const fn saturating_from_u16f(value: U16F<E>) -> Self {
+        match Self::overflowing_from_u16f(value) {
+            (_, true) => Self::MAX,
+            (x, _) => x,
+        }
     }
 
     /// Converts from [`U32F`], panicking if overflow occurred.
@@ -627,13 +577,10 @@ impl<const E: i32> I16F<E> {
     #[must_use]
     #[track_caller]
     pub const fn from_u32f(value: U32F<E>) -> Self {
-        if cfg!(debug_assertions) && value.significand > i16::MAX as u32 {
-            crate::panic::from();
+        match Self::overflowing_from_u32f(value) {
+            (_, true) if cfg!(debug_assertions) => crate::panic::from(),
+            (x, _) => x,
         }
-
-        let significand = value.significand as i16;
-
-        Self { significand }
     }
 
     /// Converts from [`U32F`], panicking if overflow occurred.
@@ -644,54 +591,43 @@ impl<const E: i32> I16F<E> {
     #[must_use]
     #[track_caller]
     pub const fn strict_from_u32f(value: U32F<E>) -> Self {
-        if value.significand > i16::MAX as u32 {
-            crate::panic::from();
+        match Self::overflowing_from_u32f(value) {
+            (_, true) => crate::panic::from(),
+            (x, _) => x,
         }
-
-        let significand = value.significand as i16;
-
-        Self { significand }
-    }
-
-    /// Converts from [`U32F`], wrapping around at the numeric bounds of the type.
-    #[must_use]
-    pub const fn wrapping_from_u32f(value: U32F<E>) -> Self {
-        let significand = value.significand as i16;
-
-        Self { significand }
-    }
-
-    /// Converts from [`U32F`], saturating at the numeric bounds of the type instead of overflowing.
-    #[must_use]
-    pub const fn saturating_from_u32f(value: U32F<E>) -> Self {
-        if value.significand > i16::MAX as u32 {
-            return Self::MAX;
-        }
-
-        let significand = value.significand as i16;
-
-        Self { significand }
-    }
-
-    /// Converts from [`U32F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
-    #[must_use]
-    pub const fn overflowing_from_u32f(value: U32F<E>) -> (Self, bool) {
-        let overflowed = value.significand > i16::MAX as u32;
-        let significand = value.significand as i16;
-
-        (Self { significand }, overflowed)
     }
 
     /// Converts from [`U32F`], returning `None` if overflow occurred.
     #[must_use]
     pub const fn checked_from_u32f(value: U32F<E>) -> Option<Self> {
-        if value.significand > i16::MAX as u32 {
-            return None;
+        match Self::overflowing_from_u32f(value) {
+            (_, true) => None,
+            (x, _) => Some(x),
         }
+    }
 
+    /// Converts from [`U32F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
+    #[must_use]
+    pub const fn overflowing_from_u32f(value: U32F<E>) -> (Self, bool) {
         let significand = value.significand as i16;
+        let overflowed = value.significand > i16::MAX as u32;
 
-        Some(Self { significand })
+        (Self { significand }, overflowed)
+    }
+
+    /// Converts from [`U32F`], wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn wrapping_from_u32f(value: U32F<E>) -> Self {
+        Self::overflowing_from_u32f(value).0
+    }
+
+    /// Converts from [`U32F`], saturating at the numeric bounds of the type instead of overflowing.
+    #[must_use]
+    pub const fn saturating_from_u32f(value: U32F<E>) -> Self {
+        match Self::overflowing_from_u32f(value) {
+            (_, true) => Self::MAX,
+            (x, _) => x,
+        }
     }
 
     /// Converts from [`U64F`], panicking if overflow occurred.
@@ -702,13 +638,10 @@ impl<const E: i32> I16F<E> {
     #[must_use]
     #[track_caller]
     pub const fn from_u64f(value: U64F<E>) -> Self {
-        if cfg!(debug_assertions) && value.significand > i16::MAX as u64 {
-            crate::panic::from();
+        match Self::overflowing_from_u64f(value) {
+            (_, true) if cfg!(debug_assertions) => crate::panic::from(),
+            (x, _) => x,
         }
-
-        let significand = value.significand as i16;
-
-        Self { significand }
     }
 
     /// Converts from [`U64F`], panicking if overflow occurred.
@@ -719,54 +652,43 @@ impl<const E: i32> I16F<E> {
     #[must_use]
     #[track_caller]
     pub const fn strict_from_u64f(value: U64F<E>) -> Self {
-        if value.significand > i16::MAX as u64 {
-            crate::panic::from();
+        match Self::overflowing_from_u64f(value) {
+            (_, true) => crate::panic::from(),
+            (x, _) => x,
         }
-
-        let significand = value.significand as i16;
-
-        Self { significand }
-    }
-
-    /// Converts from [`U64F`], wrapping around at the numeric bounds of the type.
-    #[must_use]
-    pub const fn wrapping_from_u64f(value: U64F<E>) -> Self {
-        let significand = value.significand as i16;
-
-        Self { significand }
-    }
-
-    /// Converts from [`U64F`], saturating at the numeric bounds of the type instead of overflowing.
-    #[must_use]
-    pub const fn saturating_from_u64f(value: U64F<E>) -> Self {
-        if value.significand > i16::MAX as u64 {
-            return Self::MAX;
-        }
-
-        let significand = value.significand as i16;
-
-        Self { significand }
-    }
-
-    /// Converts from [`U64F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
-    #[must_use]
-    pub const fn overflowing_from_u64f(value: U64F<E>) -> (Self, bool) {
-        let overflowed = value.significand > i16::MAX as u64;
-        let significand = value.significand as i16;
-
-        (Self { significand }, overflowed)
     }
 
     /// Converts from [`U64F`], returning `None` if overflow occurred.
     #[must_use]
     pub const fn checked_from_u64f(value: U64F<E>) -> Option<Self> {
-        if value.significand > i16::MAX as u64 {
-            return None;
+        match Self::overflowing_from_u64f(value) {
+            (_, true) => None,
+            (x, _) => Some(x),
         }
+    }
 
+    /// Converts from [`U64F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
+    #[must_use]
+    pub const fn overflowing_from_u64f(value: U64F<E>) -> (Self, bool) {
         let significand = value.significand as i16;
+        let overflowed = value.significand > i16::MAX as u64;
 
-        Some(Self { significand })
+        (Self { significand }, overflowed)
+    }
+
+    /// Converts from [`U64F`], wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn wrapping_from_u64f(value: U64F<E>) -> Self {
+        Self::overflowing_from_u64f(value).0
+    }
+
+    /// Converts from [`U64F`], saturating at the numeric bounds of the type instead of overflowing.
+    #[must_use]
+    pub const fn saturating_from_u64f(value: U64F<E>) -> Self {
+        match Self::overflowing_from_u64f(value) {
+            (_, true) => Self::MAX,
+            (x, _) => x,
+        }
     }
 
     /// Converts from [`U128F`], panicking if overflow occurred.
@@ -777,13 +699,10 @@ impl<const E: i32> I16F<E> {
     #[must_use]
     #[track_caller]
     pub const fn from_u128f(value: U128F<E>) -> Self {
-        if cfg!(debug_assertions) && value.significand > i16::MAX as u128 {
-            crate::panic::from();
+        match Self::overflowing_from_u128f(value) {
+            (_, true) if cfg!(debug_assertions) => crate::panic::from(),
+            (x, _) => x,
         }
-
-        let significand = value.significand as i16;
-
-        Self { significand }
     }
 
     /// Converts from [`U128F`], panicking if overflow occurred.
@@ -794,54 +713,43 @@ impl<const E: i32> I16F<E> {
     #[must_use]
     #[track_caller]
     pub const fn strict_from_u128f(value: U128F<E>) -> Self {
-        if value.significand > i16::MAX as u128 {
-            crate::panic::from();
+        match Self::overflowing_from_u128f(value) {
+            (_, true) => crate::panic::from(),
+            (x, _) => x,
         }
-
-        let significand = value.significand as i16;
-
-        Self { significand }
-    }
-
-    /// Converts from [`U128F`], wrapping around at the numeric bounds of the type.
-    #[must_use]
-    pub const fn wrapping_from_u128f(value: U128F<E>) -> Self {
-        let significand = value.significand as i16;
-
-        Self { significand }
-    }
-
-    /// Converts from [`U128F`], saturating at the numeric bounds of the type instead of overflowing.
-    #[must_use]
-    pub const fn saturating_from_u128f(value: U128F<E>) -> Self {
-        if value.significand > i16::MAX as u128 {
-            return Self::MAX;
-        }
-
-        let significand = value.significand as i16;
-
-        Self { significand }
-    }
-
-    /// Converts from [`U128F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
-    #[must_use]
-    pub const fn overflowing_from_u128f(value: U128F<E>) -> (Self, bool) {
-        let overflowed = value.significand > i16::MAX as u128;
-        let significand = value.significand as i16;
-
-        (Self { significand }, overflowed)
     }
 
     /// Converts from [`U128F`], returning `None` if overflow occurred.
     #[must_use]
     pub const fn checked_from_u128f(value: U128F<E>) -> Option<Self> {
-        if value.significand > i16::MAX as u128 {
-            return None;
+        match Self::overflowing_from_u128f(value) {
+            (_, true) => None,
+            (x, _) => Some(x),
         }
+    }
 
+    /// Converts from [`U128F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
+    #[must_use]
+    pub const fn overflowing_from_u128f(value: U128F<E>) -> (Self, bool) {
         let significand = value.significand as i16;
+        let overflowed = value.significand > i16::MAX as u128;
 
-        Some(Self { significand })
+        (Self { significand }, overflowed)
+    }
+
+    /// Converts from [`U128F`], wrapping around at the numeric bounds of the type.
+    #[must_use]
+    pub const fn wrapping_from_u128f(value: U128F<E>) -> Self {
+        Self::overflowing_from_u128f(value).0
+    }
+
+    /// Converts from [`U128F`], saturating at the numeric bounds of the type instead of overflowing.
+    #[must_use]
+    pub const fn saturating_from_u128f(value: U128F<E>) -> Self {
+        match Self::overflowing_from_u128f(value) {
+            (_, true) => Self::MAX,
+            (x, _) => x,
+        }
     }
 
     /// Raw transutation from [`u16`].
@@ -1037,6 +945,20 @@ impl<const E: i32> I16F<E> {
         I8F::strict_from_i16f(self)
     }
 
+    /// Converts into [`I8F`], returning `None` if overflow occurred.
+    #[inline(always)]
+    #[must_use]
+    pub const fn checked_into_i8f(self) -> Option<I8F<E>> {
+        I8F::checked_from_i16f(self)
+    }
+
+    /// Converts into [`I8F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
+    #[inline(always)]
+    #[must_use]
+    pub const fn overflowing_into_i8f(self) -> (I8F<E>, bool) {
+        I8F::overflowing_from_i16f(self)
+    }
+
     /// Converts into [`I8F`], wrapping around at the numeric bounds of the type.
     #[inline(always)]
     #[must_use]
@@ -1049,20 +971,6 @@ impl<const E: i32> I16F<E> {
     #[must_use]
     pub const fn saturating_into_i8f(self) -> I8F<E> {
         I8F::saturating_from_i16f(self)
-    }
-
-    /// Converts into [`I8F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
-    #[inline(always)]
-    #[must_use]
-    pub const fn overflowing_into_i8f(self) -> (I8F<E>, bool) {
-        I8F::overflowing_from_i16f(self)
-    }
-
-    /// Converts into [`I8F`], returning `None` if overflow occurred.
-    #[inline(always)]
-    #[must_use]
-    pub const fn checked_into_i8f(self) -> Option<I8F<E>> {
-        I8F::checked_from_i16f(self)
     }
 
     /// Converts into [`I32F`] losslessly.
@@ -1110,6 +1018,20 @@ impl<const E: i32> I16F<E> {
         U8F::strict_from_i16f(self)
     }
 
+    /// Converts into [`U8F`], returning `None` if overflow occurred.
+    #[inline(always)]
+    #[must_use]
+    pub const fn checked_into_u8f(self) -> Option<U8F<E>> {
+        U8F::checked_from_i16f(self)
+    }
+
+    /// Converts into [`U8F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
+    #[inline(always)]
+    #[must_use]
+    pub const fn overflowing_into_u8f(self) -> (U8F<E>, bool) {
+        U8F::overflowing_from_i16f(self)
+    }
+
     /// Converts into [`U8F`], wrapping around at the numeric bounds of the type.
     #[inline(always)]
     #[must_use]
@@ -1122,20 +1044,6 @@ impl<const E: i32> I16F<E> {
     #[must_use]
     pub const fn saturating_into_u8f(self) -> U8F<E> {
         U8F::saturating_from_i16f(self)
-    }
-
-    /// Converts into [`U8F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
-    #[inline(always)]
-    #[must_use]
-    pub const fn overflowing_into_u8f(self) -> (U8F<E>, bool) {
-        U8F::overflowing_from_i16f(self)
-    }
-
-    /// Converts into [`U8F`], returning `None` if overflow occurred.
-    #[inline(always)]
-    #[must_use]
-    pub const fn checked_into_u8f(self) -> Option<U8F<E>> {
-        U8F::checked_from_i16f(self)
     }
 
     /// Converts into [`U16F`], panicking if overflow occurred.
@@ -1162,6 +1070,20 @@ impl<const E: i32> I16F<E> {
         U16F::strict_from_i16f(self)
     }
 
+    /// Converts into [`U16F`], returning `None` if overflow occurred.
+    #[inline(always)]
+    #[must_use]
+    pub const fn checked_into_u16f(self) -> Option<U16F<E>> {
+        U16F::checked_from_i16f(self)
+    }
+
+    /// Converts into [`U16F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
+    #[inline(always)]
+    #[must_use]
+    pub const fn overflowing_into_u16f(self) -> (U16F<E>, bool) {
+        U16F::overflowing_from_i16f(self)
+    }
+
     /// Converts into [`U16F`], wrapping around at the numeric bounds of the type.
     #[inline(always)]
     #[must_use]
@@ -1174,20 +1096,6 @@ impl<const E: i32> I16F<E> {
     #[must_use]
     pub const fn saturating_into_u16f(self) -> U16F<E> {
         U16F::saturating_from_i16f(self)
-    }
-
-    /// Converts into [`U16F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
-    #[inline(always)]
-    #[must_use]
-    pub const fn overflowing_into_u16f(self) -> (U16F<E>, bool) {
-        U16F::overflowing_from_i16f(self)
-    }
-
-    /// Converts into [`U16F`], returning `None` if overflow occurred.
-    #[inline(always)]
-    #[must_use]
-    pub const fn checked_into_u16f(self) -> Option<U16F<E>> {
-        U16F::checked_from_i16f(self)
     }
 
     /// Converts into [`U32F`], panicking if overflow occurred.
@@ -1214,6 +1122,20 @@ impl<const E: i32> I16F<E> {
         U32F::strict_from_i16f(self)
     }
 
+    /// Converts into [`U32F`], returning `None` if overflow occurred.
+    #[inline(always)]
+    #[must_use]
+    pub const fn checked_into_u32f(self) -> Option<U32F<E>> {
+        U32F::checked_from_i16f(self)
+    }
+
+    /// Converts into [`U32F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
+    #[inline(always)]
+    #[must_use]
+    pub const fn overflowing_into_u32f(self) -> (U32F<E>, bool) {
+        U32F::overflowing_from_i16f(self)
+    }
+
     /// Converts into [`U32F`], wrapping around at the numeric bounds of the type.
     #[inline(always)]
     #[must_use]
@@ -1226,20 +1148,6 @@ impl<const E: i32> I16F<E> {
     #[must_use]
     pub const fn saturating_into_u32f(self) -> U32F<E> {
         U32F::saturating_from_i16f(self)
-    }
-
-    /// Converts into [`U32F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
-    #[inline(always)]
-    #[must_use]
-    pub const fn overflowing_into_u32f(self) -> (U32F<E>, bool) {
-        U32F::overflowing_from_i16f(self)
-    }
-
-    /// Converts into [`U32F`], returning `None` if overflow occurred.
-    #[inline(always)]
-    #[must_use]
-    pub const fn checked_into_u32f(self) -> Option<U32F<E>> {
-        U32F::checked_from_i16f(self)
     }
 
     /// Converts into [`U64F`], panicking if overflow occurred.
@@ -1266,6 +1174,20 @@ impl<const E: i32> I16F<E> {
         U64F::strict_from_i16f(self)
     }
 
+    /// Converts into [`U64F`], returning `None` if overflow occurred.
+    #[inline(always)]
+    #[must_use]
+    pub const fn checked_into_u64f(self) -> Option<U64F<E>> {
+        U64F::checked_from_i16f(self)
+    }
+
+    /// Converts into [`U64F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
+    #[inline(always)]
+    #[must_use]
+    pub const fn overflowing_into_u64f(self) -> (U64F<E>, bool) {
+        U64F::overflowing_from_i16f(self)
+    }
+
     /// Converts into [`U64F`], wrapping around at the numeric bounds of the type.
     #[inline(always)]
     #[must_use]
@@ -1278,20 +1200,6 @@ impl<const E: i32> I16F<E> {
     #[must_use]
     pub const fn saturating_into_u64f(self) -> U64F<E> {
         U64F::saturating_from_i16f(self)
-    }
-
-    /// Converts into [`U64F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
-    #[inline(always)]
-    #[must_use]
-    pub const fn overflowing_into_u64f(self) -> (U64F<E>, bool) {
-        U64F::overflowing_from_i16f(self)
-    }
-
-    /// Converts into [`U64F`], returning `None` if overflow occurred.
-    #[inline(always)]
-    #[must_use]
-    pub const fn checked_into_u64f(self) -> Option<U64F<E>> {
-        U64F::checked_from_i16f(self)
     }
 
     /// Converts into [`U128F`], panicking if overflow occurred.
@@ -1318,6 +1226,20 @@ impl<const E: i32> I16F<E> {
         U128F::strict_from_i16f(self)
     }
 
+    /// Converts into [`U128F`], returning `None` if overflow occurred.
+    #[inline(always)]
+    #[must_use]
+    pub const fn checked_into_u128f(self) -> Option<U128F<E>> {
+        U128F::checked_from_i16f(self)
+    }
+
+    /// Converts into [`U128F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
+    #[inline(always)]
+    #[must_use]
+    pub const fn overflowing_into_u128f(self) -> (U128F<E>, bool) {
+        U128F::overflowing_from_i16f(self)
+    }
+
     /// Converts into [`U128F`], wrapping around at the numeric bounds of the type.
     #[inline(always)]
     #[must_use]
@@ -1330,20 +1252,6 @@ impl<const E: i32> I16F<E> {
     #[must_use]
     pub const fn saturating_into_u128f(self) -> U128F<E> {
         U128F::saturating_from_i16f(self)
-    }
-
-    /// Converts into [`U128F`]. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
-    #[inline(always)]
-    #[must_use]
-    pub const fn overflowing_into_u128f(self) -> (U128F<E>, bool) {
-        U128F::overflowing_from_i16f(self)
-    }
-
-    /// Converts into [`U128F`], returning `None` if overflow occurred.
-    #[inline(always)]
-    #[must_use]
-    pub const fn checked_into_u128f(self) -> Option<U128F<E>> {
-        U128F::checked_from_i16f(self)
     }
 
     /// Raw transmutation to [`u16`].
