@@ -148,52 +148,63 @@ impl<const E: i32> I64F<E> {
 
     /// Tries to create a new fixed-point number from [`f32`]. Returns the nearest multiple of 2<sup>E</sup> to `value`, rounded to the number with even least significant digits if `value` is halfway between two multiples of 2<sup>E</sup>. Returns an error if `value` is not a number, less than [`Self::MIN`], or greater than [`Self::MAX`].
     pub const fn try_new_from_f32(value: f32) -> Result<Self, TryFromFloatError> {
+        const EXPONENT_BIAS: i32 = !(!0 << (EXPONENT_BITS - 1));
+        const EXPONENT_BITS: u32 = 8;
+        const EXPONENT_MASK: u32 = !(!0 << EXPONENT_BITS);
+        const EXPONENT_SHIFT: u32 = SIGNIFICAND_BITS;
+        const IMPLICIT_BIT: u32 = 1 << SIGNIFICAND_BITS;
+        const SIGN_SHIFT: u32 = EXPONENT_BITS + SIGNIFICAND_BITS;
+        const SIGNIFICAND_BITS: u32 = 23;
+        const SIGNIFICAND_MASK: u32 = !(!0 << SIGNIFICAND_BITS);
+        const ZERO_MASK: u32 = !(!0 << SIGN_SHIFT);
+
         let bits = value.to_bits();
 
-        if bits & 0x7FFFFFFF == 0 {
+        if bits & ZERO_MASK == 0 {
             return Ok(Self { significand: 0 });
         }
 
-        let mut significand = bits & 0x7FFFFF;
-        let mut exponent = bits >> 23 & 0xFF;
-        let negative = bits >> 31 != 0;
+        let mut significand = bits & SIGNIFICAND_MASK;
+        let mut exponent = bits >> EXPONENT_SHIFT & EXPONENT_MASK;
+        let sign = bits >> SIGN_SHIFT;
 
-        if exponent == 0xFF {
+        if exponent == EXPONENT_MASK {
             if significand != 0 {
                 return Err(TryFromFloatError::Nan);
             } else {
                 return Err(TryFromFloatError::Overflow);
             }
         } else if exponent > 0 {
-            significand |= 0x800000;
+            significand |= IMPLICIT_BIT;
         } else {
             exponent = 1;
         }
 
         let mut significand = significand as i64;
 
-        if negative {
+        if sign != 0 {
             significand = significand.wrapping_neg();
         }
 
-        let exponent = (exponent as i32).wrapping_sub(const { 127 + 23 });
+        let exponent = exponent as i32 - const { EXPONENT_BIAS + SIGNIFICAND_BITS.cast_signed() };
 
         if exponent >= E {
-            let shift = exponent.wrapping_sub(E) as u32;
+            let shift = exponent.wrapping_sub(E).cast_unsigned();
+            let temp = significand.unbounded_shl(shift);
 
-            if shift >= significand.leading_zeros() | significand.leading_ones() {
+            if temp.unbounded_shr(shift) != significand {
                 return Err(TryFromFloatError::Overflow);
-            } else {
-                significand <<= shift;
             }
-        } else {
-            let shift = E.wrapping_sub(exponent) as u32;
 
-            if shift >= i64::BITS {
+            significand = temp;
+        } else {
+            let shift = E.wrapping_sub(exponent).cast_unsigned();
+
+            if shift > const { SIGNIFICAND_BITS + 1 } {
                 significand = 0;
             } else {
-                significand = significand.wrapping_add(significand >> shift & 0x1);
-                significand = significand.wrapping_add(!(!0 << shift.wrapping_sub(1)));
+                significand += significand >> shift & 0x1;
+                significand += !(!0 << (shift - 1));
                 significand >>= shift;
             }
         }
@@ -203,52 +214,63 @@ impl<const E: i32> I64F<E> {
 
     /// Tries to create a new fixed-point number from [`f64`]. Returns the nearest multiple of 2<sup>E</sup> to `value`, rounded to the number with even least significant digits if `value` is halfway between two multiples of 2<sup>E</sup>. Returns an error if `value` is not a number, less than [`Self::MIN`], or greater than [`Self::MAX`].
     pub const fn try_new_from_f64(value: f64) -> Result<Self, TryFromFloatError> {
+        const EXPONENT_BIAS: i32 = !(!0 << (EXPONENT_BITS - 1));
+        const EXPONENT_BITS: u32 = 11;
+        const EXPONENT_MASK: u64 = !(!0 << EXPONENT_BITS);
+        const EXPONENT_SHIFT: u32 = SIGNIFICAND_BITS;
+        const IMPLICIT_BIT: u64 = 1 << SIGNIFICAND_BITS;
+        const SIGN_SHIFT: u32 = EXPONENT_BITS + SIGNIFICAND_BITS;
+        const SIGNIFICAND_BITS: u32 = 52;
+        const SIGNIFICAND_MASK: u64 = !(!0 << SIGNIFICAND_BITS);
+        const ZERO_MASK: u64 = !(!0 << SIGN_SHIFT);
+
         let bits = value.to_bits();
 
-        if bits & 0x7FFFFFFFFFFFFFFF == 0 {
+        if bits & ZERO_MASK == 0 {
             return Ok(Self { significand: 0 });
         }
 
-        let mut significand = bits & 0xFFFFFFFFFFFFF;
-        let mut exponent = bits >> 52 & 0x7FF;
-        let negative = bits >> 63 != 0;
+        let mut significand = bits & SIGNIFICAND_MASK;
+        let mut exponent = bits >> EXPONENT_SHIFT & EXPONENT_MASK;
+        let sign = bits >> SIGN_SHIFT;
 
-        if exponent == 0x7FF {
+        if exponent == EXPONENT_MASK {
             if significand != 0 {
                 return Err(TryFromFloatError::Nan);
             } else {
                 return Err(TryFromFloatError::Overflow);
             }
         } else if exponent > 0 {
-            significand |= 0x10000000000000;
+            significand |= IMPLICIT_BIT;
         } else {
             exponent = 1;
         }
 
-        let mut significand = significand as i64;
+        let mut significand = significand.cast_signed();
 
-        if negative {
+        if sign != 0 {
             significand = significand.wrapping_neg();
         }
 
-        let exponent = (exponent as i32).wrapping_sub(const { 1023 + 52 });
+        let exponent = exponent as i32 - const { EXPONENT_BIAS + SIGNIFICAND_BITS.cast_signed() };
 
         if exponent >= E {
-            let shift = exponent.wrapping_sub(E) as u32;
+            let shift = exponent.wrapping_sub(E).cast_unsigned();
+            let temp = significand.unbounded_shl(shift);
 
-            if shift >= significand.leading_zeros() | significand.leading_ones() {
+            if temp.unbounded_shr(shift) != significand {
                 return Err(TryFromFloatError::Overflow);
-            } else {
-                significand <<= shift;
             }
-        } else {
-            let shift = E.wrapping_sub(exponent) as u32;
 
-            if shift >= i64::BITS {
+            significand = temp;
+        } else {
+            let shift = E.wrapping_sub(exponent).cast_unsigned();
+
+            if shift > const { SIGNIFICAND_BITS + 1 } {
                 significand = 0;
             } else {
-                significand = significand.wrapping_add(significand >> shift & 0x1);
-                significand = significand.wrapping_add(!(!0 << shift.wrapping_sub(1)));
+                significand += significand >> shift & 0x1;
+                significand += !(!0 << (shift - 1));
                 significand >>= shift;
             }
         }
