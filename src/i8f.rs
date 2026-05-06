@@ -2084,57 +2084,9 @@ impl<const E: i32> I8F<E> {
     #[must_use]
     #[track_caller]
     pub const fn div<const R: i32>(self, rhs: I8F<R>) -> Self {
-        const OFFSET: i32 = i8::BITS.cast_signed() - i16::BITS.cast_signed();
-
-        let (x, overflowed) =
-            ((self.significand as i16) << -OFFSET).overflowing_div(rhs.significand as i16);
-        let negative = (x < 0) != overflowed;
-        let mut x = x as u16;
-
-        if negative {
-            x = x.wrapping_neg();
-        }
-
-        if const { R < OFFSET } {
-            let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
-
-            if cfg!(debug_assertions) && x != 0 && shift > x.leading_zeros() {
-                crate::panic::div();
-            }
-
-            if shift >= u16::BITS {
-                x = 0;
-            } else {
-                x <<= shift;
-            }
-        } else if const { R > OFFSET } {
-            let shift = const { R.wrapping_sub(OFFSET).cast_unsigned() };
-
-            if shift >= u16::BITS {
-                x = 0;
-            } else {
-                let round = const {
-                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
-
-                    !(!0u16).unbounded_shl(shift.wrapping_sub(1))
-                };
-
-                x = x.wrapping_add(x >> shift & 0x1);
-                x = x.wrapping_add(round);
-                x >>= shift;
-            }
-        }
-
-        if cfg!(debug_assertions) && x > i8::MAX as u16 + negative as u16 {
-            crate::panic::div();
-        }
-
-        if negative {
-            x = x.wrapping_neg();
-        }
-
-        Self {
-            significand: x as i8,
+        match self.overflowing_div(rhs) {
+            (_, true) if cfg!(debug_assertions) => crate::panic::div(),
+            (x, _) => x,
         }
     }
 
@@ -2150,181 +2102,18 @@ impl<const E: i32> I8F<E> {
     #[must_use]
     #[track_caller]
     pub const fn strict_div<const R: i32>(self, rhs: I8F<R>) -> Self {
-        const OFFSET: i32 = i8::BITS.cast_signed() - i16::BITS.cast_signed();
-
-        let (x, overflowed) =
-            ((self.significand as i16) << -OFFSET).overflowing_div(rhs.significand as i16);
-        let negative = (x < 0) != overflowed;
-        let mut x = x as u16;
-
-        if negative {
-            x = x.wrapping_neg();
-        }
-
-        if const { R < OFFSET } {
-            let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
-
-            if x != 0 && shift > x.leading_zeros() {
-                crate::panic::div();
-            }
-
-            if shift >= u16::BITS {
-                x = 0;
-            } else {
-                x <<= shift;
-            }
-        } else if const { R > OFFSET } {
-            let shift = const { R.wrapping_sub(OFFSET).cast_unsigned() };
-
-            if shift >= u16::BITS {
-                x = 0;
-            } else {
-                let round = const {
-                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
-
-                    !(!0u16).unbounded_shl(shift.wrapping_sub(1))
-                };
-
-                x = x.wrapping_add(x >> shift & 0x1);
-                x = x.wrapping_add(round);
-                x >>= shift;
-            }
-        }
-
-        if x > (i8::MAX as u16).wrapping_add(negative as u16) {
-            crate::panic::div();
-        }
-
-        if negative {
-            x = x.wrapping_neg();
-        }
-
-        Self {
-            significand: x as i8,
+        match self.overflowing_div(rhs) {
+            (_, true) => crate::panic::div(),
+            (x, _) => x,
         }
     }
 
-    /// Computes `self / rhs`, wrapping around at the numeric bounds of the type.
-    ///
-    /// # Panics
-    ///
-    /// This function will panic if `rhs == 0`.
+    /// Computes `self / rhs`, returning `None` if `rhs == 0` or overflow occurred.
     #[must_use]
-    #[track_caller]
-    pub const fn wrapping_div<const R: i32>(self, rhs: I8F<R>) -> Self {
-        const OFFSET: i32 = i8::BITS.cast_signed() - i16::BITS.cast_signed();
-
-        let (x, overflowed) =
-            ((self.significand as i16) << -OFFSET).overflowing_div(rhs.significand as i16);
-        let negative = (x < 0) != overflowed;
-        let mut x = x as u16;
-
-        if negative {
-            x = x.wrapping_neg();
-        }
-
-        if const { R < OFFSET } {
-            let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
-
-            if shift >= u16::BITS {
-                x = 0;
-            } else {
-                x <<= shift;
-            }
-        } else if const { R > OFFSET } {
-            let shift = const { R.wrapping_sub(OFFSET).cast_unsigned() };
-
-            if shift >= u16::BITS {
-                x = 0;
-            } else {
-                let round = const {
-                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
-
-                    !(!0u16).unbounded_shl(shift.wrapping_sub(1))
-                };
-
-                x = x.wrapping_add(x >> shift & 0x1);
-                x = x.wrapping_add(round);
-                x >>= shift;
-            }
-        }
-
-        if negative {
-            x = x.wrapping_neg();
-        }
-
-        Self {
-            significand: x as i8,
-        }
-    }
-
-    /// Computes `self / rhs`, saturating at the numeric bounds of the type instead of overflowing.
-    ///
-    /// # Panics
-    ///
-    /// This function will panic if `rhs == 0`.
-    #[must_use]
-    #[track_caller]
-    pub const fn saturating_div<const R: i32>(self, rhs: I8F<R>) -> Self {
-        const OFFSET: i32 = i8::BITS.cast_signed() - i16::BITS.cast_signed();
-
-        let (x, overflowed) =
-            ((self.significand as i16) << -OFFSET).overflowing_div(rhs.significand as i16);
-        let negative = (x < 0) != overflowed;
-        let mut x = x as u16;
-
-        if negative {
-            x = x.wrapping_neg();
-        }
-
-        if const { R < OFFSET } {
-            let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
-
-            if x != 0 && shift > x.leading_zeros() {
-                if negative {
-                    return Self::MIN;
-                } else {
-                    return Self::MAX;
-                }
-            }
-
-            if shift >= u16::BITS {
-                x = 0;
-            } else {
-                x <<= shift;
-            }
-        } else if const { R > OFFSET } {
-            let shift = const { R.wrapping_sub(OFFSET).cast_unsigned() };
-
-            if shift >= u16::BITS {
-                x = 0;
-            } else {
-                let round = const {
-                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
-
-                    !(!0u16).unbounded_shl(shift.wrapping_sub(1))
-                };
-
-                x = x.wrapping_add(x >> shift & 0x1);
-                x = x.wrapping_add(round);
-                x >>= shift;
-            }
-        }
-
-        if x > (i8::MAX as u16).wrapping_add(negative as u16) {
-            if negative {
-                return Self::MIN;
-            } else {
-                return Self::MAX;
-            }
-        }
-
-        if negative {
-            x = x.wrapping_neg();
-        }
-
-        Self {
-            significand: x as i8,
+    pub const fn checked_div<const R: i32>(self, rhs: I8F<R>) -> Option<Self> {
+        match self.overflowing_div(rhs) {
+            (_, true) => None,
+            (x, _) => Some(x),
         }
     }
 
@@ -2390,65 +2179,35 @@ impl<const E: i32> I8F<E> {
         )
     }
 
-    /// Computes `self / rhs`, returning `None` if `rhs == 0` or overflow occurred.
+    /// Computes `self / rhs`, wrapping around at the numeric bounds of the type.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if `rhs == 0`.
     #[must_use]
-    pub const fn checked_div<const R: i32>(self, rhs: I8F<R>) -> Option<Self> {
-        const OFFSET: i32 = i8::BITS.cast_signed() - i16::BITS.cast_signed();
+    #[track_caller]
+    pub const fn wrapping_div<const R: i32>(self, rhs: I8F<R>) -> Self {
+        self.overflowing_div(rhs).0
+    }
 
-        if rhs.significand == 0 {
-            return None;
-        }
-
-        let (x, overflowed) =
-            ((self.significand as i16) << -OFFSET).overflowing_div(rhs.significand as i16);
-        let negative = (x < 0) != overflowed;
-        let mut x = x as u16;
-
-        if negative {
-            x = x.wrapping_neg();
-        }
-
-        if const { R < OFFSET } {
-            let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
-
-            if x != 0 && shift > x.leading_zeros() {
-                return None;
+    /// Computes `self / rhs`, saturating at the numeric bounds of the type instead of overflowing.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if `rhs == 0`.
+    #[must_use]
+    #[track_caller]
+    pub const fn saturating_div<const R: i32>(self, rhs: I8F<R>) -> Self {
+        match self.overflowing_div(rhs) {
+            (_, true) => {
+                if self.significand.is_negative() != rhs.significand.is_negative() {
+                    Self::MIN
+                } else {
+                    Self::MAX
+                }
             }
-
-            if shift >= u16::BITS {
-                x = 0;
-            } else {
-                x <<= shift;
-            }
-        } else if const { R > OFFSET } {
-            let shift = const { R.wrapping_sub(OFFSET).cast_unsigned() };
-
-            if shift >= u16::BITS {
-                x = 0;
-            } else {
-                let round = const {
-                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
-
-                    !(!0u16).unbounded_shl(shift.wrapping_sub(1))
-                };
-
-                x = x.wrapping_add(x >> shift & 0x1);
-                x = x.wrapping_add(round);
-                x >>= shift;
-            }
+            (x, _) => x,
         }
-
-        if x > (i8::MAX as u16).wrapping_add(negative as u16) {
-            return None;
-        }
-
-        if negative {
-            x = x.wrapping_neg();
-        }
-
-        Some(Self {
-            significand: x as i8,
-        })
     }
 
     /// Computes `self / rhs`, panicking if overflow occurred.
@@ -2463,46 +2222,9 @@ impl<const E: i32> I8F<E> {
     #[must_use]
     #[track_caller]
     pub const fn div_unsigned<const R: i32>(self, rhs: U8F<R>) -> Self {
-        const OFFSET: i32 = i8::BITS.cast_signed() - i16::BITS.cast_signed();
-
-        let mut x = ((self.significand as i16) << -OFFSET) / rhs.significand as i16;
-
-        if const { R < OFFSET } {
-            let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
-
-            if cfg!(debug_assertions) && x != 0 && shift > x.leading_zeros() | x.leading_ones() {
-                crate::panic::div();
-            }
-
-            if shift >= u16::BITS {
-                x = 0;
-            } else {
-                x <<= shift;
-            }
-        } else if const { R > OFFSET } {
-            let shift = const { R.wrapping_sub(OFFSET).cast_unsigned() };
-
-            if shift >= u16::BITS {
-                x = 0;
-            } else {
-                let round = const {
-                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
-
-                    !(!0i16).unbounded_shl(shift.wrapping_sub(1))
-                };
-
-                x = x.wrapping_add(x >> shift & 0x1);
-                x = x.wrapping_add(round);
-                x >>= shift;
-            }
-        }
-
-        if cfg!(debug_assertions) && (x < i8::MIN as i16 || x > i8::MAX as i16) {
-            crate::panic::div();
-        }
-
-        Self {
-            significand: x as i8,
+        match self.overflowing_div_unsigned(rhs) {
+            (_, true) if cfg!(debug_assertions) => crate::panic::div(),
+            (x, _) => x,
         }
     }
 
@@ -2518,146 +2240,18 @@ impl<const E: i32> I8F<E> {
     #[must_use]
     #[track_caller]
     pub const fn strict_div_unsigned<const R: i32>(self, rhs: U8F<R>) -> Self {
-        const OFFSET: i32 = i8::BITS.cast_signed() - i16::BITS.cast_signed();
-
-        let mut x = ((self.significand as i16) << -OFFSET) / rhs.significand as i16;
-
-        if const { R < OFFSET } {
-            let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
-
-            if x != 0 && shift > x.leading_zeros() | x.leading_ones() {
-                crate::panic::div();
-            }
-
-            if shift >= u16::BITS {
-                x = 0;
-            } else {
-                x <<= shift;
-            }
-        } else if const { R > OFFSET } {
-            let shift = const { R.wrapping_sub(OFFSET).cast_unsigned() };
-
-            if shift >= u16::BITS {
-                x = 0;
-            } else {
-                let round = const {
-                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
-
-                    !(!0i16).unbounded_shl(shift.wrapping_sub(1))
-                };
-
-                x = x.wrapping_add(x >> shift & 0x1);
-                x = x.wrapping_add(round);
-                x >>= shift;
-            }
-        }
-
-        if x < i8::MIN as i16 || x > i8::MAX as i16 {
-            crate::panic::div();
-        }
-
-        Self {
-            significand: x as i8,
+        match self.overflowing_div_unsigned(rhs) {
+            (_, true) => crate::panic::div(),
+            (x, _) => x,
         }
     }
 
-    /// Computes `self / rhs`, wrapping around at the numeric bounds of the type.
-    ///
-    /// # Panics
-    ///
-    /// This function will panic if `rhs == 0`.
+    /// Computes `self / rhs`, returning `None` if `rhs == 0` or overflow occurred.
     #[must_use]
-    #[track_caller]
-    pub const fn wrapping_div_unsigned<const R: i32>(self, rhs: U8F<R>) -> Self {
-        const OFFSET: i32 = i8::BITS.cast_signed() - i16::BITS.cast_signed();
-
-        let mut x = ((self.significand as i16) << -OFFSET) / rhs.significand as i16;
-
-        if const { R < OFFSET } {
-            let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
-
-            if shift >= u16::BITS {
-                x = 0;
-            } else {
-                x <<= shift;
-            }
-        } else if const { R > OFFSET } {
-            let shift = const { R.wrapping_sub(OFFSET).cast_unsigned() };
-
-            if shift >= u16::BITS {
-                x = 0;
-            } else {
-                let round = const {
-                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
-
-                    !(!0i16).unbounded_shl(shift.wrapping_sub(1))
-                };
-
-                x = x.wrapping_add(x >> shift & 0x1);
-                x = x.wrapping_add(round);
-                x >>= shift;
-            }
-        }
-
-        Self {
-            significand: x as i8,
-        }
-    }
-
-    /// Computes `self / rhs`, saturating at the numeric bounds of the type instead of overflowing.
-    ///
-    /// # Panics
-    ///
-    /// This function will panic if `rhs == 0`.
-    #[must_use]
-    #[track_caller]
-    pub const fn saturating_div_unsigned<const R: i32>(self, rhs: U8F<R>) -> Self {
-        const OFFSET: i32 = i8::BITS.cast_signed() - i16::BITS.cast_signed();
-
-        let mut x = ((self.significand as i16) << -OFFSET) / rhs.significand as i16;
-
-        if const { R < OFFSET } {
-            let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
-
-            if x != 0 && shift > x.leading_zeros() | x.leading_ones() {
-                if x < 0 {
-                    return Self::MIN;
-                } else {
-                    return Self::MAX;
-                }
-            }
-
-            if shift >= u16::BITS {
-                x = 0;
-            } else {
-                x <<= shift;
-            }
-        } else if const { R > OFFSET } {
-            let shift = const { R.wrapping_sub(OFFSET).cast_unsigned() };
-
-            if shift >= u16::BITS {
-                x = 0;
-            } else {
-                let round = const {
-                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
-
-                    !(!0i16).unbounded_shl(shift.wrapping_sub(1))
-                };
-
-                x = x.wrapping_add(x >> shift & 0x1);
-                x = x.wrapping_add(round);
-                x >>= shift;
-            }
-        }
-
-        if x < i8::MIN as i16 {
-            return Self::MIN;
-        } else if x > i8::MAX as i16 {
-            return Self::MAX;
-        }
-
-        Self {
-            significand: x as i8,
+    pub const fn checked_div_unsigned<const R: i32>(self, rhs: U8F<R>) -> Option<Self> {
+        match self.overflowing_div_unsigned(rhs) {
+            (_, true) => None,
+            (x, _) => Some(x),
         }
     }
 
@@ -2712,54 +2306,35 @@ impl<const E: i32> I8F<E> {
         )
     }
 
-    /// Computes `self / rhs`, returning `None` if `rhs == 0` or overflow occurred.
+    /// Computes `self / rhs`, wrapping around at the numeric bounds of the type.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if `rhs == 0`.
     #[must_use]
-    pub const fn checked_div_unsigned<const R: i32>(self, rhs: U8F<R>) -> Option<Self> {
-        const OFFSET: i32 = i8::BITS.cast_signed() - i16::BITS.cast_signed();
+    #[track_caller]
+    pub const fn wrapping_div_unsigned<const R: i32>(self, rhs: U8F<R>) -> Self {
+        self.overflowing_div_unsigned(rhs).0
+    }
 
-        if rhs.significand == 0 {
-            return None;
-        }
-
-        let mut x = ((self.significand as i16) << -OFFSET) / rhs.significand as i16;
-
-        if const { R < OFFSET } {
-            let shift = const { OFFSET.wrapping_sub(R).cast_unsigned() };
-
-            if x != 0 && shift > x.leading_zeros() | x.leading_ones() {
-                return None;
+    /// Computes `self / rhs`, saturating at the numeric bounds of the type instead of overflowing.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if `rhs == 0`.
+    #[must_use]
+    #[track_caller]
+    pub const fn saturating_div_unsigned<const R: i32>(self, rhs: U8F<R>) -> Self {
+        match self.overflowing_div_unsigned(rhs) {
+            (_, true) => {
+                if self.significand.is_negative() {
+                    Self::MIN
+                } else {
+                    Self::MAX
+                }
             }
-
-            if shift >= u16::BITS {
-                x = 0;
-            } else {
-                x <<= shift;
-            }
-        } else if const { R > OFFSET } {
-            let shift = const { R.wrapping_sub(OFFSET).cast_unsigned() };
-
-            if shift >= u16::BITS {
-                x = 0;
-            } else {
-                let round = const {
-                    let shift = R.wrapping_sub(OFFSET).cast_unsigned();
-
-                    !(!0i16).unbounded_shl(shift.wrapping_sub(1))
-                };
-
-                x = x.wrapping_add(x >> shift & 0x1);
-                x = x.wrapping_add(round);
-                x >>= shift;
-            }
+            (x, _) => x,
         }
-
-        if x < i8::MIN as i16 || x > i8::MAX as i16 {
-            return None;
-        }
-
-        Some(Self {
-            significand: x as i8,
-        })
     }
 }
 
