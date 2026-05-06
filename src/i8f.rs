@@ -1910,44 +1910,9 @@ impl<const E: i32> I8F<E> {
     #[must_use]
     #[track_caller]
     pub const fn mul<const R: i32>(self, rhs: I8F<R>) -> Self {
-        let mut x = (self.significand as i16).wrapping_mul(rhs.significand as i16);
-
-        if const { R > 0 } {
-            let shift = const { R.cast_unsigned() };
-
-            if cfg!(debug_assertions) && x != 0 && shift >= x.leading_zeros() | x.leading_ones() {
-                crate::panic::mul();
-            }
-
-            if shift >= i16::BITS {
-                x = 0;
-            } else {
-                x <<= shift;
-            }
-        } else if const { R < 0 } {
-            let shift = const { R.wrapping_neg().cast_unsigned() };
-
-            if shift >= i16::BITS {
-                x = 0;
-            } else {
-                let round = const {
-                    let shift = R.wrapping_neg().cast_unsigned();
-
-                    !(!0i16).unbounded_shl(shift.wrapping_sub(1))
-                };
-
-                x = x.wrapping_add(x >> shift & 0x1);
-                x = x.wrapping_add(round);
-                x >>= shift;
-            }
-        }
-
-        if cfg!(debug_assertions) && (x < i8::MIN as i16 || x > i8::MAX as i16) {
-            crate::panic::mul();
-        }
-
-        Self {
-            significand: x as i8,
+        match self.overflowing_mul(rhs) {
+            (_, true) if cfg!(debug_assertions) => crate::panic::mul(),
+            (x, _) => x,
         }
     }
 
@@ -1959,219 +1924,69 @@ impl<const E: i32> I8F<E> {
     #[must_use]
     #[track_caller]
     pub const fn strict_mul<const R: i32>(self, rhs: I8F<R>) -> Self {
-        let mut x = (self.significand as i16).wrapping_mul(rhs.significand as i16);
-
-        if const { R > 0 } {
-            let shift = const { R.cast_unsigned() };
-
-            if x != 0 && shift >= x.leading_zeros() | x.leading_ones() {
-                crate::panic::mul();
-            }
-
-            if shift >= i16::BITS {
-                x = 0;
-            } else {
-                x <<= shift;
-            }
-        } else if const { R < 0 } {
-            let shift = const { R.wrapping_neg().cast_unsigned() };
-
-            if shift >= i16::BITS {
-                x = 0;
-            } else {
-                let round = const {
-                    let shift = R.wrapping_neg().cast_unsigned();
-
-                    !(!0i16).unbounded_shl(shift.wrapping_sub(1))
-                };
-
-                x = x.wrapping_add(x >> shift & 0x1);
-                x = x.wrapping_add(round);
-                x >>= shift;
-            }
-        }
-
-        if x < i8::MIN as i16 || x > i8::MAX as i16 {
-            crate::panic::mul();
-        }
-
-        Self {
-            significand: x as i8,
+        match self.overflowing_mul(rhs) {
+            (_, true) => crate::panic::mul(),
+            (x, _) => x,
         }
     }
 
-    /// Computes `self * rhs`, wrapping around at the numeric bounds of the type.
+    /// Computes `self * rhs`, returning `None` if overflow occurred.
     #[must_use]
-    pub const fn wrapping_mul<const R: i32>(self, rhs: I8F<R>) -> Self {
-        let mut x = (self.significand as i16).wrapping_mul(rhs.significand as i16);
-
-        if const { R > 0 } {
-            let shift = const { R.cast_unsigned() };
-
-            if shift >= i16::BITS {
-                x = 0;
-            } else {
-                x <<= shift;
-            }
-        } else if const { R < 0 } {
-            let shift = const { R.wrapping_neg().cast_unsigned() };
-
-            if shift >= i16::BITS {
-                x = 0;
-            } else {
-                let round = const {
-                    let shift = R.wrapping_neg().cast_unsigned();
-
-                    !(!0i16).unbounded_shl(shift.wrapping_sub(1))
-                };
-
-                x = x.wrapping_add(x >> shift & 0x1);
-                x = x.wrapping_add(round);
-                x >>= shift;
-            }
-        }
-
-        Self {
-            significand: x as i8,
-        }
-    }
-
-    /// Computes `self * rhs`, saturating at the numeric bounds of the type instead of overflowing.
-    #[must_use]
-    pub const fn saturating_mul<const R: i32>(self, rhs: I8F<R>) -> Self {
-        let mut x = (self.significand as i16).wrapping_mul(rhs.significand as i16);
-
-        if const { R > 0 } {
-            let shift = const { R.cast_unsigned() };
-
-            if x != 0 && shift >= x.leading_zeros() | x.leading_ones() {
-                if x < 0 {
-                    return Self::MIN;
-                } else {
-                    return Self::MAX;
-                }
-            }
-
-            if shift >= i16::BITS {
-                x = 0;
-            } else {
-                x <<= shift;
-            }
-        } else if const { R < 0 } {
-            let shift = const { R.wrapping_neg().cast_unsigned() };
-
-            if shift >= i16::BITS {
-                x = 0;
-            } else {
-                let round = const {
-                    let shift = R.wrapping_neg().cast_unsigned();
-
-                    !(!0i16).unbounded_shl(shift.wrapping_sub(1))
-                };
-
-                x = x.wrapping_add(x >> shift & 0x1);
-                x = x.wrapping_add(round);
-                x >>= shift;
-            }
-        }
-
-        if x < i8::MIN as i16 {
-            return Self::MIN;
-        } else if x > i8::MAX as i16 {
-            return Self::MAX;
-        }
-
-        Self {
-            significand: x as i8,
+    pub const fn checked_mul<const R: i32>(self, rhs: I8F<R>) -> Option<Self> {
+        match self.overflowing_mul(rhs) {
+            (_, true) => None,
+            (x, _) => Some(x),
         }
     }
 
     /// Computes `self * rhs`. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
     #[must_use]
     pub const fn overflowing_mul<const R: i32>(self, rhs: I8F<R>) -> (Self, bool) {
-        let mut x = (self.significand as i16).wrapping_mul(rhs.significand as i16);
+        let mut significand = self.significand as i16 * rhs.significand as i16;
         let mut overflowed = false;
 
-        if const { R > 0 } {
-            let shift = const { R.cast_unsigned() };
-
-            overflowed |= x != 0 && shift >= x.leading_zeros() | x.leading_ones();
-
-            if shift >= i16::BITS {
-                x = 0;
-            } else {
-                x <<= shift;
-            }
-        } else if const { R < 0 } {
-            let shift = const { R.wrapping_neg().cast_unsigned() };
+        if R >= 0 {
+            let shift = R.cast_unsigned();
+            let temp = significand.unbounded_shl(shift);
+            overflowed |= temp.unbounded_shr(shift) != significand;
+            significand = temp;
+        } else {
+            let shift = R.wrapping_neg().cast_unsigned();
 
             if shift >= i16::BITS {
-                x = 0;
+                significand = 0;
             } else {
-                let round = const {
-                    let shift = R.wrapping_neg().cast_unsigned();
-
-                    !(!0i16).unbounded_shl(shift.wrapping_sub(1))
-                };
-
-                x = x.wrapping_add(x >> shift & 0x1);
-                x = x.wrapping_add(round);
-                x >>= shift;
+                significand += significand >> shift & 0x1;
+                significand += !(!0 << (shift - 1));
+                significand >>= shift;
             }
         }
 
-        overflowed |= x < i8::MIN as i16 || x > i8::MAX as i16;
+        overflowed |= significand < i8::MIN as i16 || significand > i8::MAX as i16;
+        let significand = significand as i8;
 
-        (
-            Self {
-                significand: x as i8,
-            },
-            overflowed,
-        )
+        (Self { significand }, overflowed)
     }
 
-    /// Computes `self * rhs`, returning `None` if overflow occurred.
+    /// Computes `self * rhs`, wrapping around at the numeric bounds of the type.
     #[must_use]
-    pub const fn checked_mul<const R: i32>(self, rhs: I8F<R>) -> Option<Self> {
-        let mut x = (self.significand as i16).wrapping_mul(rhs.significand as i16);
+    pub const fn wrapping_mul<const R: i32>(self, rhs: I8F<R>) -> Self {
+        self.overflowing_mul(rhs).0
+    }
 
-        if const { R > 0 } {
-            let shift = const { R.cast_unsigned() };
-
-            if x != 0 && shift >= x.leading_zeros() | x.leading_ones() {
-                return None;
+    /// Computes `self * rhs`, saturating at the numeric bounds of the type instead of overflowing.
+    #[must_use]
+    pub const fn saturating_mul<const R: i32>(self, rhs: I8F<R>) -> Self {
+        match self.overflowing_mul(rhs) {
+            (_, true) => {
+                if self.significand.is_negative() != rhs.significand.is_negative() {
+                    Self::MIN
+                } else {
+                    Self::MAX
+                }
             }
-
-            if shift >= i16::BITS {
-                x = 0;
-            } else {
-                x <<= shift;
-            }
-        } else if const { R < 0 } {
-            let shift = const { R.wrapping_neg().cast_unsigned() };
-
-            if shift >= i16::BITS {
-                x = 0;
-            } else {
-                let round = const {
-                    let shift = R.wrapping_neg().cast_unsigned();
-
-                    !(!0i16).unbounded_shl(shift.wrapping_sub(1))
-                };
-
-                x = x.wrapping_add(x >> shift & 0x1);
-                x = x.wrapping_add(round);
-                x >>= shift;
-            }
+            (x, _) => x,
         }
-
-        if x < i8::MIN as i16 || x > i8::MAX as i16 {
-            return None;
-        }
-
-        Some(Self {
-            significand: x as i8,
-        })
     }
 
     /// Computes `self * rhs`, panicking if overflow occurred.
@@ -2182,52 +1997,9 @@ impl<const E: i32> I8F<E> {
     #[must_use]
     #[track_caller]
     pub const fn mul_unsigned<const R: i32>(self, rhs: U8F<R>) -> Self {
-        let mut x = (self.significand as i16).wrapping_mul(rhs.significand as i16);
-
-        if const { R > 0 } {
-            let shift = const { R.cast_unsigned() };
-
-            if cfg!(debug_assertions) && x != 0 && shift >= x.leading_zeros() | x.leading_ones() {
-                crate::panic::mul();
-            }
-
-            if shift >= i16::BITS {
-                x = 0;
-            } else {
-                x <<= shift;
-            }
-        } else if const { R < 0 } {
-            let shift = const { R.wrapping_neg().cast_unsigned() };
-
-            if shift >= i16::BITS {
-                x = 0;
-            } else {
-                let mask = const {
-                    let shift = R.wrapping_neg().cast_unsigned();
-
-                    !(!0u16).unbounded_shl(shift)
-                };
-                let round = const {
-                    let shift = R.wrapping_neg().cast_unsigned();
-
-                    !(!0u16).unbounded_shl(shift.wrapping_sub(1))
-                };
-
-                let mut temp = x as u16;
-                temp = (temp & mask).wrapping_add(temp >> shift & 0x1);
-                temp = temp.wrapping_add(round);
-                temp >>= shift;
-                x >>= shift;
-                x = x.wrapping_add_unsigned(temp);
-            }
-        }
-
-        if cfg!(debug_assertions) && (x < i8::MIN as i16 || x > i8::MAX as i16) {
-            crate::panic::mul();
-        }
-
-        Self {
-            significand: x as i8,
+        match self.overflowing_mul_unsigned(rhs) {
+            (_, true) if cfg!(debug_assertions) => crate::panic::mul(),
+            (x, _) => x,
         }
     }
 
@@ -2239,259 +2011,73 @@ impl<const E: i32> I8F<E> {
     #[must_use]
     #[track_caller]
     pub const fn strict_mul_unsigned<const R: i32>(self, rhs: U8F<R>) -> Self {
-        let mut x = (self.significand as i16).wrapping_mul(rhs.significand as i16);
-
-        if const { R > 0 } {
-            let shift = const { R.cast_unsigned() };
-
-            if x != 0 && shift >= x.leading_zeros() | x.leading_ones() {
-                crate::panic::mul();
-            }
-
-            if shift >= i16::BITS {
-                x = 0;
-            } else {
-                x <<= shift;
-            }
-        } else if const { R < 0 } {
-            let shift = const { R.wrapping_neg().cast_unsigned() };
-
-            if shift >= i16::BITS {
-                x = 0;
-            } else {
-                let mask = const {
-                    let shift = R.wrapping_neg().cast_unsigned();
-
-                    !(!0u16).unbounded_shl(shift)
-                };
-                let round = const {
-                    let shift = R.wrapping_neg().cast_unsigned();
-
-                    !(!0u16).unbounded_shl(shift.wrapping_sub(1))
-                };
-
-                let mut temp = x as u16;
-                temp = (temp & mask).wrapping_add(temp >> shift & 0x1);
-                temp = temp.wrapping_add(round);
-                temp >>= shift;
-                x >>= shift;
-                x = x.wrapping_add_unsigned(temp);
-            }
-        }
-
-        if x < i8::MIN as i16 || x > i8::MAX as i16 {
-            crate::panic::mul();
-        }
-
-        Self {
-            significand: x as i8,
+        match self.overflowing_mul_unsigned(rhs) {
+            (_, true) => crate::panic::mul(),
+            (x, _) => x,
         }
     }
 
-    /// Computes `self * rhs`, wrapping around at the numeric bounds of the type.
+    /// Computes `self * rhs`, returning `None` if overflow occurred.
     #[must_use]
-    pub const fn wrapping_mul_unsigned<const R: i32>(self, rhs: U8F<R>) -> Self {
-        let mut x = (self.significand as i16).wrapping_mul(rhs.significand as i16);
-
-        if const { R > 0 } {
-            let shift = const { R.cast_unsigned() };
-
-            if shift >= i16::BITS {
-                x = 0;
-            } else {
-                x <<= shift;
-            }
-        } else if const { R < 0 } {
-            let shift = const { R.wrapping_neg().cast_unsigned() };
-
-            if shift >= i16::BITS {
-                x = 0;
-            } else {
-                let mask = const {
-                    let shift = R.wrapping_neg().cast_unsigned();
-
-                    !(!0u16).unbounded_shl(shift)
-                };
-                let round = const {
-                    let shift = R.wrapping_neg().cast_unsigned();
-
-                    !(!0u16).unbounded_shl(shift.wrapping_sub(1))
-                };
-
-                let mut temp = x as u16;
-                temp = (temp & mask).wrapping_add(temp >> shift & 0x1);
-                temp = temp.wrapping_add(round);
-                temp >>= shift;
-                x >>= shift;
-                x = x.wrapping_add_unsigned(temp);
-            }
-        }
-
-        Self {
-            significand: x as i8,
-        }
-    }
-
-    /// Computes `self * rhs`, saturating at the numeric bounds of the type instead of overflowing.
-    #[must_use]
-    pub const fn saturating_mul_unsigned<const R: i32>(self, rhs: U8F<R>) -> Self {
-        let mut x = (self.significand as i16).wrapping_mul(rhs.significand as i16);
-
-        if const { R > 0 } {
-            let shift = const { R.cast_unsigned() };
-
-            if x != 0 && shift >= x.leading_zeros() | x.leading_ones() {
-                if x < 0 {
-                    return Self::MIN;
-                } else {
-                    return Self::MAX;
-                }
-            }
-
-            if shift >= i16::BITS {
-                x = 0;
-            } else {
-                x <<= shift;
-            }
-        } else if const { R < 0 } {
-            let shift = const { R.wrapping_neg().cast_unsigned() };
-
-            if shift >= i16::BITS {
-                x = 0;
-            } else {
-                let mask = const {
-                    let shift = R.wrapping_neg().cast_unsigned();
-
-                    !(!0u16).unbounded_shl(shift)
-                };
-                let round = const {
-                    let shift = R.wrapping_neg().cast_unsigned();
-
-                    !(!0u16).unbounded_shl(shift.wrapping_sub(1))
-                };
-
-                let mut temp = x as u16;
-                temp = (temp & mask).wrapping_add(temp >> shift & 0x1);
-                temp = temp.wrapping_add(round);
-                temp >>= shift;
-                x >>= shift;
-                x = x.wrapping_add_unsigned(temp);
-            }
-        }
-
-        if x < i8::MIN as i16 {
-            return Self::MIN;
-        } else if x > i8::MAX as i16 {
-            return Self::MAX;
-        }
-
-        Self {
-            significand: x as i8,
+    pub const fn checked_mul_unsigned<const R: i32>(self, rhs: U8F<R>) -> Option<Self> {
+        match self.overflowing_mul_unsigned(rhs) {
+            (_, true) => None,
+            (x, _) => Some(x),
         }
     }
 
     /// Computes `self * rhs`. Returns a tuple of the wrapping result and a boolean indicating whether overflow occurred.
     #[must_use]
     pub const fn overflowing_mul_unsigned<const R: i32>(self, rhs: U8F<R>) -> (Self, bool) {
-        let mut x = (self.significand as i16).wrapping_mul(rhs.significand as i16);
+        let mut significand = self.significand as i16 * rhs.significand as i16;
         let mut overflowed = false;
 
-        if const { R > 0 } {
-            let shift = const { R.cast_unsigned() };
-
-            overflowed |= x != 0 && shift >= x.leading_zeros() | x.leading_ones();
-
-            if shift >= i16::BITS {
-                x = 0;
-            } else {
-                x <<= shift;
-            }
-        } else if const { R < 0 } {
-            let shift = const { R.wrapping_neg().cast_unsigned() };
+        if R >= 0 {
+            let shift = R.cast_unsigned();
+            let temp = significand.unbounded_shl(shift);
+            overflowed |= temp.unbounded_shr(shift) != significand;
+            significand = temp;
+        } else {
+            let shift = R.wrapping_neg().cast_unsigned();
 
             if shift >= i16::BITS {
-                x = 0;
+                significand = 0;
             } else {
-                let mask = const {
-                    let shift = R.wrapping_neg().cast_unsigned();
-
-                    !(!0u16).unbounded_shl(shift)
-                };
-                let round = const {
-                    let shift = R.wrapping_neg().cast_unsigned();
-
-                    !(!0u16).unbounded_shl(shift.wrapping_sub(1))
-                };
-
-                let mut temp = x as u16;
-                temp = (temp & mask).wrapping_add(temp >> shift & 0x1);
-                temp = temp.wrapping_add(round);
+                let mut temp = significand.cast_unsigned();
+                let mask = !(!0 << shift);
+                let round = !(!0 << (shift - 1));
+                temp = (temp & mask) + round + (temp >> shift & 0x1);
                 temp >>= shift;
-                x >>= shift;
-                x = x.wrapping_add_unsigned(temp);
+                significand >>= shift;
+                significand += temp.cast_signed();
             }
         }
 
-        overflowed |= x < i8::MIN as i16 || x > i8::MAX as i16;
+        overflowed |= significand < i8::MIN as i16 || significand > i8::MAX as i16;
+        let significand = significand as i8;
 
-        (
-            Self {
-                significand: x as i8,
-            },
-            overflowed,
-        )
+        (Self { significand }, overflowed)
     }
 
-    /// Computes `self * rhs`, returning `None` if overflow occurred.
+    /// Computes `self * rhs`, wrapping around at the numeric bounds of the type.
     #[must_use]
-    pub const fn checked_mul_unsigned<const R: i32>(self, rhs: U8F<R>) -> Option<Self> {
-        let mut x = (self.significand as i16).wrapping_mul(rhs.significand as i16);
+    pub const fn wrapping_mul_unsigned<const R: i32>(self, rhs: U8F<R>) -> Self {
+        self.overflowing_mul_unsigned(rhs).0
+    }
 
-        if const { R > 0 } {
-            let shift = const { R.cast_unsigned() };
-
-            if x != 0 && shift >= x.leading_zeros() | x.leading_ones() {
-                return None;
+    /// Computes `self * rhs`, saturating at the numeric bounds of the type instead of overflowing.
+    #[must_use]
+    pub const fn saturating_mul_unsigned<const R: i32>(self, rhs: U8F<R>) -> Self {
+        match self.overflowing_mul_unsigned(rhs) {
+            (_, true) => {
+                if self.significand.is_negative() {
+                    Self::MIN
+                } else {
+                    Self::MAX
+                }
             }
-
-            if shift >= i16::BITS {
-                x = 0;
-            } else {
-                x <<= shift;
-            }
-        } else if const { R < 0 } {
-            let shift = const { R.wrapping_neg().cast_unsigned() };
-
-            if shift >= i16::BITS {
-                x = 0;
-            } else {
-                let mask = const {
-                    let shift = R.wrapping_neg().cast_unsigned();
-
-                    !(!0u16).unbounded_shl(shift)
-                };
-                let round = const {
-                    let shift = R.wrapping_neg().cast_unsigned();
-
-                    !(!0u16).unbounded_shl(shift.wrapping_sub(1))
-                };
-
-                let mut temp = x as u16;
-                temp = (temp & mask).wrapping_add(temp >> shift & 0x1);
-                temp = temp.wrapping_add(round);
-                temp >>= shift;
-                x >>= shift;
-                x = x.wrapping_add_unsigned(temp);
-            }
+            (x, _) => x,
         }
-
-        if x < i8::MIN as i16 || x > i8::MAX as i16 {
-            return None;
-        }
-
-        Some(Self {
-            significand: x as i8,
-        })
     }
 
     #[doc(hidden)]
